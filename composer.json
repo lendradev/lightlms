@@ -1,10 +1,10 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "lightlms/lms",
+    "name": "lendradev/lightlms",
     "type": "project",
     "description": "LightLMS - a modern, self-hosted open-source Learning Management System built with Laravel, Inertia.js and React.",
     "keywords": ["lms", "laravel", "inertia", "react", "learning", "education"],
-    "homepage": "https://github.com/lightlms/lightlms",
+    "homepage": "https://github.com/lendradev/lightlms",
     "license": "MIT",
     "require": {
         "php": "^8.3",

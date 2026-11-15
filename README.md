@@ -112,7 +112,7 @@ LightLMS takes the middle path:
 ### Install
 
 ```bash
-git clone https://github.com/lightlms/lightlms.git
+git clone https://github.com/lendradev/lightlms.git
 cd lightlms
 
 composer install

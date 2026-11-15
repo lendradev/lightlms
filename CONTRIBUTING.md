@@ -16,7 +16,7 @@ acceptable in issues, pull requests, or discussions.
 You need PHP 8.3+, Composer 2, and Node.js 22+.
 
 ```bash
-git clone https://github.com/lightlms/lightlms.git
+git clone https://github.com/lendradev/lightlms.git
 cd lightlms
 composer install
 npm install
