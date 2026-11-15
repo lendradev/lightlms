@@ -3,6 +3,8 @@
 node_modules
 vendor
 tests
+public/build
+public/hot
 storage/logs/*
 storage/framework/cache/*
 storage/framework/sessions/*
