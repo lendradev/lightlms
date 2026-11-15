@@ -1,0 +1,125 @@
+@import 'tailwindcss';
+
+@import '@fontsource-variable/inter';
+@import '@fontsource-variable/source-serif-4';
+@import '@fontsource-variable/jetbrains-mono';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+
+@theme {
+    --font-sans:
+        'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+        sans-serif;
+    --font-serif: 'Source Serif 4', ui-serif, Georgia, Cambria, 'Times New Roman', serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+    /* Brand — a calm, confident crimson used sparingly (MIT OCW heritage). */
+    --color-brand-50: oklch(97.2% 0.012 20);
+    --color-brand-100: oklch(94.4% 0.028 22);
+    --color-brand-200: oklch(88.6% 0.058 24);
+    --color-brand-300: oklch(80.2% 0.098 26);
+    --color-brand-400: oklch(68.9% 0.155 28);
+    --color-brand-500: oklch(58.6% 0.198 30);
+    --color-brand-600: oklch(49.1% 0.193 30);
+    --color-brand-700: oklch(41.4% 0.166 30);
+    --color-brand-800: oklch(35.2% 0.134 30);
+    --color-brand-900: oklch(30.9% 0.106 30);
+    --color-brand-950: oklch(19.4% 0.068 30);
+
+    /* Ink — warm neutral scale for text and surfaces. */
+    --color-ink-50: oklch(98.4% 0.003 60);
+    --color-ink-100: oklch(96.2% 0.004 60);
+    --color-ink-200: oklch(91.9% 0.006 60);
+    --color-ink-300: oklch(85.7% 0.008 60);
+    --color-ink-400: oklch(70.9% 0.011 60);
+    --color-ink-500: oklch(58.7% 0.013 60);
+    --color-ink-600: oklch(48.3% 0.014 60);
+    --color-ink-700: oklch(39.8% 0.014 60);
+    --color-ink-800: oklch(31.5% 0.013 60);
+    --color-ink-900: oklch(24.6% 0.012 60);
+    --color-ink-950: oklch(17.4% 0.011 60);
+
+    /* Academic accent — calm teal for progress, completion and "in progress" states. */
+    --color-accent-50: oklch(97.5% 0.012 195);
+    --color-accent-100: oklch(94.6% 0.028 195);
+    --color-accent-200: oklch(89.2% 0.055 195);
+    --color-accent-300: oklch(81.6% 0.085 194);
+    --color-accent-400: oklch(72.1% 0.106 192);
+    --color-accent-500: oklch(63.4% 0.109 191);
+    --color-accent-600: oklch(53.8% 0.099 190);
+    --color-accent-700: oklch(45.4% 0.084 189);
+    --color-accent-800: oklch(38.4% 0.069 188);
+    --color-accent-900: oklch(33.2% 0.058 187);
+    --color-accent-950: oklch(21.6% 0.039 188);
+
+    --radius-card: 0.75rem;
+
+    --shadow-soft: 0 1px 2px oklch(24.6% 0.012 60 / 0.04), 0 4px 12px oklch(24.6% 0.012 60 / 0.05);
+    --shadow-lifted: 0 2px 4px oklch(24.6% 0.012 60 / 0.05), 0 12px 28px oklch(24.6% 0.012 60 / 0.08);
+}
+
+@layer base {
+    :root {
+        color-scheme: light;
+    }
+
+    html {
+        -webkit-text-size-adjust: 100%;
+        scroll-behavior: smooth;
+    }
+
+    body {
+        @apply bg-ink-50 text-ink-900 antialiased;
+        font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    }
+
+    :focus-visible {
+        @apply outline-2 outline-offset-2 outline-brand-600;
+    }
+
+    ::selection {
+        @apply bg-brand-100 text-brand-900;
+    }
+}
+
+@utility container-page {
+    @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+}
+
+@utility card {
+    @apply rounded-card border border-ink-200 bg-white shadow-soft;
+}
+
+@utility card-hover {
+    @apply transition duration-200 hover:-translate-y-0.5 hover:shadow-lifted;
+}
+
+@utility btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition
+        focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-60;
+}
+
+@utility btn-primary {
+    @apply btn bg-brand-600 text-white hover:bg-brand-700 focus-visible:outline-brand-600;
+}
+
+@utility btn-secondary {
+    @apply btn border border-ink-300 bg-white text-ink-800 hover:bg-ink-100 focus-visible:outline-ink-600;
+}
+
+@utility btn-ghost {
+    @apply btn text-ink-700 hover:bg-ink-100 hover:text-ink-900 focus-visible:outline-ink-600;
+}
+
+@utility badge {
+    @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium;
+}
+
+@utility prose-lms {
+    @apply text-ink-700 leading-relaxed;
+}
+
+@utility text-balance {
+    text-wrap: balance;
+}

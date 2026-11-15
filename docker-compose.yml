@@ -1,0 +1,75 @@
+name: lightlms
+
+services:
+    app:
+        build:
+            context: .
+            target: runtime
+        restart: unless-stopped
+        env_file:
+            - .env
+        environment:
+            APP_ENV: production
+            APP_DEBUG: "false"
+        volumes:
+            - storage:/app/storage
+        depends_on:
+            db:
+                condition: service_healthy
+            cache:
+                condition: service_started
+        networks:
+            - lightlms
+
+    db:
+        image: docker.io/library/postgres:18.7-alpine
+        restart: unless-stopped
+        environment:
+            POSTGRES_DB: ${DB_DATABASE:-lightlms}
+            POSTGRES_USER: ${DB_USERNAME:-lightlms}
+            POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD must be set}
+        volumes:
+            - db:/var/lib/postgresql/data
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-lightlms} -d ${DB_DATABASE:-lightlms}"]
+            interval: 10s
+            timeout: 5s
+            retries: 5
+        networks:
+            - lightlms
+
+    cache:
+        image: docker.io/library/redis:8.10.3-alpine
+        restart: unless-stopped
+        command: ["redis-server", "--save", "60", "1", "--loglevel", "warning"]
+        volumes:
+            - cache:/data
+        networks:
+            - lightlms
+
+    worker:
+        build:
+            context: .
+            target: runtime
+        restart: unless-stopped
+        command: ["php", "artisan", "queue:work", "--sleep=3", "--tries=3", "--max-time=3600"]
+        env_file:
+            - .env
+        environment:
+            APP_ENV: production
+            APP_DEBUG: "false"
+        volumes:
+            - storage:/app/storage
+        depends_on:
+            db:
+                condition: service_healthy
+        networks:
+            - lightlms
+
+volumes:
+    db:
+    cache:
+    storage:
+
+networks:
+    lightlms:
