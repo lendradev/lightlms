@@ -2,8 +2,8 @@
 
 namespace Database\Factories;
 
-use App\Models\Module;
 use App\Models\Course;
+use App\Models\Module;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -23,6 +23,7 @@ class ModuleFactory extends Factory
             'title' => fake()->sentence(3),
             'summary' => fake()->sentence(10),
             'position' => fake()->numberBetween(1, 20),
+            'visible' => true,
         ];
     }
 }

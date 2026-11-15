@@ -25,7 +25,7 @@ mkdir -p "$DEST"
 
 tar -C "$SRC" \
   --exclude=.git --exclude=node_modules --exclude=vendor \
-  --exclude=public/build \
+  --exclude=public/build --exclude=bootstrap/cache \
   --exclude=database/database.sqlite --exclude=.env \
   -cf - . | docker exec -i -e DEST="$DEST" "$CONTAINER" sh -c 'tar -C "$DEST" -xf -'
 
@@ -49,12 +49,12 @@ fi
 echo "synced $SRC -> $CONTAINER:$DEST"
 
 # Laravel's package discovery cache lives in bootstrap/cache and is wiped by the
-# sync, so it is rebuilt and persisted back into the deps directory.
-# Only PHP containers can do this; skip silently elsewhere.
+# sync, so it is rebuilt. Only PHP containers can do this; skip silently elsewhere.
 docker exec -e DEST="$DEST" "$CONTAINER" sh -c '
 set -e
 cd "$DEST"
 if command -v php >/dev/null 2>&1 && [ -d vendor ]; then
+  rm -f bootstrap/cache/packages.php bootstrap/cache/services.php
   php artisan package:discover --ansi >/dev/null
 fi
 ' || echo "NOTE: skipped package discovery in $CONTAINER (no PHP runtime)" >&2

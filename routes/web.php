@@ -1,39 +1,33 @@
 <?php
 
-use App\Models\Course;
+use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\CourseController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\SetupController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    $courses = Course::query()
-        ->published()
-        ->withCount('modules')
-        ->orderBy('published_at', 'desc')
-        ->limit(6)
-        ->get(['id', 'title', 'slug', 'summary', 'instructor_name', 'level', 'duration_minutes']);
+Route::middleware('installed')->group(function (): void {
+    Route::get('/', HomeController::class)->name('home');
+    Route::get('/courses', [CourseController::class, 'index'])->name('courses.index');
+    Route::get('/courses/{course}', [CourseController::class, 'show'])->name('courses.show');
+});
 
-    return inertia('Welcome', [
-        'courses' => $courses,
-    ]);
-})->name('home');
+Route::prefix('setup')->name('setup.')->group(function (): void {
+    Route::get('/', [SetupController::class, 'index'])->name('index');
+    Route::post('/', [SetupController::class, 'install'])->name('install');
+});
 
-Route::get('/courses', function () {
-    $courses = Course::query()
-        ->published()
-        ->withCount('modules')
-        ->orderBy('published_at', 'desc')
-        ->paginate(12);
+Route::middleware('installed')->group(function (): void {
+    Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+    Route::post('/login', [AuthController::class, 'login'])->middleware('guest');
 
-    return inertia('Courses/Index', [
-        'courses' => $courses,
-    ]);
-})->name('courses.index');
+    Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
+    Route::post('/register', [AuthController::class, 'register'])->middleware('guest');
 
-Route::get('/courses/{course}', function (Course $course) {
-    abort_unless($course->isPublished(), 404);
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 
-    $course->load('modules.lessons');
-
-    return inertia('Courses/Show', [
-        'course' => $course,
-    ]);
-})->name('courses.show');
+    Route::middleware('auth')->group(function (): void {
+        Route::get('/dashboard', DashboardController::class)->name('dashboard');
+    });
+});

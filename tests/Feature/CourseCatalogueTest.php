@@ -5,13 +5,22 @@ namespace Tests\Feature;
 use App\Models\Course;
 use App\Models\Lesson;
 use App\Models\Module;
+use App\Models\Setting;
 use App\Models\User;
+use App\Support\Setup;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class CourseCatalogueTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        Setting::put(Setup::KEY_INSTALLED, 'true', 'setup');
+    }
 
     public function test_guest_can_view_the_home_page(): void
     {

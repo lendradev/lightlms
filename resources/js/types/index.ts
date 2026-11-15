@@ -13,11 +13,13 @@ export type Lesson = {
     id: number;
     module_id: number;
     title: string;
-    type: 'video' | 'reading' | 'quiz' | 'assignment';
+    type: 'reading' | 'video' | 'quiz' | 'assignment' | 'forum';
     position: number;
     duration_minutes: number;
     body: string | null;
     is_preview: boolean;
+    grade_max?: number;
+    due_at?: string | null;
 };
 
 export type Module = {
@@ -40,6 +42,7 @@ export type Course = {
     duration_minutes: number;
     thumbnail_path: string | null;
     published_at: string | null;
+    status?: string;
     modules: Module[];
 };
 
@@ -75,8 +78,14 @@ export type SharedProps = {
         name: string;
         locale: string;
         availableLocales: string[];
+        registrationMode: string;
+        installed: boolean;
     };
     auth: {
         user: AuthUser | null;
+    };
+    flash: {
+        success: string | null;
+        error: string | null;
     };
 };

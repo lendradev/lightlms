@@ -16,4 +16,14 @@ enum UserRole: string
             self::Admin => 'Administrator',
         };
     }
+
+    public function canTeach(): bool
+    {
+        return $this === self::Instructor || $this === self::Admin;
+    }
+
+    public function canAdminister(): bool
+    {
+        return $this === self::Admin;
+    }
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Support\Locale;
+use App\Support\Setup;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -19,15 +20,19 @@ class HandleInertiaRequests extends Middleware
     {
         return [
             ...parent::share($request),
-
             'app' => [
-                'name' => config('app.name'),
+                'name' => Setup::siteName(),
                 'locale' => app()->getLocale(),
                 'availableLocales' => Locale::available(),
+                'registrationMode' => Setup::registrationMode(),
+                'installed' => Setup::isInstalled(),
             ],
-
             'auth' => [
                 'user' => $request->user()?->only(['id', 'name', 'email', 'role']),
+            ],
+            'flash' => [
+                'success' => fn () => $request->session()->get('success'),
+                'error' => fn () => $request->session()->get('error'),
             ],
         ];
     }
