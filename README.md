@@ -43,7 +43,7 @@ default and remembers your choice.
 |---|---|
 | ![Student dashboard](docs/screenshots/10-dashboard-student.png) | ![Gradebook](docs/screenshots/23-gradebook.png) |
 
-**See all 50 screens in both themes in [docs/screenshots.md](docs/screenshots.md).**
+**See all 53 screens in both themes in [docs/screenshots.md](docs/screenshots.md).**
 
 ---
 
@@ -110,8 +110,8 @@ LightLMS takes the middle path:
 | File uploads (course material, submissions) | Available |
 | Notifications by email and in-app | Available |
 | REST API for integrations (bearer tokens, `/api/v1`) | Available |
+| Certificates of completion with a public verification page | Available |
 | Gradebook with categories and weighting | Planned |
-| Certificates of completion | Planned |
 | Multi-language UI (English primary, Bahasa Indonesia secondary) | Planned |
 
 ---
@@ -373,6 +373,9 @@ dropped exception handler to the container rules for formatting and build assets
 LightLMS ships a REST API for integrations under `/api/v1`, authenticated with bearer tokens.
 The reference, including the error contract and every endpoint, is in
 [`docs/api.md`](docs/api.md).
+
+Courses can issue a certificate of completion, with a public verification page. How a course
+decides who is finished is described in [`docs/certificates.md`](docs/certificates.md).
 
 ---
 

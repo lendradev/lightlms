@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ApiTokenController;
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\CertificateController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FileController;
@@ -12,6 +13,7 @@ use App\Http\Controllers\LearningController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\SetupController;
 use App\Http\Controllers\Teaching\AssignmentController as TeachingAssignmentController;
+use App\Http\Controllers\Teaching\CertificateController as TeachingCertificateController;
 use App\Http\Controllers\Teaching\GradebookController;
 use App\Http\Controllers\Teaching\QuizController as TeachingQuizController;
 use App\Http\Controllers\Teaching\RosterController;
@@ -22,6 +24,8 @@ Route::middleware('installed')->group(function (): void {
     Route::get('/', HomeController::class)->name('home');
     Route::get('/courses', [CourseController::class, 'index'])->name('courses.index');
     Route::get('/courses/{course}', [CourseController::class, 'show'])->name('courses.show');
+    Route::get('/certificates/verify/{code}', [CertificateController::class, 'verify'])
+        ->name('certificates.verify');
 });
 
 Route::prefix('setup')->name('setup.')->group(function (): void {
@@ -77,6 +81,11 @@ Route::middleware('installed')->group(function (): void {
         Route::delete('/settings/api-tokens/{token}', [ApiTokenController::class, 'destroy'])
             ->name('settings.api-tokens.destroy');
 
+        Route::get('/certificates', [CertificateController::class, 'index'])
+            ->name('certificates.index');
+        Route::get('/certificates/{code}', [CertificateController::class, 'show'])
+            ->name('certificates.show');
+
         Route::middleware('role:instructor,admin')->group(function (): void {
             Route::get('/teaching', [TeachingController::class, 'index'])->name('teaching.index');
             Route::get('/teaching/{course}', [TeachingController::class, 'show'])->name('teaching.course');
@@ -113,6 +122,15 @@ Route::middleware('installed')->group(function (): void {
                 ->name('teaching.lessons.files.store');
             Route::delete('/teaching/{course}/files/{file}', [TeachingController::class, 'destroyFile'])
                 ->name('teaching.files.destroy');
+
+            Route::get('/teaching/{course}/certificates', [TeachingCertificateController::class, 'index'])
+                ->name('teaching.certificates.index');
+            Route::put('/teaching/{course}/certificates/rule', [TeachingCertificateController::class, 'updateRule'])
+                ->name('teaching.certificates.rule.update');
+            Route::post('/teaching/{course}/certificates', [TeachingCertificateController::class, 'store'])
+                ->name('teaching.certificates.store');
+            Route::delete('/teaching/{course}/certificates/{certificate}', [TeachingCertificateController::class, 'destroy'])
+                ->name('teaching.certificates.destroy');
         });
     });
 });

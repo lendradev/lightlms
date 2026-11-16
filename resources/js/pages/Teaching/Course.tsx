@@ -164,6 +164,9 @@ export default function TeachingCourse({ course, students }: Props) {
                         <Button asChild size="sm" variant="outline">
                             <Link href={`/teaching/${course.slug}/gradebook`}>Gradebook</Link>
                         </Button>
+                        <Button asChild size="sm" variant="outline">
+                            <Link href={`/teaching/${course.slug}/certificates`}>Certificates</Link>
+                        </Button>
                         <Button
                             size="sm"
                             variant={course.status === 'published' ? 'outline' : 'default'}

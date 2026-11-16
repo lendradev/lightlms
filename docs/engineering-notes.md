@@ -231,3 +231,11 @@ The API test helper does it for every request.
 the API gradebook calls it first. A hand-made item with a made-up `source_id` did not survive.
 
 **Fix.** In tests, build the item from a real activity of the course, so `syncItems()` keeps it.
+
+## The certificate must be issued twice to be returned twice
+**Symptom.** A test that called the issue method twice got a certificate the first time and
+nothing the second time.
+**Cause.** The method returned `null` when a certificate already existed, so the caller could
+not tell "not eligible" from "already issued".
+**Fix.** The method returns the existing certificate when there is one. A caller that needs to
+know whether something was just issued checks the audit log, not the return value.

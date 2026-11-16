@@ -172,6 +172,19 @@ Shown once, before the site has an administrator.
 |---|---|
 | ![Teacher notifications](screenshots/28-teacher-notifications.png) | ![Teacher notifications in dark mode](screenshots/28-teacher-notifications-dark.png) |
 
+### Certificates
+| Light | Dark |
+|---|---|
+| ![Certificates](screenshots/30-certificates-learner.png) | ![Certificates in dark mode](screenshots/30-certificates-learner-dark.png) |
+### Certificate verification
+| Light | Dark |
+|---|---|
+| ![Certificate verification](screenshots/31-certificate-verify.png) | ![Certificate verification in dark mode](screenshots/31-certificate-verify-dark.png) |
+### Completion rule and certificates
+| Light | Dark |
+|---|---|
+| ![Completion rule and certificates](screenshots/32-certificates-teacher.png) | ![Completion rule and certificates in dark mode](screenshots/32-certificates-teacher-dark.png) |
+
 ## Administration
 
 ### Dashboard

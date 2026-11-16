@@ -1,5 +1,6 @@
 import { Link, usePage } from '@inertiajs/react';
 import {
+    Award,
     Bell,
     BookOpen,
     DatabaseBackup,
@@ -38,6 +39,7 @@ type NavItem = {
 const NAV_ITEMS: NavItem[] = [
     { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard, roles: ['student', 'instructor', 'admin'] },
     { label: 'My courses', href: '/learning', icon: GraduationCap, roles: ['student'] },
+    { label: 'Certificates', href: '/certificates', icon: Award, roles: ['student', 'instructor', 'admin'] },
     { label: 'Teaching', href: '/teaching', icon: BookOpen, roles: ['instructor', 'admin'] },
     { label: 'Catalogue', href: '/courses', icon: BookOpen, roles: ['student', 'instructor', 'admin'] },
     { label: 'API tokens', href: '/settings/api-tokens', icon: KeyRound, roles: ['student', 'instructor', 'admin'] },

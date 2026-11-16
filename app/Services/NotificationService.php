@@ -30,6 +30,7 @@ class NotificationService
         'course.published' => ['label' => 'A course you teach is published', 'category' => 'teaching', 'channel' => 'both', 'digestable' => false],
         'forum.reply' => ['label' => 'Someone replies to your discussion', 'category' => 'discussion', 'channel' => 'both', 'digestable' => true],
         'deadline.upcoming' => ['label' => 'An assignment deadline is near', 'category' => 'reminder', 'channel' => 'both', 'digestable' => true],
+        'certificate.issued' => ['label' => 'Your certificate of completion is ready', 'category' => 'grading', 'channel' => 'both', 'digestable' => false],
     ];
 
     /**

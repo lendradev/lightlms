@@ -10,6 +10,10 @@ use Illuminate\Support\Facades\DB;
 
 class EnrollmentService
 {
+    public function __construct(
+        private readonly CertificateService $certificates,
+    ) {}
+
     public function isEnrolled(int $userId, int $courseId): bool
     {
         return DB::table('course_user')
@@ -136,5 +140,18 @@ class EnrollmentService
                 'status' => $progress >= 100 ? 'completed' : 'active',
                 'updated_at' => now(),
             ]);
+
+        if ($progress < 100) {
+            return;
+        }
+
+        $course = $lesson->module->course;
+        $learner = User::query()->find($userId);
+
+        if ($course === null || $learner === null) {
+            return;
+        }
+
+        $this->certificates->issueIfEligible($course, $learner);
     }
 }

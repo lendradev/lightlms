@@ -22,6 +22,7 @@ class SubmissionService
     public function __construct(
         private readonly GradebookService $gradebook,
         private readonly NotificationService $notifications,
+        private readonly CertificateService $certificates,
     ) {}
 
     /**
@@ -169,6 +170,8 @@ class SubmissionService
                 $course !== null ? '/learning/'.$course->slug : null,
                 ['assignment_id' => $assignment->id, 'score' => $points],
             );
+
+            $this->certificates->issueIfEligible($course, $submission->student);
         }
 
         return $submission;
