@@ -1,5 +1,6 @@
 import { Head, Link } from '@inertiajs/react';
 import { AppShell } from '@/components/AppShell';
+import { useTranslation } from '@/lib/i18n';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -39,6 +40,8 @@ type Props = {
 };
 
 export default function LearningGradebook({ course, items, categories, grades, categoryTotals, total }: Props) {
+    const { t } = useTranslation();
+
     const gradeFor = (itemId: number) => grades.find((grade) => grade.item_id === itemId);
 
     const categoryName = (categoryId: number | null) =>
@@ -54,22 +57,23 @@ export default function LearningGradebook({ course, items, categories, grades, c
                         <CardHeader>
                             <CardTitle className="text-base">{course.title}</CardTitle>
                             <CardDescription>
-                                Marks for every graded activity. Items that are still waiting for a
-                                mark are left out of the total.
+                                {t('gradebook.transcriptBody')}
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
                             {items.length === 0 ? (
                                 <p className="text-sm text-muted-foreground">
-                                    Nothing has been graded in this course yet.
+                                    {t('gradebook.transcriptEmpty')}
                                 </p>
                             ) : (
                                 <Table>
                                     <TableHeader>
                                         <TableRow>
-                                            <TableHead>Activity</TableHead>
-                                            <TableHead>Category</TableHead>
-                                            <TableHead className="text-right">Mark</TableHead>
+                                            <TableHead>{t('gradebook.activity')}</TableHead>
+                                            <TableHead>{t('gradebook.category')}</TableHead>
+                                            <TableHead className="text-right">
+                                                {t('gradebook.markColumn')}
+                                            </TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
@@ -121,12 +125,12 @@ export default function LearningGradebook({ course, items, categories, grades, c
                     <aside className="space-y-4 lg:sticky lg:top-20 lg:self-start">
                         <Card>
                             <CardHeader>
-                                <CardTitle className="text-sm">Your grade</CardTitle>
+                                <CardTitle className="text-sm">{t('gradebook.yourGrade')}</CardTitle>
                             </CardHeader>
                             <CardContent>
                                 {total.points === null ? (
                                     <p className="text-sm text-muted-foreground">
-                                        No marks yet, so there is no total.
+                                        {t('gradebook.noGradeYet')}
                                     </p>
                                 ) : (
                                     <div className="flex items-baseline gap-3">
@@ -140,8 +144,13 @@ export default function LearningGradebook({ course, items, categories, grades, c
                                 )}
                                 {total.percent !== null && (
                                     <p className="mt-2 text-sm text-muted-foreground">
-                                        {total.percent}% · {total.graded}{' '}
-                                        {total.graded === 1 ? 'activity' : 'activities'} counted
+                                        {total.percent}% ·{' '}
+                                        {t(
+                                            total.graded === 1
+                                                ? 'gradebook.countedOne'
+                                                : 'gradebook.counted',
+                                            { count: total.graded },
+                                        )}
                                     </p>
                                 )}
                             </CardContent>
@@ -150,7 +159,7 @@ export default function LearningGradebook({ course, items, categories, grades, c
                         {categories.length > 0 && (
                             <Card>
                                 <CardHeader>
-                                    <CardTitle className="text-sm">Categories</CardTitle>
+                                    <CardTitle className="text-sm">{t('gradebook.categories')}</CardTitle>
                                 </CardHeader>
                                 <CardContent>
                                     <dl className="space-y-3">
@@ -188,7 +197,7 @@ export default function LearningGradebook({ course, items, categories, grades, c
                         )}
 
                         <Button asChild variant="outline" size="sm">
-                            <Link href={`/learning/${course.slug}`}>Back to the course</Link>
+                            <Link href={`/learning/${course.slug}`}>{t('course.backToCourse')}</Link>
                         </Button>
                     </aside>
                 </div>

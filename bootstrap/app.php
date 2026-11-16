@@ -4,6 +4,7 @@ use App\Http\Middleware\EnsureInstalled;
 use App\Http\Middleware\EnsureUserHasRole;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\SecurityHeaders;
+use App\Http\Middleware\SetLocale;
 use App\Support\ApiError;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
@@ -27,7 +28,11 @@ return Application::configure(basePath: dirname(__DIR__))
         },
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->encryptCookies(except: [
+            App\Support\Locale::COOKIE,
+        ]);
         $middleware->web(append: [
+            SetLocale::class,
             HandleInertiaRequests::class,
             SecurityHeaders::class,
         ]);

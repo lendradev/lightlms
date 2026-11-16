@@ -1,0 +1,25 @@
+<?php
+
+return [
+    'auth.signIn' => 'Masuk',
+    'auth.signUp' => 'Buat akun',
+    'auth.email' => 'Email',
+    'auth.password' => 'Kata sandi',
+    'auth.confirmPassword' => 'Ulangi kata sandi',
+    'auth.name' => 'Nama Anda',
+    'auth.remember' => 'Tetap masuk',
+    'auth.forgot' => 'Lupa kata sandi?',
+    'auth.noAccount' => 'Belum punya akun?',
+    'auth.haveAccount' => 'Sudah punya akun?',
+    'auth.inviteCode' => 'Kode undangan',
+    'auth.inviteCodeOptional' => 'Kode undangan (opsional)',
+    'auth.welcome' => 'Selamat datang kembali',
+    'auth.welcomeBody' => 'Gunakan akun Anda untuk membuka kursus.',
+    'auth.registerBody' => 'Anda bisa langsung mendaftar di kursus.',
+    'auth.registrationMode' => 'Pendaftaran',
+    'auth.mode.open' => 'Siapa pun bisa mendaftar',
+    'auth.mode.invite' => 'Hanya dengan undangan',
+    'auth.mode.closed' => 'Ditutup',
+    'auth.failed' => 'Email atau kata sandi tidak cocok.',
+    'auth.throttled' => 'Terlalu banyak percobaan. Coba lagi sebentar lagi.',
+];

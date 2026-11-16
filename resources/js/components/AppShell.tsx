@@ -26,6 +26,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import type { AuthUser } from '@/types';
 
@@ -37,23 +38,29 @@ type NavItem = {
 };
 
 const NAV_ITEMS: NavItem[] = [
-    { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard, roles: ['student', 'instructor', 'admin'] },
-    { label: 'My courses', href: '/learning', icon: GraduationCap, roles: ['student'] },
-    { label: 'Certificates', href: '/certificates', icon: Award, roles: ['student', 'instructor', 'admin'] },
-    { label: 'Teaching', href: '/teaching', icon: BookOpen, roles: ['instructor', 'admin'] },
-    { label: 'Catalogue', href: '/courses', icon: BookOpen, roles: ['student', 'instructor', 'admin'] },
-    { label: 'API tokens', href: '/settings/api-tokens', icon: KeyRound, roles: ['student', 'instructor', 'admin'] },
-    { label: 'Users', href: '/admin/users', icon: Users, roles: ['admin'] },
-    { label: 'Invitations', href: '/admin/invitations', icon: Mail, roles: ['admin'] },
-    { label: 'Backup', href: '/admin/backup', icon: DatabaseBackup, roles: ['admin'] },
-    { label: 'Settings', href: '/admin/settings', icon: Settings, roles: ['admin'] },
+    { label: 'nav.dashboard', href: '/dashboard', icon: LayoutDashboard, roles: ['student', 'instructor', 'admin'] },
+    { label: 'nav.myCourses', href: '/learning', icon: GraduationCap, roles: ['student'] },
+    { label: 'nav.certificates', href: '/certificates', icon: Award, roles: ['student', 'instructor', 'admin'] },
+    { label: 'nav.teaching', href: '/teaching', icon: BookOpen, roles: ['instructor', 'admin'] },
+    { label: 'nav.catalogue', href: '/courses', icon: BookOpen, roles: ['student', 'instructor', 'admin'] },
+    { label: 'nav.apiTokens', href: '/settings/api-tokens', icon: KeyRound, roles: ['student', 'instructor', 'admin'] },
+    { label: 'nav.users', href: '/admin/users', icon: Users, roles: ['admin'] },
+    { label: 'nav.invitations', href: '/admin/invitations', icon: Mail, roles: ['admin'] },
+    { label: 'nav.backup', href: '/admin/backup', icon: DatabaseBackup, roles: ['admin'] },
+    { label: 'nav.settings', href: '/admin/settings', icon: Settings, roles: ['admin'] },
 ];
 
 export function AppShell({ title, actions, children }: { title: string; actions?: ReactNode; children: ReactNode }) {
-    const { auth, app, notifications } = usePage().props as unknown as {
+    const { auth, app, notifications, translations } = usePage().props as unknown as {
         auth: { user: AuthUser | null };
-        app: { name: string };
+        app: {
+            name: string;
+            locale: string;
+            availableLocales: string[];
+            localeNames?: Record<string, string>;
+        };
         notifications: { unread: number };
+        translations?: Record<string, string>;
     };
 
     const [menuOpen, setMenuOpen] = useState(false);
@@ -81,7 +88,7 @@ export function AppShell({ title, actions, children }: { title: string; actions?
                             className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-sidebar-foreground transition hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
                         >
                             <item.icon className="size-4 shrink-0" aria-hidden />
-                            {item.label}
+                            {translations?.[item.label] ?? item.label}
                         </Link>
                     ))}
                 </nav>
@@ -100,7 +107,7 @@ export function AppShell({ title, actions, children }: { title: string; actions?
                             <SheetTrigger asChild>
                                 <Button variant="outline" size="icon" className="lg:hidden">
                                     <Menu aria-hidden />
-                                    <span className="sr-only">Open navigation</span>
+                                    <span className="sr-only">{translations?.['nav.openNavigation'] ?? 'Open navigation'}</span>
                                 </Button>
                             </SheetTrigger>
                             <SheetContent side="left" className="w-72 p-0">
@@ -121,7 +128,7 @@ export function AppShell({ title, actions, children }: { title: string; actions?
                                             className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-sidebar-foreground transition hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                                         >
                                             <item.icon className="size-4 shrink-0" aria-hidden />
-                                            {item.label}
+                                            {translations?.[item.label] ?? item.label}
                                         </Link>
                                     ))}
                                 </nav>
@@ -135,7 +142,10 @@ export function AppShell({ title, actions, children }: { title: string; actions?
                         {actions}
                         {user && (
                             <Button asChild variant="ghost" size="icon" className="relative">
-                                <Link href="/notifications" aria-label={`Notifications, ${unread} unread`}>
+                                <Link
+                                    href="/notifications"
+                                    aria-label={`${translations?.['nav.notifications'] ?? 'Notifications'}, ${unread} unread`}
+                                >
                                     <Bell className="size-4" aria-hidden />
                                     {unread > 0 && (
                                         <span className="absolute -right-0.5 -top-0.5 grid min-w-4 place-items-center rounded-full bg-primary px-1 text-[10px] font-semibold text-primary-foreground">
@@ -145,6 +155,7 @@ export function AppShell({ title, actions, children }: { title: string; actions?
                                 </Link>
                             </Button>
                         )}
+                        <LanguageSwitcher app={app} />
                         <ThemeToggle />
                         {user && (
                             <div className="lg:hidden">

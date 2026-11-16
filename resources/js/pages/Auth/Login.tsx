@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useTranslation } from '@/lib/i18n';
 
 type Props = {
     registrationMode: string;
@@ -16,6 +17,7 @@ type Form = {
 };
 
 export default function Login({ registrationMode, siteName }: Props) {
+    const { t } = useTranslation();
     const { data, setData, post, processing, errors } = useForm<Form>({
         email: '',
         password: '',
@@ -33,14 +35,14 @@ export default function Login({ registrationMode, siteName }: Props) {
                             L
                         </span>
                         <h1 className="mt-5 font-serif text-2xl font-semibold tracking-tight text-foreground">
-                            Sign in to {siteName}
+                            {t('auth.signIn')} · {siteName}
                         </h1>
                     </div>
 
                     <Card>
                         <CardHeader>
-                            <CardTitle>Sign in</CardTitle>
-                            <CardDescription>Use your account to reach your courses.</CardDescription>
+                            <CardTitle>{t('auth.signIn')}</CardTitle>
+                            <CardDescription>{t('auth.welcomeBody')}</CardDescription>
                         </CardHeader>
                         <CardContent>
                             <form
@@ -51,7 +53,7 @@ export default function Login({ registrationMode, siteName }: Props) {
                                 className="grid gap-4"
                             >
                                 <div className="grid gap-2">
-                                    <Label htmlFor="email">Email</Label>
+                                    <Label htmlFor="email">{t('auth.email')}</Label>
                                     <Input
                                         id="email"
                                         type="email"
@@ -63,7 +65,7 @@ export default function Login({ registrationMode, siteName }: Props) {
                                 </div>
 
                                 <div className="grid gap-2">
-                                    <Label htmlFor="password">Password</Label>
+                                    <Label htmlFor="password">{t('auth.password')}</Label>
                                     <Input
                                         id="password"
                                         type="password"
@@ -83,11 +85,11 @@ export default function Login({ registrationMode, siteName }: Props) {
                                         onChange={(event) => setData('remember', event.target.checked)}
                                         className="size-4 rounded border-input accent-primary"
                                     />
-                                    Keep me signed in
+                                    {t('auth.remember')}
                                 </label>
 
                                 <Button type="submit" disabled={processing}>
-                                    {processing ? 'Signing in…' : 'Sign in'}
+                                    {processing ? '…' : t('auth.signIn')}
                                 </Button>
                             </form>
                         </CardContent>
@@ -95,9 +97,9 @@ export default function Login({ registrationMode, siteName }: Props) {
 
                     {registrationMode !== 'closed' && (
                         <p className="mt-6 text-center text-sm text-muted-foreground">
-                            Need an account?{' '}
+                            {t('auth.noAccount')}{' '}
                             <Link href="/register" className="font-medium text-primary hover:underline">
-                                Register
+                                {t('auth.signUp')}
                             </Link>
                         </p>
                     )}

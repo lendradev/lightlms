@@ -1,6 +1,7 @@
 import { Head, Link, router } from '@inertiajs/react';
 import { Download, Settings2 } from 'lucide-react';
 import { AppShell } from '@/components/AppShell';
+import { useTranslation } from '@/lib/i18n';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -63,6 +64,7 @@ export default function TeachingGradebook({
     totals,
     categoryTotals,
 }: Props) {
+    const { t } = useTranslation();
     const gradeFor = (itemId: number, userId: number) =>
         grades.find((grade) => grade.item_id === itemId && grade.user_id === userId);
 
@@ -97,13 +99,13 @@ export default function TeachingGradebook({
                         <Button asChild size="sm" variant="outline">
                             <Link href={`/teaching/${course.slug}/gradebook/settings`} as="button">
                                 <Settings2 aria-hidden />
-                                Settings
+                                {t('action.settings')}
                             </Link>
                         </Button>
                         <Button asChild size="sm" variant="outline">
                             <Link href={`/teaching/${course.slug}/gradebook/export`} as="a">
                                 <Download aria-hidden />
-                                Export CSV
+                                {t('action.export')}
                             </Link>
                         </Button>
                     </div>
@@ -113,25 +115,23 @@ export default function TeachingGradebook({
                     <CardHeader>
                         <CardTitle className="text-base">{course.title}</CardTitle>
                         <CardDescription>
-                            Enter a mark in a cell to grade it. The weight under each column decides how
-                            much that activity counts. Leave a cell empty to clear the mark.
+                            {t('gradebook.body')}
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
                         {items.length === 0 ? (
                             <p className="text-sm text-muted-foreground">
-                                No graded activities yet. Add an assignment or a quiz to the course and it
-                                will appear here.
+                                {t('gradebook.noItems')}
                             </p>
                         ) : students.length === 0 ? (
                             <p className="text-sm text-muted-foreground">
-                                No students enrolled yet. Add people from the roster.
+                                {t('gradebook.noStudents')}
                             </p>
                         ) : (
                             <Table>
                                 <TableHeader>
                                     <TableRow>
-                                        <TableHead>Student</TableHead>
+                                        <TableHead>{t('gradebook.student')}</TableHead>
                                         {items.map((item) => {
                                             const category = categoryName(item.category_id);
 
@@ -161,8 +161,10 @@ export default function TeachingGradebook({
                                                 </TableHead>
                                             );
                                         })}
-                                        <TableHead className="text-right">Total</TableHead>
-                                        <TableHead className="text-right">Grade</TableHead>
+                                        <TableHead className="text-right">{t('course.total')}</TableHead>
+                                        <TableHead className="text-right">
+                                            {t('gradebook.gradeColumn')}
+                                        </TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -246,9 +248,11 @@ export default function TeachingGradebook({
                                 <CardHeader>
                                     <CardTitle className="text-sm">{category.name}</CardTitle>
                                     <CardDescription>
-                                        {category.weight !== null ? `Weight ×${category.weight}` : 'No weight'}
-                                        {' · '}
-                                        {category.aggregation.replace('_', ' ')}
+                                        {category.weight !== null
+                                        ? `${t('gradebook.weight')} ×${category.weight}`
+                                        : t('gradebook.weight')}
+                                    {' · '}
+                                    {t(`gradebook.aggregation.${category.aggregation}`)}
                                     </CardDescription>
                                 </CardHeader>
                                 <CardContent>
@@ -287,8 +291,7 @@ export default function TeachingGradebook({
 
                 {items.length > 0 && students.length > 0 && (
                     <p className="mt-4 text-xs text-muted-foreground">
-                        The course total rolls up the categories first and then the items that have no
-                        category. Items that are left empty, hidden or locked do not count.
+                        {t('gradebook.totalNote')}
                     </p>
                 )}
             </AppShell>

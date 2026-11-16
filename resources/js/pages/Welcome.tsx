@@ -1,4 +1,4 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { ArrowRight } from 'lucide-react';
 import CourseCard from '@/components/CourseCard';
 import { SiteFooter, SiteHeader } from '@/components/SiteChrome';
@@ -10,35 +10,30 @@ type Props = {
     auth: SharedProps['auth'];
 };
 
+type PageProps = {
+    translations?: Record<string, string>;
+};
+
 const DOCS_URL = 'https://lendradev.github.io/lightlms/';
 const REPO_URL = 'https://github.com/lendradev/lightlms';
 
 const FACTS = [
-    { value: '14', label: 'REST endpoints under /api/v1' },
-    { value: '3', label: 'roles per course, plus a site admin' },
-    { value: 'MIT', label: 'licence, no vendor in the middle' },
+    { value: '14', label: 'landing.fact1' },
+    { value: '3', label: 'landing.fact2' },
+    { value: 'MIT', label: 'landing.fact3' },
 ];
 
 const FEATURES = [
-    {
-        title: 'Courses, modules and activities',
-        body: 'A course holds modules; a module holds readings, videos, quizzes, assignments and forum threads. Learners mark each activity complete and the course progress follows.',
-    },
-    {
-        title: 'Grading with weights and categories',
-        body: 'Give every item a weight, group the items into categories, and export the sheet as CSV. Manual marks, feedback and letter grades sit in the same view.',
-    },
-    {
-        title: 'Roles that fail closed',
-        body: 'Site roles and course roles are separate. Every state-changing endpoint checks the course membership on the server and records the action in the audit log.',
-    },
-    {
-        title: 'Your own backup',
-        body: 'One compose file starts the app, Postgres, Redis and a queue worker. The administrator can export the database with the uploaded files and restore it later.',
-    },
+    { title: 'landing.feature1Title', body: 'landing.feature1Body' },
+    { title: 'landing.feature2Title', body: 'landing.feature2Body' },
+    { title: 'landing.feature3Title', body: 'landing.feature3Body' },
+    { title: 'landing.feature4Title', body: 'landing.feature4Body' },
 ];
 
 export default function Welcome({ courses, auth }: Props) {
+    const { translations } = usePage().props as unknown as PageProps;
+    const t = (key: string) => translations?.[key] ?? key;
+
     return (
         <>
             <Head title="Self-hosted learning management" />
@@ -50,25 +45,24 @@ export default function Welcome({ courses, auth }: Props) {
                     <div className="container-page grid items-start gap-12 py-14 lg:grid-cols-[0.9fr_1.1fr] lg:py-20">
                         <div>
                             <p className="text-sm font-medium text-muted-foreground">
-                                Open source · MIT licensed
+                                {t('landing.eyebrow')}
                             </p>
                             <h1 className="mt-4 text-balance font-serif text-4xl font-semibold leading-[1.1] tracking-tight text-foreground sm:text-5xl">
-                                Self-hosted learning management for schools and course teams
+                                {t('landing.headline')}
                             </h1>
                             <p className="mt-5 max-w-xl text-lg leading-relaxed text-muted-foreground">
-                                LightLMS runs courses, assignments, quizzes and grading on your own
-                                server. The student record never leaves your infrastructure.
+                                {t('landing.lede')}
                             </p>
 
                             <div className="mt-8 flex flex-wrap gap-3">
                                 <Button asChild>
                                     <Link href="/courses">
-                                        See the catalogue
+                                        {t('app.seeCatalogue')}
                                         <ArrowRight aria-hidden />
                                     </Link>
                                 </Button>
                                 <Button asChild variant="outline">
-                                    <a href={`${DOCS_URL}quick-start.html`}>Read the documentation</a>
+                                    <a href={`${DOCS_URL}quick-start.html`}>{t('app.readDocs')}</a>
                                 </Button>
                             </div>
 
@@ -79,7 +73,7 @@ export default function Welcome({ courses, auth }: Props) {
                                             {fact.value}
                                         </dt>
                                         <dd className="mt-1 text-sm leading-relaxed text-muted-foreground">
-                                            {fact.label}
+                                            {t(fact.label)}
                                         </dd>
                                     </div>
                                 ))}
@@ -109,11 +103,10 @@ export default function Welcome({ courses, auth }: Props) {
                     <div className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr]">
                         <div>
                             <h2 className="text-balance font-serif text-3xl font-semibold tracking-tight text-foreground">
-                                What the platform does
+                                {t('landing.featuresTitle')}
                             </h2>
                             <p className="mt-4 max-w-sm leading-relaxed text-muted-foreground">
-                                Four areas cover the ordinary work of a school: the course, the work
-                                handed in, the mark, and the record of who did what.
+                                {t('landing.featuresLede')}
                             </p>
                         </div>
 
@@ -121,10 +114,10 @@ export default function Welcome({ courses, auth }: Props) {
                             {FEATURES.map((feature) => (
                                 <div key={feature.title}>
                                     <dt className="font-serif text-lg font-semibold text-foreground">
-                                        {feature.title}
+                                        {t(feature.title)}
                                     </dt>
                                     <dd className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                                        {feature.body}
+                                        {t(feature.body)}
                                     </dd>
                                 </div>
                             ))}
@@ -153,18 +146,16 @@ export default function Welcome({ courses, auth }: Props) {
 
                         <div>
                             <h2 className="text-balance font-serif text-3xl font-semibold tracking-tight text-foreground">
-                                Build a course and see who is behind
+                                {t('landing.builderTitle')}
                             </h2>
                             <p className="mt-4 leading-relaxed text-muted-foreground">
-                                The builder writes the course as you work: add a section, add an
-                                activity, publish it. The roster sits beside it, with each learner and
-                                the share of the course they have finished.
+                                {t('landing.builderLede')}
                             </p>
                             <Link
                                 href="/courses"
                                 className="mt-6 inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline"
                             >
-                                See the catalogue
+                                {t('app.seeCatalogue')}
                                 <ArrowRight className="size-4" aria-hidden />
                             </Link>
                         </div>
@@ -175,17 +166,17 @@ export default function Welcome({ courses, auth }: Props) {
                     <div className="flex items-end justify-between gap-4">
                         <div>
                             <h2 className="font-serif text-3xl font-semibold tracking-tight text-foreground">
-                                Published courses
+                                {t('landing.publishedTitle')}
                             </h2>
                             <p className="mt-2 text-muted-foreground">
-                                Recent courses from this installation.
+                                {t('landing.publishedLede')}
                             </p>
                         </div>
                         <Link
                             href="/courses"
                             className="inline-flex shrink-0 items-center gap-1 text-sm font-semibold text-primary hover:underline"
                         >
-                            See the catalogue
+                            {t('app.seeCatalogue')}
                             <ArrowRight className="size-4" aria-hidden />
                         </Link>
                     </div>
@@ -198,7 +189,7 @@ export default function Welcome({ courses, auth }: Props) {
                         </div>
                     ) : (
                         <p className="mt-8 rounded-md border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
-                            No published course yet. Sign in as an instructor to publish one.
+                            {t('landing.publishedEmpty')}
                         </p>
                     )}
                 </section>
@@ -206,20 +197,20 @@ export default function Welcome({ courses, auth }: Props) {
                 <section className="border-t border-border bg-card">
                     <div className="container-page py-16 lg:py-20">
                         <h2 className="text-balance font-serif text-3xl font-semibold tracking-tight text-foreground">
-                            Run it on your own host
+                            {t('landing.closeTitle')}
                         </h2>
                         <p className="mt-3 max-w-xl leading-relaxed text-muted-foreground">
-                            One compose file, one database, and the documentation to go with it.
+                            {t('landing.closeLede')}
                         </p>
                         <div className="mt-7 flex flex-wrap gap-3">
                             <Button asChild>
                                 <a href={`${DOCS_URL}quick-start.html`}>
-                                    Read the quick start
+                                    {t('landing.quickStart')}
                                     <ArrowRight aria-hidden />
                                 </a>
                             </Button>
                             <Button asChild variant="outline">
-                                <a href={REPO_URL}>Open the repository</a>
+                                <a href={REPO_URL}>{t('app.openRepository')}</a>
                             </Button>
                         </div>
                     </div>

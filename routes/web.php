@@ -10,6 +10,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Learning\AssignmentController as LearningAssignmentController;
 use App\Http\Controllers\Learning\QuizController as LearningQuizController;
 use App\Http\Controllers\LearningController;
+use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\SetupController;
 use App\Http\Controllers\Teaching\AssignmentController as TeachingAssignmentController;
@@ -41,6 +42,8 @@ Route::middleware('installed')->group(function (): void {
     Route::post('/register', [AuthController::class, 'register'])->middleware('guest');
 
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
+
+    Route::post('/locale', [LocaleController::class, 'update'])->name('locale.update');
 
     Route::middleware('auth')->group(function (): void {
         Route::get('/dashboard', DashboardController::class)->name('dashboard');

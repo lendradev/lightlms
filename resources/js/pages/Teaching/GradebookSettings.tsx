@@ -1,6 +1,7 @@
 import { Head, Link, router, useForm } from '@inertiajs/react';
 import { ArrowLeft, Plus, Trash2 } from 'lucide-react';
 import { AppShell } from '@/components/AppShell';
+import { useTranslation } from '@/lib/i18n';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -54,6 +55,8 @@ type Props = {
 };
 
 export default function TeachingGradebookSettings({ course, categories, items, settings, aggregations }: Props) {
+    const { t } = useTranslation();
+
     const categoryForm = useForm({
         name: '',
         parent_id: '' as string,
@@ -96,7 +99,7 @@ export default function TeachingGradebookSettings({ course, categories, items, s
                     <Button asChild size="sm" variant="outline">
                         <Link href={`/teaching/${course.slug}/gradebook`} as="button">
                             <ArrowLeft aria-hidden />
-                            Back to the gradebook
+                            {t('gradebook.back')}
                         </Link>
                     </Button>
                 }
@@ -106,17 +109,16 @@ export default function TeachingGradebookSettings({ course, categories, items, s
                         <CardHeader>
                             <CardTitle className="text-base">Categories</CardTitle>
                             <CardDescription>
-                                A category groups activities. Its weight decides how much the group
-                                counts toward the course total.
+                                {t('gradebook.categoriesBody')}
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
                             <Table>
                                 <TableHeader>
                                     <TableRow>
-                                        <TableHead>Name</TableHead>
-                                        <TableHead>Aggregation</TableHead>
-                                        <TableHead className="text-right">Weight</TableHead>
+                                        <TableHead>{t('course.titleField')}</TableHead>
+                                        <TableHead>{t('gradebook.aggregation')}</TableHead>
+                                        <TableHead className="text-right">{t('gradebook.weight')}</TableHead>
                                         <TableHead />
                                     </TableRow>
                                 </TableHeader>
@@ -124,7 +126,7 @@ export default function TeachingGradebookSettings({ course, categories, items, s
                                     {categories.length === 0 ? (
                                         <TableRow>
                                             <TableCell colSpan={4} className="text-sm text-muted-foreground">
-                                                No categories yet. Everything is counted at the top level.
+                                                {t('gradebook.noCategories')}
                                             </TableCell>
                                         </TableRow>
                                     ) : (
@@ -134,13 +136,13 @@ export default function TeachingGradebookSettings({ course, categories, items, s
                                                     <span className="block font-medium">{category.name}</span>
                                                     {category.parent_id !== null && (
                                                         <span className="block text-xs text-muted-foreground">
-                                                            Inside another category
+                                                            {t('gradebook.parentCategory')}
                                                         </span>
                                                     )}
                                                 </TableCell>
                                                 <TableCell>
                                                     <Badge variant="outline">
-                                                        {category.aggregation.replace('_', ' ')}
+                                                        {t(`gradebook.aggregation.${category.aggregation}`)}
                                                     </Badge>
                                                 </TableCell>
                                                 <TableCell className="text-right tabular-nums">
@@ -153,7 +155,7 @@ export default function TeachingGradebookSettings({ course, categories, items, s
                                                         onClick={() => removeCategory(category.id)}
                                                     >
                                                         <Trash2 aria-hidden />
-                                                        Delete
+                                                        {t('action.delete')}
                                                     </Button>
                                                 </TableCell>
                                             </TableRow>
@@ -176,7 +178,7 @@ export default function TeachingGradebookSettings({ course, categories, items, s
                                 className="grid gap-3 border-t pt-4 sm:grid-cols-2"
                             >
                                 <div className="grid gap-2">
-                                    <Label htmlFor="category-name">Name</Label>
+                                    <Label htmlFor="category-name">{t('course.titleField')}</Label>
                                     <Input
                                         id="category-name"
                                         value={categoryForm.data.name}
@@ -188,7 +190,9 @@ export default function TeachingGradebookSettings({ course, categories, items, s
                                 </div>
 
                                 <div className="grid gap-2">
-                                    <Label htmlFor="category-aggregation">Aggregation</Label>
+                                    <Label htmlFor="category-aggregation">
+                                        {t('gradebook.aggregation')}
+                                    </Label>
                                     <Select
                                         value={categoryForm.data.aggregation}
                                         onValueChange={(value) =>
@@ -212,7 +216,7 @@ export default function TeachingGradebookSettings({ course, categories, items, s
                                 </div>
 
                                 <div className="grid gap-2">
-                                    <Label htmlFor="category-weight">Weight</Label>
+                                    <Label htmlFor="category-weight">{t('gradebook.weight')}</Label>
                                     <Input
                                         id="category-weight"
                                         type="number"
@@ -229,13 +233,15 @@ export default function TeachingGradebookSettings({ course, categories, items, s
                                 </div>
 
                                 <div className="grid gap-2">
-                                    <Label htmlFor="category-parent">Parent category</Label>
+                                    <Label htmlFor="category-parent">
+                                        {t('gradebook.parentCategory')}
+                                    </Label>
                                     <Select
                                         value={categoryForm.data.parent_id}
                                         onValueChange={(value) => categoryForm.setData('parent_id', value)}
                                     >
                                         <SelectTrigger id="category-parent">
-                                            <SelectValue placeholder="Top level" />
+                                            <SelectValue placeholder={t('gradebook.topLevel')} />
                                         </SelectTrigger>
                                         <SelectContent>
                                             {categories.map((category) => (
@@ -250,7 +256,7 @@ export default function TeachingGradebookSettings({ course, categories, items, s
                                 <div className="sm:col-span-2">
                                     <Button type="submit" disabled={categoryForm.processing}>
                                         <Plus aria-hidden />
-                                        Add category
+                                        {t('gradebook.addCategory')}
                                     </Button>
                                 </div>
                             </form>
@@ -262,8 +268,7 @@ export default function TeachingGradebookSettings({ course, categories, items, s
                             <CardHeader>
                                 <CardTitle className="text-base">Manual items</CardTitle>
                                 <CardDescription>
-                                    A mark that is not tied to an activity, such as a final project or
-                                    class participation.
+                                    {t('gradebook.manualItemsBody')}
                                 </CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-4">
@@ -271,9 +276,13 @@ export default function TeachingGradebookSettings({ course, categories, items, s
                                     <Table>
                                         <TableHeader>
                                             <TableRow>
-                                                <TableHead>Name</TableHead>
-                                                <TableHead className="text-right">Max</TableHead>
-                                                <TableHead className="text-right">Weight</TableHead>
+                                                <TableHead>{t('course.titleField')}</TableHead>
+                                                <TableHead className="text-right">
+                                                    {t('course.max')}
+                                                </TableHead>
+                                                <TableHead className="text-right">
+                                                    {t('gradebook.weight')}
+                                                </TableHead>
                                             </TableRow>
                                         </TableHeader>
                                         <TableBody>
@@ -283,7 +292,7 @@ export default function TeachingGradebookSettings({ course, categories, items, s
                                                         <span className="block font-medium">{item.name}</span>
                                                         {item.locked && (
                                                             <Badge variant="outline" className="mt-1">
-                                                                Locked
+                                                                {t('gradebook.locked')}
                                                             </Badge>
                                                         )}
                                                     </TableCell>
@@ -299,7 +308,7 @@ export default function TeachingGradebookSettings({ course, categories, items, s
                                     </Table>
                                 ) : (
                                     <p className="text-sm text-muted-foreground">
-                                        No manual items yet.
+                                        {t('gradebook.noManualItems')}
                                     </p>
                                 )}
 
@@ -314,7 +323,7 @@ export default function TeachingGradebookSettings({ course, categories, items, s
                                     className="grid gap-3 border-t pt-4 sm:grid-cols-2"
                                 >
                                     <div className="grid gap-2 sm:col-span-2">
-                                        <Label htmlFor="item-name">Name</Label>
+                                        <Label htmlFor="item-name">{t('course.titleField')}</Label>
                                         <Input
                                             id="item-name"
                                             value={itemForm.data.name}
@@ -326,7 +335,7 @@ export default function TeachingGradebookSettings({ course, categories, items, s
                                     </div>
 
                                     <div className="grid gap-2">
-                                        <Label htmlFor="item-max">Maximum points</Label>
+                                        <Label htmlFor="item-max">{t('gradebook.maxPoints')}</Label>
                                         <Input
                                             id="item-max"
                                             type="number"
@@ -345,7 +354,7 @@ export default function TeachingGradebookSettings({ course, categories, items, s
                                     </div>
 
                                     <div className="grid gap-2">
-                                        <Label htmlFor="item-weight">Weight</Label>
+                                        <Label htmlFor="item-weight">{t('gradebook.weight')}</Label>
                                         <Input
                                             id="item-weight"
                                             type="number"
@@ -357,13 +366,13 @@ export default function TeachingGradebookSettings({ course, categories, items, s
                                     </div>
 
                                     <div className="grid gap-2">
-                                        <Label htmlFor="item-category">Category</Label>
+                                        <Label htmlFor="item-category">{t('gradebook.category')}</Label>
                                         <Select
                                             value={itemForm.data.category_id}
                                             onValueChange={(value) => itemForm.setData('category_id', value)}
                                         >
                                             <SelectTrigger id="item-category">
-                                                <SelectValue placeholder="Top level" />
+                                                <SelectValue placeholder={t('gradebook.topLevel')} />
                                             </SelectTrigger>
                                             <SelectContent>
                                                 {categories.map((category) => (
@@ -376,7 +385,7 @@ export default function TeachingGradebookSettings({ course, categories, items, s
                                     </div>
 
                                     <div className="grid gap-2">
-                                        <Label htmlFor="item-pass">Pass points</Label>
+                                        <Label htmlFor="item-pass">{t('gradebook.passPoints')}</Label>
                                         <Input
                                             id="item-pass"
                                             type="number"
@@ -392,7 +401,7 @@ export default function TeachingGradebookSettings({ course, categories, items, s
                                     <div className="sm:col-span-2">
                                         <Button type="submit" disabled={itemForm.processing}>
                                             <Plus aria-hidden />
-                                            Add manual item
+                                            {t('gradebook.addManualItem')}
                                         </Button>
                                     </div>
                                 </form>
@@ -403,8 +412,7 @@ export default function TeachingGradebookSettings({ course, categories, items, s
                             <CardHeader>
                                 <CardTitle className="text-base">Totals and letter grades</CardTitle>
                                 <CardDescription>
-                                    How the course total is computed, and the percentage each letter grade
-                                    starts at.
+                                    {t('gradebook.totalsBody')}
                                 </CardDescription>
                             </CardHeader>
                             <CardContent>
@@ -419,7 +427,9 @@ export default function TeachingGradebookSettings({ course, categories, items, s
                                     className="grid gap-3 sm:grid-cols-2"
                                 >
                                     <div className="grid gap-2 sm:col-span-2">
-                                        <Label htmlFor="settings-aggregation">Course aggregation</Label>
+                                        <Label htmlFor="settings-aggregation">
+                                            {t('gradebook.courseAggregation')}
+                                        </Label>
                                         <Select
                                             value={settingsForm.data.aggregation}
                                             onValueChange={(value) =>
@@ -444,10 +454,10 @@ export default function TeachingGradebookSettings({ course, categories, items, s
 
                                     {(
                                         [
-                                            ['letter_a', 'A from'],
-                                            ['letter_b', 'B from'],
-                                            ['letter_c', 'C from'],
-                                            ['letter_d', 'D from'],
+                                            ['letter_a', t('gradebook.letterA')],
+                                            ['letter_b', t('gradebook.letterB')],
+                                            ['letter_c', t('gradebook.letterC')],
+                                            ['letter_d', t('gradebook.letterD')],
                                         ] as const
                                     ).map(([field, label]) => (
                                         <div key={field} className="grid gap-2">
@@ -468,7 +478,7 @@ export default function TeachingGradebookSettings({ course, categories, items, s
 
                                     <div className="sm:col-span-2">
                                         <Button type="submit" disabled={settingsForm.processing}>
-                                            Save settings
+                                            {t('gradebook.saveSettings')}
                                         </Button>
                                     </div>
                                 </form>

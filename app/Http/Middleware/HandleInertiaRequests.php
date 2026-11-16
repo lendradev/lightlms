@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use App\Services\NotificationService;
 use App\Support\Locale;
 use App\Support\Setup;
+use App\Support\Translations;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -25,9 +26,13 @@ class HandleInertiaRequests extends Middleware
                 'name' => Setup::siteName(),
                 'locale' => app()->getLocale(),
                 'availableLocales' => Locale::available(),
+                'localeNames' => collect(Locale::available())->mapWithKeys(
+                    fn (string $locale) => [$locale => Locale::name($locale)],
+                )->all(),
                 'registrationMode' => Setup::registrationMode(),
                 'installed' => Setup::isInstalled(),
             ],
+            'translations' => fn () => Translations::for(app()->getLocale()),
             'auth' => [
                 'user' => $request->user()?->only(['id', 'name', 'email', 'role']),
             ],

@@ -331,3 +331,13 @@ the request never sent leaves that key out of the validated array entirely. Only
 were actually present, or that have a default, are present in the result.
 **Fix.** Read optional fields with `array_key_exists('weight', $validated)`, the same way the item
 update action already did.
+## A cookie that the framework encrypts cannot be read by the middleware that sets it
+**Symptom.** The locale cookie was written by the application but the next request came back in
+English, and the test suite failed with `DecryptException: The payload is invalid`.
+**Cause.** Laravel encrypts every cookie by default. The locale middleware read the raw cookie
+value, which was the encrypted blob, so the locale never matched and the middleware fell back to
+the default. The test helper `withCookie` encrypts the value for the request, so the test read an
+encrypted value too and got a second layer of encryption.
+**Fix.** Exclude the cookie from encryption with `$middleware->encryptCookies(except: [...])`, and
+use `withUnencryptedCookies()` in the tests. The value in the cookie is a language code, so there
+is nothing to protect.

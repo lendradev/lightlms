@@ -1,6 +1,7 @@
 import { Head, Link, router } from '@inertiajs/react';
 import { CheckCircle2, Circle, Clock, FileText, MessageSquare, Video } from 'lucide-react';
 import { AppShell } from '@/components/AppShell';
+import { useTranslation } from '@/lib/i18n';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -46,6 +47,7 @@ const typeIcons: Record<string, typeof FileText> = {
 };
 
 export default function LearningCourse({ course, completedLessonIds }: Props) {
+    const { t } = useTranslation();
     const allLessons = course.modules.flatMap((module) => module.lessons);
     const total = allLessons.length;
     const done = allLessons.filter((lesson) => completedLessonIds.includes(lesson.id)).length;
@@ -108,7 +110,9 @@ export default function LearningCourse({ course, completedLessonIds }: Props) {
                                                                 </span>
                                                             )}
                                                             {lesson.is_preview && (
-                                                                <Badge variant="outline">Preview</Badge>
+                                                                <Badge variant="outline">
+                                                                    {t('course.preview')}
+                                                                </Badge>
                                                             )}
                                                         </span>
                                                     </span>
@@ -116,20 +120,24 @@ export default function LearningCourse({ course, completedLessonIds }: Props) {
                                                     {isDone ? (
                                                         <Badge variant="secondary" className="gap-1">
                                                             <CheckCircle2 className="size-3" aria-hidden />
-                                                            Done
+                                                            {t('course.done')}
                                                         </Badge>
                                                     ) : lesson.type === 'assignment' && lesson.assignment ? (
                                                         <Button asChild size="sm">
                                                             <Link href={`/assignments/${lesson.assignment.id}`}>
-                                                                Open assignment
+                                                                {t('course.openAssignment')}
                                                             </Link>
                                                         </Button>
                                                     ) : lesson.type === 'quiz' && lesson.quiz ? (
                                                         <Button asChild size="sm">
-                                                            <Link href={`/quizzes/${lesson.quiz.id}`}>Open quiz</Link>
+                                                            <Link href={`/quizzes/${lesson.quiz.id}`}>
+                                                                {t('course.openQuiz')}
+                                                            </Link>
                                                         </Button>
                                                     ) : lesson.is_preview ? (
-                                                        <Badge variant="outline">Preview</Badge>
+                                                        <Badge variant="outline">
+                                                            {t('course.preview')}
+                                                        </Badge>
                                                     ) : (
                                                         <Button
                                                             size="sm"
@@ -158,34 +166,39 @@ export default function LearningCourse({ course, completedLessonIds }: Props) {
                     <aside className="lg:sticky lg:top-20 lg:self-start">
                         <Card>
                             <CardHeader>
-                                <CardTitle className="text-sm">Your progress</CardTitle>
+                                <CardTitle className="text-sm">{t('course.progress')}</CardTitle>
                             </CardHeader>
                             <CardContent>
                                 <Progress value={progress} />
                                 <p className="mt-2 text-xs text-muted-foreground">
-                                    {done} of {total} activities complete ({progress}%)
+                                    {t('course.completed', {
+                                        done,
+                                        total,
+                                        percent: progress,
+                                    })}
                                 </p>
                             </CardContent>
                         </Card>
 
                         <Card className="mt-4">
                             <CardHeader>
-                                <CardTitle className="text-sm">Your grades</CardTitle>
+                                <CardTitle className="text-sm">{t('course.grades')}</CardTitle>
                             </CardHeader>
                             <CardContent>
                                 <p className="text-xs text-muted-foreground">
-                                    Marks for every graded activity, with the category totals and the
-                                    final grade.
+                                    {t('course.gradesBody')}
                                 </p>
                                 <Button asChild size="sm" variant="outline" className="mt-3">
-                                    <Link href={`/learning/${course.slug}/grades`}>Open transcript</Link>
+                                    <Link href={`/learning/${course.slug}/grades`}>
+                                        {t('course.openTranscript')}
+                                    </Link>
                                 </Button>
                             </CardContent>
                         </Card>
 
                         <Card className="mt-4">
                             <CardHeader>
-                                <CardTitle className="text-sm">Contents</CardTitle>
+                                <CardTitle className="text-sm">{t('course.contents')}</CardTitle>
                             </CardHeader>
                             <CardContent>
                                 <ol className="space-y-3">

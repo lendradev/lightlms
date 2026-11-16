@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useTranslation } from '@/lib/i18n';
 
 type Props = {
     requiresInviteCode: boolean;
@@ -26,6 +27,7 @@ export default function Register({
     invitedEmail,
     siteName,
 }: Props) {
+    const { t } = useTranslation();
     const { data, setData, post, processing, errors } = useForm<Form>({
         name: '',
         email: invitedEmail ?? '',
@@ -56,8 +58,8 @@ export default function Register({
 
                     <Card>
                         <CardHeader>
-                            <CardTitle>Create your account</CardTitle>
-                            <CardDescription>You will be able to enrol in courses right away.</CardDescription>
+                            <CardTitle>{t('auth.signUp')}</CardTitle>
+                            <CardDescription>{t('auth.registerBody')}</CardDescription>
                         </CardHeader>
                         <CardContent>
                             <form
@@ -68,7 +70,7 @@ export default function Register({
                                 className="grid gap-4"
                             >
                                 <div className="grid gap-2">
-                                    <Label htmlFor="name">Name</Label>
+                                    <Label htmlFor="name">{t('auth.name')}</Label>
                                     <Input
                                         id="name"
                                         autoComplete="name"
@@ -79,7 +81,7 @@ export default function Register({
                                 </div>
 
                                 <div className="grid gap-2">
-                                    <Label htmlFor="email">Email</Label>
+                                    <Label htmlFor="email">{t('auth.email')}</Label>
                                     <Input
                                         id="email"
                                         type="email"
@@ -92,7 +94,7 @@ export default function Register({
 
                                 {requiresInviteCode && (
                                     <div className="grid gap-2">
-                                        <Label htmlFor="invite_code">Invite code</Label>
+                                        <Label htmlFor="invite_code">{t('auth.inviteCode')}</Label>
                                         <Input
                                             id="invite_code"
                                             value={data.invite_code}
@@ -105,7 +107,7 @@ export default function Register({
                                 )}
 
                                 <div className="grid gap-2">
-                                    <Label htmlFor="password">Password</Label>
+                                    <Label htmlFor="password">{t('auth.password')}</Label>
                                     <Input
                                         id="password"
                                         type="password"
@@ -117,7 +119,9 @@ export default function Register({
                                 </div>
 
                                 <div className="grid gap-2">
-                                    <Label htmlFor="password_confirmation">Confirm password</Label>
+                                    <Label htmlFor="password_confirmation">
+                                        {t('auth.confirmPassword')}
+                                    </Label>
                                     <Input
                                         id="password_confirmation"
                                         type="password"

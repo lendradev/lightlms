@@ -1,0 +1,25 @@
+<?php
+
+return [
+    'auth.signIn' => 'Sign in',
+    'auth.signUp' => 'Create your account',
+    'auth.email' => 'Email',
+    'auth.password' => 'Password',
+    'auth.confirmPassword' => 'Confirm password',
+    'auth.name' => 'Your name',
+    'auth.remember' => 'Keep me signed in',
+    'auth.forgot' => 'Forgot your password?',
+    'auth.noAccount' => 'Need an account?',
+    'auth.haveAccount' => 'Already have an account?',
+    'auth.inviteCode' => 'Invite code',
+    'auth.inviteCodeOptional' => 'Invite code (optional)',
+    'auth.welcome' => 'Welcome back',
+    'auth.welcomeBody' => 'Use your account to reach your courses.',
+    'auth.registerBody' => 'You will be able to enrol in courses right away.',
+    'auth.registrationMode' => 'Registration',
+    'auth.mode.open' => 'Anyone can sign up',
+    'auth.mode.invite' => 'Invitation only',
+    'auth.mode.closed' => 'Closed',
+    'auth.failed' => 'Those credentials do not match our records.',
+    'auth.throttled' => 'Too many attempts. Try again in a moment.',
+];
