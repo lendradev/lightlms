@@ -2,6 +2,8 @@
 
 # LightLMS
 
+![LightLMS](docs/banner/banner.png)
+
 **A modern, self-hosted open-source Learning Management System.**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-crimson.svg)](LICENSE)
