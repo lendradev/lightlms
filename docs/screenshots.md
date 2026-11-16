@@ -209,4 +209,47 @@ Shown when someone reaches a course or an area they are not allowed into.
 
 ---
 
+## Validation and empty states
+
+An empty screen should still say what happened and what to do next. These are the states a
+learner or an instructor hits on a fresh account or an empty course.
+
+### Sign in with wrong credentials
+
+| Light | Dark |
+|---|---|
+| ![Sign in error](screenshots/60-form-error-login.png) | ![Sign in error in dark mode](screenshots/60-form-error-login-dark.png) |
+
+### Registration validation
+
+| Light | Dark |
+|---|---|
+| ![Registration validation](screenshots/61-form-error-register.png) | ![Registration validation in dark mode](screenshots/61-form-error-register-dark.png) |
+
+### Catalogue with no match
+
+| Light | Dark |
+|---|---|
+| ![Catalogue with no match](screenshots/62-empty-catalogue-search.png) | ![Catalogue with no match in dark mode](screenshots/62-empty-catalogue-search-dark.png) |
+
+### No enrolments yet
+
+| Light | Dark |
+|---|---|
+| ![No enrolments yet](screenshots/63-empty-learning.png) | ![No enrolments yet in dark mode](screenshots/63-empty-learning-dark.png) |
+
+### Course with no participants
+
+| Light | Dark |
+|---|---|
+| ![Roster with no participants](screenshots/64-empty-roster.png) | ![Roster with no participants in dark mode](screenshots/64-empty-roster-dark.png) |
+
+### Gradebook with no graded activities
+
+| Light | Dark |
+|---|---|
+| ![Empty gradebook](screenshots/65-empty-gradebook.png) | ![Empty gradebook in dark mode](screenshots/65-empty-gradebook-dark.png) |
+
+---
+
 Back to the [README](../README.md).
