@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>{{ $title ?? 'Something went wrong' }} · {{ config('app.name', 'LightLMS') }}</title>
 
+        @include('partials.theme-init')
         @vite(['resources/css/app.css'])
     </head>
     <body class="min-h-screen bg-background text-foreground antialiased">
@@ -21,7 +22,7 @@
                 </p>
                 <a
                     href="{{ url('/') }}"
-                    class="mt-6 inline-block rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
+                    class="mt-6 inline-flex h-10 items-center justify-center rounded-sm bg-primary px-4 text-sm font-medium text-primary-foreground transition hover:bg-primary/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
                 >
                     Back to the homepage
                 </a>

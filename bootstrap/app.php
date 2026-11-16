@@ -4,11 +4,14 @@ use App\Http\Middleware\EnsureInstalled;
 use App\Http\Middleware\EnsureUserHasRole;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\SecurityHeaders;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -38,4 +41,35 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
         );
+
+        // Browser requests that reach an HTTP error get the themed error page
+        // instead of Laravel's default one, which ignores the design tokens.
+        // Validation and authentication errors keep their own handling: the
+        // first needs the session errors, the second needs the redirect.
+        $exceptions->render(function (\Throwable $e, Request $request) {
+            if ($request->expectsJson() || $request->is('api/*') || $request->header('X-Inertia')) {
+                return null;
+            }
+
+            if ($e instanceof ValidationException || $e instanceof AuthenticationException) {
+                return null;
+            }
+
+            $status = $e instanceof HttpExceptionInterface ? $e->getStatusCode() : 500;
+
+            $title = match (true) {
+                $status === 404 => 'Page not found',
+                $status === 403 => 'Access denied',
+                $status === 419 => 'Session expired',
+                $status >= 500 => 'Something went wrong',
+                default => 'Request could not be completed',
+            };
+
+            return response()->view('errors.error', [
+                'title' => $title,
+                'message' => $status >= 500
+                    ? 'The server ran into a problem. Please try again in a moment.'
+                    : $e->getMessage(),
+            ], $status);
+        });
     })->create();

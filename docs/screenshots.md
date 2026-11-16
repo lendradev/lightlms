@@ -188,4 +188,25 @@ every action stays reachable with a thumb.
 
 ---
 
+## Error states
+
+Errors are part of the product, not an afterthought. The error page uses the same tokens as the rest
+of the application, so it follows the theme and keeps the identity intact.
+
+### Page not found
+
+| Light | Dark |
+|---|---|
+| ![Page not found](screenshots/50-error-404.png) | ![Page not found in dark mode](screenshots/50-error-404-dark.png) |
+
+### Access denied
+
+Shown when someone reaches a course or an area they are not allowed into.
+
+| Light | Dark |
+|---|---|
+| ![Access denied](screenshots/51-error-403.png) | ![Access denied in dark mode](screenshots/51-error-403-dark.png) |
+
+---
+
 Back to the [README](../README.md).
