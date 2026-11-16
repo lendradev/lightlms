@@ -106,6 +106,44 @@ class LocaleTest extends TestCase
         $this->assertSame([], array_values(array_diff($shared, $allowed)));
     }
 
+    public function test_every_placeholder_uses_the_colon_syntax_the_front_end_replaces(): void
+    {
+        foreach (['en', 'id'] as $locale) {
+            foreach (Translations::for($locale) as $key => $value) {
+                foreach ($this->flatten($value) as $string) {
+                    // The front end replaces ":name". A placeholder in braces is
+                    // never replaced, so it reaches the browser as raw text.
+                    $this->assertDoesNotMatchRegularExpression(
+                        '/\{[a-z_]+\}/',
+                        $string,
+                        "The string \"{$key}\" in {$locale} uses braces instead of a colon.",
+                    );
+                }
+            }
+        }
+    }
+
+    /**
+     * A translation group may hold a nested array, such as the validation
+     * messages for a size rule.
+     *
+     * @return list<string>
+     */
+    private function flatten(mixed $value): array
+    {
+        if (is_array($value)) {
+            $strings = [];
+
+            foreach ($value as $item) {
+                $strings = [...$strings, ...$this->flatten($item)];
+            }
+
+            return $strings;
+        }
+
+        return [(string) $value];
+    }
+
     public function test_a_key_that_is_missing_in_one_language_falls_back_to_english(): void
     {
         $indonesian = Translations::for('id');

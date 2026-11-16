@@ -178,6 +178,35 @@ class GradebookTest extends TestCase
         $this->assertSame(87.5, $total['percent']);
     }
 
+    public function test_a_category_total_uses_the_aggregation_of_that_category(): void
+    {
+        $course = Course::factory()->create();
+        $module = Module::factory()->create(['course_id' => $course->id]);
+        Lesson::factory()->assignment()->create(['module_id' => $module->id, 'grade_max' => 100]);
+        Lesson::factory()->assignment()->create(['module_id' => $module->id, 'grade_max' => 100]);
+
+        $gradebook = app(GradebookService::class);
+        $gradebook->syncItems($course);
+
+        $items = GradeItem::query()->where('course_id', $course->id)->orderBy('sort_order')->get();
+
+        $exams = $gradebook->saveCategory($course, 'Exams', null, 'weighted_mean', 3);
+        $items[0]->update(['category_id' => $exams->id]);
+        $items[1]->update(['category_id' => $exams->id]);
+
+        $student = User::factory()->create();
+        $teacher = User::factory()->instructor()->create();
+
+        $gradebook->saveGrade($items[0], $student, 100, null, $teacher);
+        $gradebook->saveGrade($items[1], $student, 50, null, $teacher);
+
+        $subtotal = $gradebook->categoryTotal($course, $exams, $student);
+
+        $this->assertSame(75.0, $subtotal['points'], 'The mean of 100 and 50.');
+        $this->assertSame(100.0, $subtotal['max']);
+        $this->assertSame(75.0, $subtotal['percent']);
+    }
+
     public function test_a_manual_item_is_counted_in_the_total(): void
     {
         $course = Course::factory()->create();

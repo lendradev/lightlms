@@ -33,7 +33,7 @@ return [
     'course.lessons' => 'Aktivitas',
     'course.progress' => 'Kemajuan Anda',
     'course.contents' => 'Daftar isi',
-    'course.completed' => '{done} dari {total} aktivitas selesai ({percent}%)',
+    'course.completed' => ':done dari :total aktivitas selesai (:percent%)',
     'course.markComplete' => 'Tandai selesai',
     'course.done' => 'Selesai',
     'course.preview' => 'Pratinjau',

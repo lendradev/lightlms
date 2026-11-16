@@ -370,7 +370,7 @@ class GradebookService
         }
 
         $points = $this->aggregate($entries, $category->aggregation);
-        $max = $this->aggregateMax($entries);
+        $max = $this->aggregateMax($entries, $category->aggregation);
         $percent = $max > 0 ? round(($points / $max) * 100, 1) : null;
 
         return [

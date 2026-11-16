@@ -33,7 +33,7 @@ return [
     'course.lessons' => 'Activities',
     'course.progress' => 'Your progress',
     'course.contents' => 'Contents',
-    'course.completed' => '{done} of {total} activities complete ({percent}%)',
+    'course.completed' => ':done of :total activities complete (:percent%)',
     'course.markComplete' => 'Mark complete',
     'course.done' => 'Done',
     'course.preview' => 'Preview',
