@@ -270,3 +270,36 @@ so the response says nothing about whether Pages is configured.
 **Fix.** Do not read the API response as proof that Pages is off. Check the repository settings, or
 call the endpoint with a token. The same applies to `actions/configure-pages`: with
 `enablement: true` it needs a token that is not `GITHUB_TOKEN`.
+
+## Git cannot store an empty directory
+**Symptom.** The suite passed on the developer machine and failed on the runner with
+`Test directory "tests/Unit" not found` and exit code 2, on every PHP version.
+
+**Cause.** `tests/Unit` held no file. Git does not track directories, so the directory did not
+exist in the clone, and PHPUnit treats a missing test directory as a fatal error, not as an empty
+suite.
+
+**Fix.** Put a file in the directory. A real unit test is better than a placeholder: it proves the
+suite runs. The same trap applies to any directory listed in `phpunit.xml`.
+
+## SQLite accepts a join to a table that has not been joined yet
+**Symptom.** The suite passed locally and failed on the runner with
+`missing FROM-clause entry for table "modules"` on PostgreSQL only.
+
+**Cause.** The query joined `lessons` to `modules` before it joined `modules` to `courses`. SQLite
+resolves a table that is not in the `FROM` list as a separate cross join and returns the rows
+anyway. PostgreSQL refuses to build the query at all.
+
+**Fix.** Join in the order the tables depend on each other: `courses` to `modules`, then `modules`
+to `lessons`. Run the suite against the database the CI uses, not only against SQLite.
+
+## PHPUnit reads the environment before Laravel does
+**Symptom.** A test run reported 156 warnings instead of 156 passes, with
+`file_get_contents(/work/.env)` as the reason.
+
+**Cause.** `phpunit.xml` sets `DB_CONNECTION` and friends as `<env>` without `force="true"`, so
+PHPUnit keeps an existing environment variable and ignores its own value. The `.env` file then
+supplied the database connection, overriding the test configuration.
+
+**Fix.** Put a `.env` in place before running the suite, or set the variables in the shell. The
+run in CI copies `.env.example` to `.env` for the same reason.
