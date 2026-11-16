@@ -58,7 +58,7 @@ export function AppShell({ title, actions, children }: { title: string; actions?
     return (
         <div className="flex min-h-screen bg-background">
             <aside className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col border-r bg-sidebar lg:flex">
-                <div className="flex h-16 shrink-0 items-center gap-2.5 border-b px-5">
+                <div className="flex h-14 shrink-0 items-center gap-2.5 border-b px-5">
                     <span className="grid size-8 place-items-center rounded-md bg-primary text-sm font-bold text-primary-foreground">
                         L
                     </span>
@@ -86,7 +86,7 @@ export function AppShell({ title, actions, children }: { title: string; actions?
             </aside>
 
             <div className="flex min-w-0 flex-1 flex-col">
-                <header className="sticky top-0 z-40 flex h-16 shrink-0 items-center justify-between gap-3 border-b bg-card/85 px-4 backdrop-blur sm:px-6 lg:px-8">
+                <header className="sticky top-0 z-40 flex h-14 shrink-0 items-center justify-between gap-3 border-b bg-card/85 px-4 backdrop-blur sm:px-6 lg:px-8">
                     <div className="flex min-w-0 items-center gap-3">
                         <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
                             <SheetTrigger asChild>
@@ -96,7 +96,7 @@ export function AppShell({ title, actions, children }: { title: string; actions?
                                 </Button>
                             </SheetTrigger>
                             <SheetContent side="left" className="w-72 p-0">
-                                <div className="flex h-16 items-center gap-2.5 border-b px-5">
+                                <div className="flex h-14 items-center gap-2.5 border-b px-5">
                                     <span className="grid size-8 place-items-center rounded-md bg-primary text-sm font-bold text-primary-foreground">
                                         L
                                     </span>

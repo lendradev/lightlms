@@ -39,8 +39,11 @@ class DashboardController extends Controller
             ->limit(6)
             ->get()
             ->map(function ($course) {
-                $course->progress = (int) ($course->pivot->progress ?? 0);
-                $course->status = $course->pivot->status ?? 'active';
+                // `progress` and `enrollment_status` are pivot values. They cannot
+                // be assigned to the course itself: `status` is cast to the
+                // CourseStatus enum on the model.
+                $course->enrollment_progress = (int) ($course->pivot->progress ?? 0);
+                $course->enrollment_status = (string) ($course->pivot->status ?? 'active');
 
                 return $course;
             });

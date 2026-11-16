@@ -20,8 +20,48 @@ modules, lessons, assignments and progress tracking, deployed on infrastructure 
 It is a conventional Laravel application with a React front end served through Inertia.js, so
 every part of it is readable, testable and replaceable.
 
-> **Status:** early development. The data model and public catalogue are stable; authentication
-> and the instructor authoring experience are the next milestones. See the roadmap below.
+> **Status:** the core platform is in place — authentication, role-based dashboards, a course
+> builder, a learner course player with progress tracking, and an administration area with
+> user management, invitations, settings and one-click backup. See the roadmap below.
+
+## Screenshots
+
+### Home
+
+![LightLMS home](docs/screenshots/01-home.png)
+
+### Student dashboard
+
+![Student dashboard](docs/screenshots/02-dashboard-student.png)
+
+### Course catalogue
+
+![Course catalogue](docs/screenshots/04-catalogue.png)
+
+### Course detail
+
+![Course detail](docs/screenshots/05-course-detail.png)
+
+### Course player
+
+![Course player](docs/screenshots/03-learning-course.png)
+
+### Course builder
+
+![Course builder](docs/screenshots/07-course-builder.png)
+
+### Administration
+
+![Administration](docs/screenshots/08-admin-users.png)
+
+### Mobile
+
+The layout is designed for a phone first: the navigation collapses into a sheet, cards
+stack, and every action stays reachable with a thumb.
+
+| Mobile dashboard | Mobile catalogue |
+|---|---|
+| ![Mobile dashboard](docs/screenshots/10-mobile-dashboard.png) | ![Mobile catalogue](docs/screenshots/11-mobile-catalogue.png) |
 
 ---
 
@@ -52,10 +92,12 @@ and leave you with an admin panel and no coherent learner experience.
 LightLMS takes the middle path:
 
 - **A calm learner interface.** The visual language is deliberately restrained — generous
-  whitespace, a single crimson accent, a warm neutral type scale — in the spirit of MIT
+  whitespace, a single deep bronze accent, a warm neutral type scale — in the spirit of MIT
   OpenCourseWare. Nothing pulses for attention, because nothing should need to.
-- **A conventional stack.** Laravel 13, Inertia.js v3, React 19 and Tailwind CSS v4. No
-  bespoke framework, no Vue/React hybrid, no lock-in.
+- **A conventional stack.** Laravel 13, Inertia.js v3, React 19, Tailwind CSS v4 and
+  shadcn/ui. No bespoke framework, no Vue/React hybrid, no lock-in.
+- **Set up without touching the terminal.** A setup wizard checks the environment, creates
+  the first administrator and decides whether people can sign up on their own.
 - **One-command deployment.** A multi-stage Dockerfile plus a compose file with Postgres,
   Redis and a queue worker. Any Docker host will do.
 - **Readable by default.** Controllers stay thin, business logic lives in models and actions,
@@ -63,21 +105,25 @@ LightLMS takes the middle path:
 
 ---
 
-## Feature roadmap
-
 | Area | Status |
 |---|---|
-| Course catalogue (browse, filter, paginate) | Available |
+| Setup wizard (environment check, first administrator, registration mode) | Available |
+| Authentication (session, roles: student / instructor / admin) | Available |
+| Self-registration, invite-only mode, shared invite code | Available |
+| Course catalogue (search, filter by level, grid and list view) | Available |
 | Course detail with module & lesson outline | Available |
-| Data model: courses, modules, lessons, enrollments | Available |
+| Course builder (sections, activities, publish and unpublish) | Available |
+| Learner dashboard: enrolled courses, progress, deadlines, grades | Available |
+| Course player with per-activity completion and progress tracking | Available |
+| Administration: users, roles, invitations, site settings | Available |
+| One-click backup and restore (database + uploaded files) | Available |
+| Data model: courses, sections, activities, enrollments, grades | Available |
 | Docker image + compose stack (Postgres, Redis, worker) | Available |
-| Authentication (session, roles: student / instructor / admin) | Planned |
-| Instructor authoring: create and edit courses, modules, lessons | Planned |
-| Learner dashboard: enrolled courses, progress, continue where you left off | Planned |
-| Assignments, submissions and grading | Planned |
-| Quizzes with question types and attempt tracking | Planned |
+| Assignments, submissions and grading | In progress |
+| Quizzes with question types and attempt tracking | In progress |
 | File uploads (course material, submissions) | Planned |
 | Notifications by email and in-app | Planned |
+| Gradebook with categories and weighting | Planned |
 | Certificates of completion | Planned |
 | REST API for integrations | Planned |
 | Multi-language UI (English primary, Bahasa Indonesia secondary) | Planned |
@@ -91,7 +137,7 @@ LightLMS takes the middle path:
 | Language | PHP 8.3+ | Tested on 8.5 |
 | Framework | Laravel 13 | Conventional MVC, Eloquent, queues, scheduler |
 | Front-end bridge | Inertia.js v3 | Server-driven navigation, no separate SPA router |
-| UI library | React 19 + TypeScript 5.9 | Functional components, no state library needed |
+| UI library | React 19 + TypeScript 5.9 + shadcn/ui | Functional components, no state library needed |
 | Styling | Tailwind CSS v4 | CSS-first `@theme` tokens, no JS config file |
 | Build tool | Vite 8 | Laravel plugin + Tailwind plugin |
 | Database | PostgreSQL 18 (SQLite for local dev) | Migrations via Eloquent |
@@ -123,10 +169,20 @@ php artisan key:generate
 
 touch database/database.sqlite
 php artisan migrate
-php artisan db:seed          # optional: demo courses
 
 npm run build
 php artisan serve
+```
+
+Open <http://127.0.0.1:8000>. The **setup wizard** takes over: it checks the
+environment, asks for the site name and your administrator account, and lets you
+choose whether anyone can sign up or only invited people can.
+
+To explore with demo content instead, seed it and sign in with
+`admin@lightlms.test` / `password12345`:
+
+```bash
+php artisan db:seed
 ```
 
 The application is now available at <http://127.0.0.1:8000>.
@@ -269,8 +325,13 @@ composer run lint          # Laravel Pint
 ```
 
 **Design tokens** live in `resources/css/app.css` under `@theme`. The palette is intentionally
-small: a crimson brand scale, a warm neutral ink scale, and a teal accent used only for progress
-and completion states. Change the tokens there, not in components.
+small: a deep bronze brand scale for actions and links, a warm neutral ink scale for surfaces
+and text, and a dark teal accent used only for progress and completion states. Change the
+tokens there, not in components.
+
+The shape language follows MIT OpenCourseWare: a tight 5px radius, a real card shadow rather
+than a flat outline, and a serif reserved for display headings while the chrome stays in the
+system sans.
 
 ---
 
@@ -327,18 +388,28 @@ and distribute it, provided the copyright notice and permission notice are inclu
 ## Bahasa Indonesia
 
 **LightLMS** adalah sistem manajemen pembelajaran (LMS) open-source yang bisa di-hosting sendiri
-untuk sekolah, kampus, danWidaguru independen: katalog kursus, modul, pelajaran, tugas, serta
+untuk sekolah, kampus, dan Widaguru independen: katalog kursus, modul, pelajaran, tugas, serta
 pelacakan progres peserta.
 
+**Fitur yang sudah berjalan:** wizard konfigurasi awal, autentikasi dengan peran
+(student/instructor/admin), mode pendaftaran terbuka atau hanya undangan, course builder,
+course player dengan pelacakan progres, panel administrasi (pengguna, undangan, pengaturan),
+serta backup dan restore data dalam satu klik.
+
 **Tumpukan teknologi:** Laravel 13, Inertia.js v3, React 19, TypeScript, Tailwind CSS v4,
-PostgreSQL, Redis, dan Docker.
+shadcn/ui, PostgreSQL, Redis, dan Docker.
+
 **Menjalankan secara lokal**
 
 ```bash
 composer install && npm install
 cp .env.example .env && php artisan key:generate
-php artisan migrate --seed && npm run build && php artisan serve
+php artisan migrate && npm run build && php artisan serve
 ```
+
+Setelah itu buka <http://127.0.0.1:8000> dan ikuti wizard konfigurasi awal. Untuk melihat
+isi contoh, jalankan `php artisan db:seed` lalu masuk dengan
+`admin@lightlms.test` / `password12345`.
 
 **Deployment dengan Docker**
 

@@ -8,32 +8,47 @@ type SiteHeaderProps = {
 
 export function SiteHeader({ user }: SiteHeaderProps) {
     return (
-        <header className="sticky top-0 z-40 border-b border-border bg-card/85 backdrop-blur">
-            <div className="container-page flex h-16 items-center justify-between gap-6">
+        <header className="sticky top-0 z-40 border-b border-border bg-card">
+            <div className="container-page flex h-14 items-center justify-between gap-6">
                 <Link href="/" className="flex items-center gap-2.5" aria-label="LightLMS home">
-                    <span className="grid size-8 place-items-center rounded-md bg-primary text-sm font-bold text-primary-foreground">
+                    <span className="grid size-7 place-items-center rounded-sm bg-primary text-sm font-bold text-primary-foreground">
                         L
                     </span>
                     <span className="font-serif text-lg font-semibold tracking-tight text-foreground">LightLMS</span>
                 </Link>
 
-                <nav className="hidden items-center gap-6 text-sm font-medium text-muted-foreground md:flex" aria-label="Main">
+                <nav
+                    className="hidden items-center gap-6 text-sm font-medium text-muted-foreground md:flex"
+                    aria-label="Main"
+                >
                     <Link href="/courses" className="transition hover:text-foreground">
                         Explore courses
                     </Link>
-                    <a href="#about" className="transition hover:text-foreground">
-                        About
+                    <a href="#features" className="transition hover:text-foreground">
+                        Features
                     </a>
                 </nav>
 
                 <div className="flex items-center gap-3">
                     {user ? (
-                        <span className="hidden text-sm text-muted-foreground sm:inline">{user.name}</span>
+                        <Link
+                            href="/dashboard"
+                            className="hidden text-sm font-medium text-foreground transition hover:text-primary sm:inline"
+                        >
+                            {user.name}
+                        </Link>
                     ) : (
-                        <span className="hidden text-sm text-muted-foreground sm:inline">Sign in</span>
+                        <Link
+                            href="/login"
+                            className="hidden text-sm font-medium text-foreground transition hover:text-primary sm:inline"
+                        >
+                            Sign in
+                        </Link>
                     )}
                     <Button asChild size="sm">
-                        <Link href="/courses">Get started</Link>
+                        <Link href={user ? '/dashboard' : '/courses'}>
+                            {user ? 'Dashboard' : 'Get started'}
+                        </Link>
                     </Button>
                 </div>
             </div>
@@ -43,7 +58,7 @@ export function SiteHeader({ user }: SiteHeaderProps) {
 
 export function SiteFooter({ children }: { children?: ReactNode }) {
     return (
-        <footer className="mt-24 border-t border-border bg-card">
+        <footer className="mt-16 border-t border-border bg-card">
             <div className="container-page py-12">
                 <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
                     <div>
@@ -56,7 +71,11 @@ export function SiteFooter({ children }: { children?: ReactNode }) {
                     <div>
                         <p className="text-sm font-semibold text-foreground">Product</p>
                         <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-                            <li>Course catalogue</li>
+                            <li>
+                                <Link href="/courses" className="transition hover:text-foreground">
+                                    Course catalogue
+                                </Link>
+                            </li>
                             <li>Assignments &amp; quizzes</li>
                             <li>Progress tracking</li>
                         </ul>

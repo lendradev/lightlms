@@ -1,9 +1,9 @@
 import { Head, router } from '@inertiajs/react';
-import { CheckCircle2, Circle, Clock, FileText, MessageSquare, PlayCircle, Video } from 'lucide-react';
+import { CheckCircle2, Circle, Clock, FileText, MessageSquare, Video } from 'lucide-react';
 import { AppShell } from '@/components/AppShell';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 
 type Lesson = {
@@ -43,10 +43,9 @@ const typeIcons: Record<string, typeof FileText> = {
 };
 
 export default function LearningCourse({ course, completedLessonIds }: Props) {
-    const total = course.modules.reduce((sum, module) => sum + module.lessons.length, 0);
-    const done = course.modules
-        .flatMap((module) => module.lessons)
-        .filter((lesson) => completedLessonIds.includes(lesson.id)).length;
+    const allLessons = course.modules.flatMap((module) => module.lessons);
+    const total = allLessons.length;
+    const done = allLessons.filter((lesson) => completedLessonIds.includes(lesson.id)).length;
     const progress = total === 0 ? 0 : Math.round((done / total) * 100);
 
     return (
@@ -54,39 +53,47 @@ export default function LearningCourse({ course, completedLessonIds }: Props) {
             <Head title={course.title} />
 
             <AppShell title={course.title}>
-                <div className="grid gap-6 lg:grid-cols-[1fr_20rem]">
+                <div className="grid gap-8 lg:grid-cols-[1fr_18rem]">
                     <div className="space-y-6">
                         <div>
-                            <h2 className="text-balance font-serif text-2xl font-semibold tracking-tight">
+                            <p className="text-sm text-muted-foreground">
+                                {course.instructor_name ?? 'LightLMS'}
+                            </p>
+                            <h2 className="mt-0.5 text-balance font-serif text-2xl font-semibold tracking-tight">
                                 {course.title}
                             </h2>
-                            <p className="mt-1 text-sm text-muted-foreground">
-                                {course.instructor_name ?? 'LightLMS'} · {total} activities
-                            </p>
+                            <p className="mt-2 max-w-2xl text-muted-foreground">{course.summary}</p>
                         </div>
 
                         {course.modules.map((module) => (
-                            <Card key={module.id}>
-                                <CardHeader>
-                                    <CardTitle className="text-base">{module.title}</CardTitle>
-                                    {module.summary && (
-                                        <CardDescription>{module.summary}</CardDescription>
-                                    )}
-                                </CardHeader>
-                                <CardContent>
+                            <section key={module.id}>
+                                <div className="mb-3 flex items-baseline justify-between gap-4">
+                                    <h3 className="font-serif text-lg font-semibold text-foreground">
+                                        {module.title}
+                                    </h3>
+                                    <span className="text-xs text-muted-foreground">
+                                        {module.lessons.length}{' '}
+                                        {module.lessons.length === 1 ? 'activity' : 'activities'}
+                                    </span>
+                                </div>
+
+                                <Card className="gap-0 py-0">
                                     <ul className="divide-y">
                                         {module.lessons.map((lesson) => {
-                                            const Icon = typeIcons[lesson.type] ?? PlayCircle;
+                                            const Icon = typeIcons[lesson.type] ?? FileText;
                                             const isDone = completedLessonIds.includes(lesson.id);
 
                                             return (
                                                 <li
                                                     key={lesson.id}
-                                                    className="flex flex-wrap items-center gap-3 py-3"
+                                                    className="flex flex-wrap items-center gap-3 px-5 py-3.5"
                                                 >
-                                                    <Icon className="size-4 shrink-0 text-muted-foreground" aria-hidden />
+                                                    <Icon
+                                                        className="size-4 shrink-0 text-muted-foreground"
+                                                        aria-hidden
+                                                    />
                                                     <span className="min-w-0 flex-1">
-                                                        <span className="block text-sm font-medium">
+                                                        <span className="block text-sm font-medium text-foreground">
                                                             {lesson.position}. {lesson.title}
                                                         </span>
                                                         <span className="mt-0.5 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
@@ -97,7 +104,9 @@ export default function LearningCourse({ course, completedLessonIds }: Props) {
                                                                     {lesson.duration_minutes} min
                                                                 </span>
                                                             )}
-                                                            {lesson.is_preview && <Badge variant="outline">Preview</Badge>}
+                                                            {lesson.is_preview && (
+                                                                <Badge variant="outline">Preview</Badge>
+                                                            )}
                                                         </span>
                                                     </span>
 
@@ -106,6 +115,8 @@ export default function LearningCourse({ course, completedLessonIds }: Props) {
                                                             <CheckCircle2 className="size-3" aria-hidden />
                                                             Done
                                                         </Badge>
+                                                    ) : lesson.is_preview ? (
+                                                        <Badge variant="outline">Preview</Badge>
                                                     ) : (
                                                         <Button
                                                             size="sm"
@@ -126,12 +137,12 @@ export default function LearningCourse({ course, completedLessonIds }: Props) {
                                             );
                                         })}
                                     </ul>
-                                </CardContent>
-                            </Card>
+                                </Card>
+                            </section>
                         ))}
                     </div>
 
-                    <aside className="lg:sticky lg:top-24 lg:self-start">
+                    <aside className="lg:sticky lg:top-20 lg:self-start">
                         <Card>
                             <CardHeader>
                                 <CardTitle className="text-sm">Your progress</CardTitle>
@@ -141,6 +152,46 @@ export default function LearningCourse({ course, completedLessonIds }: Props) {
                                 <p className="mt-2 text-xs text-muted-foreground">
                                     {done} of {total} activities complete ({progress}%)
                                 </p>
+                            </CardContent>
+                        </Card>
+
+                        <Card className="mt-4">
+                            <CardHeader>
+                                <CardTitle className="text-sm">Contents</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <ol className="space-y-3">
+                                    {course.modules.map((module) => (
+                                        <li key={module.id}>
+                                            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                                                {module.title}
+                                            </p>
+                                            <ul className="mt-1.5 space-y-1">
+                                                {module.lessons.map((lesson) => (
+                                                    <li
+                                                        key={lesson.id}
+                                                        className="flex items-start gap-2 text-sm"
+                                                    >
+                                                        {completedLessonIds.includes(lesson.id) ? (
+                                                            <CheckCircle2
+                                                                className="mt-0.5 size-3.5 shrink-0 text-secondary"
+                                                                aria-hidden
+                                                            />
+                                                        ) : (
+                                                            <Circle
+                                                                className="mt-0.5 size-3.5 shrink-0 text-muted-foreground"
+                                                                aria-hidden
+                                                            />
+                                                        )}
+                                                        <span className="min-w-0 text-muted-foreground">
+                                                            {lesson.title}
+                                                        </span>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </li>
+                                    ))}
+                                </ol>
                             </CardContent>
                         </Card>
                     </aside>

@@ -35,6 +35,7 @@ type Props = {
     course: {
         id: number;
         title: string;
+        slug: string;
         summary: string;
         description: string | null;
         level: string;

@@ -1,4 +1,5 @@
-import { Head } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
+import { Clock, GraduationCap, Layers, User } from 'lucide-react';
 import { SiteFooter, SiteHeader } from '@/components/SiteChrome';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -14,10 +15,13 @@ const typeLabels: Record<string, string> = {
     reading: 'Reading',
     quiz: 'Quiz',
     assignment: 'Assignment',
+    forum: 'Forum',
 };
 
 export default function CourseShow({ course, auth }: Props) {
     const totalLessons = course.modules.reduce((sum, module) => sum + module.lessons.length, 0);
+    const hours = Math.floor(course.duration_minutes / 60);
+    const minutes = course.duration_minutes % 60;
 
     return (
         <>
@@ -25,59 +29,122 @@ export default function CourseShow({ course, auth }: Props) {
 
             <SiteHeader user={auth.user} />
 
-            <main className="container-page py-12">
-                <div className="grid gap-10 lg:grid-cols-[1fr_20rem]">
+            <div className="bg-primary text-primary-foreground">
+                <div className="container-page py-8">
+                    <nav aria-label="Breadcrumb" className="text-sm text-primary-foreground/75">
+                        <Link href="/" className="transition hover:text-primary-foreground">
+                            Home
+                        </Link>
+                        <span className="px-1.5">/</span>
+                        <Link href="/courses" className="transition hover:text-primary-foreground">
+                            Courses
+                        </Link>
+                    </nav>
+
+                    <h1 className="mt-3 text-balance font-serif text-3xl font-semibold leading-tight tracking-tight">
+                        {course.title}
+                    </h1>
+                    <p className="mt-2 max-w-3xl text-primary-foreground/85">{course.summary}</p>
+
+                    <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-1 text-sm text-primary-foreground/80">
+                        <span className="inline-flex items-center gap-1.5">
+                            <User className="size-4" aria-hidden />
+                            {course.instructor_name ?? 'LightLMS'}
+                        </span>
+                        <span className="inline-flex items-center gap-1.5">
+                            <Layers className="size-4" aria-hidden />
+                            {course.modules.length} modules
+                        </span>
+                        <span className="inline-flex items-center gap-1.5">
+                            <GraduationCap className="size-4" aria-hidden />
+                            {totalLessons} activities
+                        </span>
+                        <span className="inline-flex items-center gap-1.5">
+                            <Clock className="size-4" aria-hidden />
+                            {hours > 0 ? `${hours}h ` : ''}
+                            {minutes}m
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <main className="container-page py-10">
+                <div className="grid gap-8 lg:grid-cols-[1fr_20rem]">
                     <article>
-                        <Badge variant="outline" className="capitalize">
-                            {course.level}
-                        </Badge>
-                        <h1 className="mt-4 text-balance font-serif text-3xl font-semibold tracking-tight text-foreground">
-                            {course.title}
-                        </h1>
-                        <p className="mt-3 text-lg text-muted-foreground">{course.summary}</p>
-
-                        <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-1 text-sm text-muted-foreground">
-                            <span>{course.instructor_name ?? 'LightLMS'}</span>
-                            <span>{course.modules.length} modules</span>
-                            <span>{totalLessons} lessons</span>
-                            <span>{Math.round(course.duration_minutes / 60)}h total</span>
-                        </div>
-
                         {course.description && (
-                            <div className="mt-10 max-w-2xl leading-relaxed text-muted-foreground">
-                                {course.description}
-                            </div>
+                            <section>
+                                <h2 className="font-serif text-xl font-semibold text-foreground">
+                                    About this course
+                                </h2>
+                                <div className="mt-3 max-w-2xl leading-relaxed text-foreground/80">
+                                    {course.description}
+                                </div>
+                            </section>
                         )}
+
+                        <section className="mt-10">
+                            <h2 className="font-serif text-xl font-semibold text-foreground">
+                                Course outline
+                            </h2>
+
+                            <div className="mt-4 divide-y rounded-md border bg-card">
+                                {course.modules.map((module) => (
+                                    <div key={module.id} className="p-5">
+                                        <h3 className="font-medium text-foreground">{module.title}</h3>
+                                        {module.summary && (
+                                            <p className="mt-0.5 text-sm text-muted-foreground">
+                                                {module.summary}
+                                            </p>
+                                        )}
+
+                                        <ul className="mt-3 divide-y border-t">
+                                            {module.lessons.map((lesson) => (
+                                                <li
+                                                    key={lesson.id}
+                                                    className="flex items-center gap-3 py-2.5 text-sm"
+                                                >
+                                                    <span className="w-6 shrink-0 text-muted-foreground">
+                                                        {lesson.position}
+                                                    </span>
+                                                    <span className="min-w-0 flex-1 truncate text-foreground">
+                                                        {lesson.title}
+                                                    </span>
+                                                    {lesson.duration_minutes > 0 && (
+                                                        <span className="shrink-0 text-xs text-muted-foreground">
+                                                            {lesson.duration_minutes} min
+                                                        </span>
+                                                    )}
+                                                    <Badge variant="outline" className="shrink-0 capitalize">
+                                                        {typeLabels[lesson.type] ?? lesson.type}
+                                                    </Badge>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                ))}
+                            </div>
+                        </section>
                     </article>
 
-                    <aside className="lg:sticky lg:top-24 lg:self-start">
+                    <aside className="lg:sticky lg:top-20 lg:self-start">
                         <Card>
                             <CardHeader>
-                                <CardTitle className="text-sm">Course outline</CardTitle>
+                                <CardTitle className="text-sm">Course info</CardTitle>
                             </CardHeader>
-                            <CardContent>
-                                <ol className="space-y-4">
-                                    {course.modules.map((module) => (
-                                        <li key={module.id}>
-                                            <p className="text-sm font-medium text-foreground">{module.title}</p>
-                                            <ul className="mt-1.5 space-y-1">
-                                                {module.lessons.map((lesson) => (
-                                                    <li
-                                                        key={lesson.id}
-                                                        className="flex items-baseline justify-between gap-3 text-sm text-muted-foreground"
-                                                    >
-                                                        <span className="truncate">
-                                                            {lesson.position}. {lesson.title}
-                                                        </span>
-                                                        <span className="shrink-0 text-xs">
-                                                            {typeLabels[lesson.type] ?? lesson.type}
-                                                        </span>
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        </li>
-                                    ))}
-                                </ol>
+                            <CardContent className="space-y-4">
+                                <InfoField label="Instructors" value={course.instructor_name ?? 'LightLMS'} />
+                                <InfoField label="Level" value={course.level} capitalize />
+                                <InfoField
+                                    label="Learning resource types"
+                                    value={[
+                                        ...new Set(
+                                            course.modules
+                                                .flatMap((module) => module.lessons)
+                                                .map((lesson) => typeLabels[lesson.type] ?? lesson.type),
+                                        ),
+                                    ].join(', ')}
+                                />
+                                <InfoField label="Total activities" value={String(totalLessons)} />
                             </CardContent>
                         </Card>
                     </aside>
@@ -86,5 +153,24 @@ export default function CourseShow({ course, auth }: Props) {
 
             <SiteFooter />
         </>
+    );
+}
+
+function InfoField({
+    label,
+    value,
+    capitalize = false,
+}: {
+    label: string;
+    value: string;
+    capitalize?: boolean;
+}) {
+    return (
+        <div>
+            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                {label}
+            </p>
+            <p className={`mt-1 text-sm text-foreground ${capitalize ? 'capitalize' : ''}`}>{value}</p>
+        </div>
     );
 }

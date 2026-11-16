@@ -13,6 +13,7 @@ use App\Support\Setup;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class DemoSeeder extends Seeder
 {
@@ -97,7 +98,7 @@ class DemoSeeder extends Seeder
 
         foreach ($courses as $data) {
             $course = Course::query()->firstOrCreate(
-                ['slug' => \Illuminate\Support\Str::slug($data['title'])],
+                ['slug' => Str::slug($data['title'])],
                 [
                     'title' => $data['title'],
                     'summary' => $data['summary'],

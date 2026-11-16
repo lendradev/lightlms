@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -26,13 +27,33 @@ class UserController extends Controller
             ->withQueryString();
 
         return Inertia::render('Admin/Users/Index', [
-            'users' => $users,
+            'users' => $this->withPlainLabels($users),
             'filters' => [
                 'q' => $request->string('q')->toString(),
                 'role' => $request->string('role')->toString(),
             ],
             'roles' => array_map(fn (UserRole $role) => ['value' => $role->value, 'label' => $role->label()], UserRole::cases()),
         ]);
+    }
+
+    /**
+     * Laravel's paginator labels carry HTML entities such as `&laquo;`. They
+     * travel as plain text through JSON, so decode them once on the server.
+     *
+     * @param  LengthAwarePaginator<int, User>  $paginator
+     * @return array<string, mixed>
+     */
+    private function withPlainLabels(LengthAwarePaginator $paginator): array
+    {
+        $data = $paginator->toArray();
+
+        $data['links'] = array_map(static function (array $link): array {
+            $link['label'] = html_entity_decode((string) $link['label']);
+
+            return $link;
+        }, $data['links']);
+
+        return $data;
     }
 
     public function store(Request $request): RedirectResponse
