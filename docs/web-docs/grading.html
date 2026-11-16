@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Assignments and quizzes · LightLMS</title>
+        <meta name="description" content="Attempts, deadlines, marking, and the gradebook in LightLMS." />
+        <link rel="stylesheet" href="assets/styles.css" />
+        <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='5' fill='%234c56c4'/%3E%3Ctext x='16' y='22' font-family='sans-serif' font-size='18' font-weight='700' fill='white' text-anchor='middle'%3EL%3C/text%3E%3C/svg%3E" />
+    </head>
+    <body>
+        <a class="skip" href="#main">Skip to content</a>
+        <div class="shell">
+            <aside class="sidebar">
+                <a class="brand" href="index.html">
+                    <span class="brand-mark" aria-hidden="true">L</span>
+                    LightLMS
+                </a>
+                <nav aria-label="Documentation">
+                    <div class="nav-group">
+                        <p class="nav-title">Start</p>
+                        <ul class="nav-list">
+                            <li><a href="index.html">Overview</a></li>
+                            <li><a href="quick-start.html">Quick start</a></li>
+                            <li><a href="configuration.html">Configuration</a></li>
+                        </ul>
+                    </div>
+                    <div class="nav-group">
+                        <p class="nav-title">Using it</p>
+                        <ul class="nav-list">
+                            <li><a href="courses.html">Courses and lessons</a></li>
+                            <li><a href="grading.html" aria-current="page">Assignments and quizzes</a></li>
+                            <li><a href="certificates.html">Certificates</a></li>
+                            <li><a href="notifications.html">Notifications</a></li>
+                        </ul>
+                    </div>
+                    <div class="nav-group">
+                        <p class="nav-title">Integrating</p>
+                        <ul class="nav-list">
+                            <li><a href="api.html">REST API</a></li>
+                        </ul>
+                    </div>
+                    <div class="nav-group">
+                        <p class="nav-title">Operating</p>
+                        <ul class="nav-list">
+                            <li><a href="deployment.html">Deployment</a></li>
+                            <li><a href="contributing.html">Contributing</a></li>
+                        </ul>
+                    </div>
+                </nav>
+            </aside>
+
+            <main class="content" id="main">
+                <p class="eyebrow">Using it</p>
+                <h1>Assignments and quizzes</h1>
+                <p class="lead">
+                    Both activities produce marks, and both marks land in the gradebook of the
+                    course. What differs is who does the marking.
+                </p>
+
+                <h2>Assignments</h2>
+                <p>
+                    An assignment is written work. A learner hands in an attempt, and a teacher
+                    marks it with a score and a note.
+                </p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Setting</th>
+                            <th>What it does</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Attempt limit</td>
+                            <td>
+                                How many times a learner may hand in. The limit is enforced on the
+                                server, not only in the interface.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Deadline</td>
+                            <td>The due date of the activity.</td>
+                        </tr>
+                        <tr>
+                            <td>Late policy</td>
+                            <td>
+                                When late work is allowed. With it off, a hand-in after the
+                                deadline is refused.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Attachments</td>
+                            <td>
+                                A learner may attach a file to the hand-in. The file is stored
+                                privately and served through a permission check.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p>
+                    Marking an assignment writes to the gradebook and sends a notification to the
+                    learner.
+                </p>
+
+                <h2>Quizzes</h2>
+                <p>A quiz holds questions, each with its own points.</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Question type</th>
+                            <th>How it is marked</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Multiple choice</td>
+                            <td>Automatic.</td>
+                        </tr>
+                        <tr>
+                            <td>Multiple select</td>
+                            <td>Automatic. Every option has to be right.</td>
+                        </tr>
+                        <tr>
+                            <td>True or false</td>
+                            <td>Automatic.</td>
+                        </tr>
+                        <tr>
+                            <td>Short answer</td>
+                            <td>Read by a marker.</td>
+                        </tr>
+                        <tr>
+                            <td>Essay</td>
+                            <td>Read by a marker.</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p>
+                    An attempt with questions that need a person comes back partly marked, and the
+                    teacher sees a panel with the answers that still need a decision.
+                </p>
+                <div class="note">
+                    <p>
+                        The correct answers never reach the browser. The learner receives the
+                        prompts and the options; the marking happens on the server.
+                    </p>
+                </div>
+                <p>
+                    A quiz also has an attempt limit, a time limit, and a pass mark. A scored
+                    attempt is mirrored into the gradebook.
+                </p>
+
+                <h2>The gradebook</h2>
+                <p>
+                    The gradebook of a course shows every grade item and every mark. A teacher
+                    can mark inline, override a mark, and export the whole thing as CSV.
+                </p>
+                <p>
+                    Grade items may belong to a category, and categories and items carry weights,
+                    so the final total is a weighted mean rather than a plain average.
+                </p>
+                <p>
+                    A learner sees the same page with only their own marks. The totals are
+                    calculated on the server, so nobody can read somebody else's mark by asking
+                    for it.
+                </p>
+
+                <h2>Audit</h2>
+                <p>
+                    Every hand-in, every mark, every quiz attempt, and every change to the roster
+                    is written to the audit log with the person, the course, the before and after
+                    values, the address, and the browser. The log is under
+                    <strong>Administration</strong>.
+                </p>
+
+                <div class="footer">
+                    <span>LightLMS documentation</span>
+                    <nav aria-label="Footer">
+                        <a href="https://github.com/lendradev/lightlms">Repository</a>
+                        <a href="certificates.html">Certificates</a>
+                        <a href="courses.html">Courses and lessons</a>
+                    </nav>
+                </div>
+            </main>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Certificates · LightLMS</title>
+        <meta name="description" content="Completion rules, issuing, and verifying certificates in LightLMS." />
+        <link rel="stylesheet" href="assets/styles.css" />
+        <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='5' fill='%234c56c4'/%3E%3Ctext x='16' y='22' font-family='sans-serif' font-size='18' font-weight='700' fill='white' text-anchor='middle'%3EL%3C/text%3E%3C/svg%3E" />
+    </head>
+    <body>
+        <a class="skip" href="#main">Skip to content</a>
+        <div class="shell">
+            <aside class="sidebar">
+                <a class="brand" href="index.html">
+                    <span class="brand-mark" aria-hidden="true">L</span>
+                    LightLMS
+                </a>
+                <nav aria-label="Documentation">
+                    <div class="nav-group">
+                        <p class="nav-title">Start</p>
+                        <ul class="nav-list">
+                            <li><a href="index.html">Overview</a></li>
+                            <li><a href="quick-start.html">Quick start</a></li>
+                            <li><a href="configuration.html">Configuration</a></li>
+                        </ul>
+                    </div>
+                    <div class="nav-group">
+                        <p class="nav-title">Using it</p>
+                        <ul class="nav-list">
+                            <li><a href="courses.html">Courses and lessons</a></li>
+                            <li><a href="grading.html">Assignments and quizzes</a></li>
+                            <li><a href="certificates.html" aria-current="page">Certificates</a></li>
+                            <li><a href="notifications.html">Notifications</a></li>
+                        </ul>
+                    </div>
+                    <div class="nav-group">
+                        <p class="nav-title">Integrating</p>
+                        <ul class="nav-list">
+                            <li><a href="api.html">REST API</a></li>
+                        </ul>
+                    </div>
+                    <div class="nav-group">
+                        <p class="nav-title">Operating</p>
+                        <ul class="nav-list">
+                            <li><a href="deployment.html">Deployment</a></li>
+                            <li><a href="contributing.html">Contributing</a></li>
+                        </ul>
+                    </div>
+                </nav>
+            </aside>
+
+            <main class="content" id="main">
+                <p class="eyebrow">Using it</p>
+                <h1>Certificates</h1>
+                <p class="lead">
+                    A course can issue a certificate when a learner finishes it. The certificate
+                    carries the name of the learner at the moment it was issued, a date, and a
+                    public code that anybody can check.
+                </p>
+
+                <h2>The completion rule</h2>
+                <p>
+                    Each course has one rule. The teacher sets it on the
+                    <strong>Certificates</strong> page of the course.
+                </p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Rule</th>
+                            <th>A learner is finished when</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Every activity completed</td>
+                            <td>The progress of the course reaches 100%.</td>
+                        </tr>
+                        <tr>
+                            <td>A minimum grade</td>
+                            <td>The final grade reaches the percentage the teacher set.</td>
+                        </tr>
+                        <tr>
+                            <td>Approved by the teacher</td>
+                            <td>The teacher presses Issue.</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p>
+                    A course without a rule uses <em>every activity completed</em>, which is the
+                    safest default: a certificate never appears earlier than the work is done.
+                    The rule can be switched off for a course, and nothing is issued while it is
+                    off.
+                </p>
+
+                <h2>Where a certificate comes from</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Trigger</th>
+                            <th>What happens</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>The learner completes the last activity</td>
+                            <td>The certificate is issued if the rule allows it.</td>
+                        </tr>
+                        <tr>
+                            <td>A submission is graded</td>
+                            <td>The certificate is issued if the rule allows it.</td>
+                        </tr>
+                        <tr>
+                            <td>The teacher presses Issue</td>
+                            <td>The certificate is issued, whatever the rule says.</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p>A learner never gets two certificates for the same course.</p>
+
+                <h2>The pages</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Page</th>
+                            <th>Who can open it</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>/certificates</code></td>
+                            <td>The signed-in person, for their own certificates.</td>
+                        </tr>
+                        <tr>
+                            <td><code>/certificates/{code}</code></td>
+                            <td>The holder of the certificate, and the teachers of the course.</td>
+                        </tr>
+                        <tr>
+                            <td><code>/certificates/verify/{code}</code></td>
+                            <td>Anybody, with the code.</td>
+                        </tr>
+                        <tr>
+                            <td><code>/teaching/{course}/certificates</code></td>
+                            <td>The teachers of the course.</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h2>Verification</h2>
+                <p>
+                    Every certificate has a code, for example <code>AOSP-X5YO</code>. The
+                    verification page shows whether the certificate is valid, when it was issued,
+                    and, for a valid certificate, who holds it.
+                </p>
+                <p>
+                    A revoked certificate shows the reason and <strong>does not</strong> name the
+                    learner. A revoked certificate stays in the list of the learner, marked as
+                    revoked, so the history is not lost.
+                </p>
+
+                <h2>Revoking a certificate</h2>
+                <p>
+                    A teacher of the course can revoke a certificate with a reason. The reason is
+                    stored and shown on the verification page, and the revocation is written to
+                    the audit log.
+                </p>
+
+                <h2>What a certificate does not contain</h2>
+                <ul>
+                    <li>
+                        A copy of the learner's marks. The certificate says the course was
+                        finished, not how it was scored.
+                    </li>
+                    <li>
+                        A cryptographic signature. This is a record in the database, not a
+                        verifiable document in the Open Badges sense.
+                    </li>
+                    <li>Any personal data beyond the name of the recipient and the course.</li>
+                </ul>
+
+                <h2>Not implemented yet</h2>
+                <ul>
+                    <li>PDF download of the certificate.</li>
+                    <li>Open Badges 2.0 issuance, so the certificate can go into a badge wallet.</li>
+                    <li>A webhook that tells another system when a certificate is issued.</li>
+                </ul>
+
+                <div class="footer">
+                    <span>LightLMS documentation</span>
+                    <nav aria-label="Footer">
+                        <a href="https://github.com/lendradev/lightlms">Repository</a>
+                        <a href="grading.html">Assignments and quizzes</a>
+                        <a href="api.html">API reference</a>
+                    </nav>
+                </div>
+            </main>
+        </div>
+    </body>
+</html>

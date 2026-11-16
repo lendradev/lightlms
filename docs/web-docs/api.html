@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>REST API · LightLMS</title>
+        <meta name="description" content="The REST API of LightLMS: bearer tokens, endpoints, and the error contract." />
+        <link rel="stylesheet" href="assets/styles.css" />
+        <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='5' fill='%234c56c4'/%3E%3Ctext x='16' y='22' font-family='sans-serif' font-size='18' font-weight='700' fill='white' text-anchor='middle'%3EL%3C/text%3E%3C/svg%3E" />
+    </head>
+    <body>
+        <a class="skip" href="#main">Skip to content</a>
+        <div class="shell">
+            <aside class="sidebar">
+                <a class="brand" href="index.html">
+                    <span class="brand-mark" aria-hidden="true">L</span>
+                    LightLMS
+                </a>
+                <nav aria-label="Documentation">
+                    <div class="nav-group">
+                        <p class="nav-title">Start</p>
+                        <ul class="nav-list">
+                            <li><a href="index.html">Overview</a></li>
+                            <li><a href="quick-start.html">Quick start</a></li>
+                            <li><a href="configuration.html">Configuration</a></li>
+                        </ul>
+                    </div>
+                    <div class="nav-group">
+                        <p class="nav-title">Using it</p>
+                        <ul class="nav-list">
+                            <li><a href="courses.html">Courses and lessons</a></li>
+                            <li><a href="grading.html">Assignments and quizzes</a></li>
+                            <li><a href="certificates.html">Certificates</a></li>
+                            <li><a href="notifications.html">Notifications</a></li>
+                        </ul>
+                    </div>
+                    <div class="nav-group">
+                        <p class="nav-title">Integrating</p>
+                        <ul class="nav-list">
+                            <li><a href="api.html" aria-current="page">REST API</a></li>
+                        </ul>
+                    </div>
+                    <div class="nav-group">
+                        <p class="nav-title">Operating</p>
+                        <ul class="nav-list">
+                            <li><a href="deployment.html">Deployment</a></li>
+                            <li><a href="contributing.html">Contributing</a></li>
+                        </ul>
+                    </div>
+                </nav>
+            </aside>
+
+            <main class="content" id="main">
+                <p class="eyebrow">Integrating</p>
+                <h1>REST API</h1>
+                <p class="lead">
+                    LightLMS answers on <code>/api/v1</code> with JSON in and JSON out. Every
+                    request needs a bearer token, and the token carries the permissions of the
+                    person it belongs to.
+                </p>
+
+                <h2>Getting a token</h2>
+                <p>
+                    A token belongs to one person and acts with that person's permissions. The
+                    course-scoped rules of the web apply here too: a token for an instructor in
+                    one course gives no access to another course they do not teach.
+                </p>
+                <ol>
+                    <li>Sign in to LightLMS.</li>
+                    <li>Open <strong>API tokens</strong> in the sidebar.</li>
+                    <li>Create a token with a name that says what it is for.</li>
+                </ol>
+                <p>
+                    The token is shown once, right after it is created. It cannot be recovered
+                    later, only revoked. Revoking it takes effect on the next request.
+                </p>
+                <pre><code>Authorization: Bearer &lt;token&gt;</code></pre>
+
+                <h2>Rate limits</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Limit</th>
+                            <th>Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Requests per minute</td>
+                            <td>60</td>
+                        </tr>
+                        <tr>
+                            <td>Requests per day</td>
+                            <td>1000</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p>
+                    The limit is counted per token, not per address, so one busy integration cannot
+                    lock out other people behind the same network. Going over the limit answers
+                    with <code>429</code> and a <code>Retry-After</code> header.
+                </p>
+
+                <h2>Response shapes</h2>
+                <p>A single record:</p>
+                <pre><code>{ "data": { "id": 1, "title": "Systems Thinking for Public Policy" } }</code></pre>
+                <p>A list of records:</p>
+                <pre><code>{
+  "data": [ { "id": 1 } ],
+  "links": { "first": null, "last": null },
+  "meta": { "current_page": 1, "last_page": 3, "per_page": 15, "total": 42 }
+}</code></pre>
+                <p>
+                    Dates are ISO 8601 in UTC. Marks are numbers, never strings.
+                </p>
+
+                <h2>Errors</h2>
+                <p>
+                    Every failure uses the same body, so a client reads one field instead of
+                    parsing prose.
+                </p>
+                <pre><code>{
+  "error": {
+    "code": "validation_failed",
+    "message": "The given data was invalid.",
+    "details": { "content": ["The content field is required."] }
+  }
+}</code></pre>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th>Status</th>
+                            <th>Meaning</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>unauthenticated</code></td>
+                            <td>401</td>
+                            <td>Missing, invalid, or revoked token.</td>
+                        </tr>
+                        <tr>
+                            <td><code>forbidden</code></td>
+                            <td>403</td>
+                            <td>Valid token, but the person may not do this.</td>
+                        </tr>
+                        <tr>
+                            <td><code>not_found</code></td>
+                            <td>404</td>
+                            <td>No such record, or none the caller may see.</td>
+                        </tr>
+                        <tr>
+                            <td><code>validation_failed</code></td>
+                            <td>422</td>
+                            <td>The body did not pass validation.</td>
+                        </tr>
+                        <tr>
+                            <td><code>rate_limited</code></td>
+                            <td>429</td>
+                            <td>Too many requests.</td>
+                        </tr>
+                        <tr>
+                            <td><code>server_error</code></td>
+                            <td>500</td>
+                            <td>The server ran into a problem.</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="note">
+                    <p>
+                        A <code>403</code> answers a permission question, a <code>404</code> answers
+                        an existence question. LightLMS answers <code>404</code> where
+                        <code>403</code> would reveal that a record exists but belongs to somebody
+                        else.
+                    </p>
+                </div>
+
+                <h2>Endpoints</h2>
+                <p>Base URL: <code>https://your-site.example/api/v1</code></p>
+
+                <h3>GET /me</h3>
+                <p>The person the token belongs to.</p>
+
+                <h3>GET /courses</h3>
+                <p>The published catalogue. Takes <code>q</code>, <code>level</code>, and <code>per_page</code>.</p>
+
+                <h3>GET /courses/{course}</h3>
+                <p>One course with its modules and activities. The slug identifies the course.</p>
+
+                <h3>GET /enrollments</h3>
+                <p>The courses the caller is enrolled in, with progress and status.</p>
+
+                <h3>POST /enrollments</h3>
+                <p>Enrol the caller in a course. The body carries the slug.</p>
+                <pre><code>{ "course": "systems-thinking-for-public-policy" }</code></pre>
+                <p>
+                    The course must be published and must allow self-enrolment, otherwise the
+                    answer is <code>403</code>.
+                </p>
+
+                <h3>DELETE /enrollments/{course}</h3>
+                <p>Leave a course. Answers <code>204</code>.</p>
+
+                <h3>GET /courses/{course}/participants</h3>
+                <p>The people enrolled in a course. Needs the teaching capability.</p>
+
+                <h3>GET /courses/{course}/progress/{user}</h3>
+                <p>The progress of one person in one course.</p>
+
+                <h3>GET /courses/{course}/grades</h3>
+                <p>
+                    The gradebook of a course. A learner sees only their own marks; somebody who
+                    teaches the course sees every mark.
+                </p>
+
+                <h3>GET /assignments/{assignment}/submissions</h3>
+                <p>The attempts of the caller on one assignment.</p>
+
+                <h3>POST /assignments/{assignment}/submissions</h3>
+                <p>Hand in an attempt.</p>
+                <pre><code>{ "content": "My mapping of the bus route system." }</code></pre>
+                <p>
+                    The content needs at least 10 characters. The attempt limit applies, and a
+                    passed deadline without late submission allowed answers <code>422</code>.
+                    Hand-ins through the API are audited like hand-ins through the web.
+                </p>
+
+                <h3>GET /notifications</h3>
+                <p>The inbox of the caller, newest first.</p>
+
+                <h3>POST /notifications/{notification}/read</h3>
+                <p>Mark one notification as read.</p>
+
+                <h2>What the API does not expose</h2>
+                <ul>
+                    <li>Quiz answers, answer keys, and marks before a submission.</li>
+                    <li>The contents of a course the caller is not part of.</li>
+                    <li>Passwords, tokens, and other secrets of other people.</li>
+                    <li>Anything about a person that the caller cannot already see on the web.</li>
+                </ul>
+
+                <h2>Example</h2>
+                <pre><code>TOKEN="1|your-token-here"
+
+curl -s https://your-site.example/api/v1/me \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Accept: application/json"</code></pre>
+
+                <div class="footer">
+                    <span>LightLMS documentation</span>
+                    <nav aria-label="Footer">
+                        <a href="https://github.com/lendradev/lightlms">Repository</a>
+                        <a href="certificates.html">Certificates</a>
+                        <a href="quick-start.html">Quick start</a>
+                    </nav>
+                </div>
+            </main>
+        </div>
+    </body>
+</html>

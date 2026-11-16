@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>LightLMS documentation</title>
+        <meta
+            name="description"
+            content="Documentation for LightLMS, a self-hosted learning management system built on Laravel and Inertia."
+        />
+        <link rel="stylesheet" href="assets/styles.css" />
+        <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='5' fill='%234c56c4'/%3E%3Ctext x='16' y='22' font-family='sans-serif' font-size='18' font-weight='700' fill='white' text-anchor='middle'%3EL%3C/text%3E%3C/svg%3E" />
+    </head>
+    <body>
+        <a class="skip" href="#main">Skip to content</a>
+        <div class="shell">
+            <aside class="sidebar">
+                <a class="brand" href="index.html">
+                    <span class="brand-mark" aria-hidden="true">L</span>
+                    LightLMS
+                </a>
+                <nav aria-label="Documentation">
+                    <div class="nav-group">
+                        <p class="nav-title">Start</p>
+                        <ul class="nav-list">
+                            <li><a href="index.html" aria-current="page">Overview</a></li>
+                            <li><a href="quick-start.html">Quick start</a></li>
+                            <li><a href="configuration.html">Configuration</a></li>
+                        </ul>
+                    </div>
+                    <div class="nav-group">
+                        <p class="nav-title">Using it</p>
+                        <ul class="nav-list">
+                            <li><a href="courses.html">Courses and lessons</a></li>
+                            <li><a href="grading.html">Assignments and quizzes</a></li>
+                            <li><a href="certificates.html">Certificates</a></li>
+                            <li><a href="notifications.html">Notifications</a></li>
+                        </ul>
+                    </div>
+                    <div class="nav-group">
+                        <p class="nav-title">Integrating</p>
+                        <ul class="nav-list">
+                            <li><a href="api.html">REST API</a></li>
+                        </ul>
+                    </div>
+                    <div class="nav-group">
+                        <p class="nav-title">Operating</p>
+                        <ul class="nav-list">
+                            <li><a href="deployment.html">Deployment</a></li>
+                            <li><a href="contributing.html">Contributing</a></li>
+                        </ul>
+                    </div>
+                </nav>
+            </aside>
+
+            <main class="content" id="main">
+                <p class="eyebrow">Documentation</p>
+                <h1>LightLMS</h1>
+                <p class="lead">
+                    LightLMS is a self-hosted learning management system. It runs on Laravel and
+                    Inertia, it ships as one Docker image, and it does the ordinary work of a
+                    school: courses, assignments, quizzes, grades, and certificates.
+                </p>
+
+                <div class="grid">
+                    <a class="card card-link" href="quick-start.html">
+                        <strong>Quick start</strong>
+                        <span>Run it locally, or with Docker, in a few minutes.</span>
+                    </a>
+                    <a class="card card-link" href="api.html">
+                        <strong>REST API</strong>
+                        <span>Bearer tokens, endpoints, and the error contract.</span>
+                    </a>
+                    <a class="card card-link" href="grading.html">
+                        <strong>Assignments and quizzes</strong>
+                        <span>Attempts, deadlines, marking, and the gradebook.</span>
+                    </a>
+                    <a class="card card-link" href="certificates.html">
+                        <strong>Certificates</strong>
+                        <span>Completion rules and the public verification page.</span>
+                    </a>
+                    <a class="card card-link" href="deployment.html">
+                        <strong>Deployment</strong>
+                        <span>Docker, environment variables, and the queue worker.</span>
+                    </a>
+                    <a class="card card-link" href="contributing.html">
+                        <strong>Contributing</strong>
+                        <span>How the project is built, and where to start.</span>
+                    </a>
+                </div>
+
+                <h2>What it does</h2>
+                <ul>
+                    <li>A setup wizard that checks the environment and creates the first administrator.</li>
+                    <li>A course builder with sections, activities, drafts, and publishing.</li>
+                    <li>Assignments with attempt limits, deadlines, late policy, and attachments.</li>
+                    <li>
+                        Quizzes with multiple choice, multiple select, true or false, short answer,
+                        and essay questions. Short answers and essays are marked by a person.
+                    </li>
+                    <li>A gradebook with weighted totals, categories, inline marking, and CSV export.</li>
+                    <li>Certificates of completion with a public verification page.</li>
+                    <li>Notifications by in-app message and email, with per-person preferences.</li>
+                    <li>A REST API for integrations, authenticated with bearer tokens.</li>
+                    <li>An audit log of every privileged action.</li>
+                </ul>
+
+                <h2>What it does not do</h2>
+                <p>
+                    LightLMS is deliberately narrow. There is no video hosting, no live sessions, no
+                    payment processor, and no marketplace of third-party content. It is a place to
+                    put your own courses and to run them properly.
+                </p>
+
+                <div class="note">
+                    <p>
+                        The source is public and the whole application fits in one repository. If
+                        something here does not fit your school, change it rather than working
+                        around it.
+                    </p>
+                </div>
+
+                <div class="footer">
+                    <span>LightLMS documentation</span>
+                    <nav aria-label="Footer">
+                        <a href="https://github.com/lendradev/lightlms">Repository</a>
+                        <a href="api.html">API reference</a>
+                        <a href="quick-start.html">Quick start</a>
+                    </nav>
+                </div>
+            </main>
+        </div>
+    </body>
+</html>

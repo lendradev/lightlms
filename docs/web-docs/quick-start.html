@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Quick start · LightLMS</title>
+        <meta name="description" content="Run LightLMS locally or with Docker in a few minutes." />
+        <link rel="stylesheet" href="assets/styles.css" />
+        <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='5' fill='%234c56c4'/%3E%3Ctext x='16' y='22' font-family='sans-serif' font-size='18' font-weight='700' fill='white' text-anchor='middle'%3EL%3C/text%3E%3C/svg%3E" />
+    </head>
+    <body>
+        <a class="skip" href="#main">Skip to content</a>
+        <div class="shell">
+            <aside class="sidebar">
+                <a class="brand" href="index.html">
+                    <span class="brand-mark" aria-hidden="true">L</span>
+                    LightLMS
+                </a>
+                <nav aria-label="Documentation">
+                    <div class="nav-group">
+                        <p class="nav-title">Start</p>
+                        <ul class="nav-list">
+                            <li><a href="index.html">Overview</a></li>
+                            <li><a href="quick-start.html" aria-current="page">Quick start</a></li>
+                            <li><a href="configuration.html">Configuration</a></li>
+                        </ul>
+                    </div>
+                    <div class="nav-group">
+                        <p class="nav-title">Using it</p>
+                        <ul class="nav-list">
+                            <li><a href="courses.html">Courses and lessons</a></li>
+                            <li><a href="grading.html">Assignments and quizzes</a></li>
+                            <li><a href="certificates.html">Certificates</a></li>
+                            <li><a href="notifications.html">Notifications</a></li>
+                        </ul>
+                    </div>
+                    <div class="nav-group">
+                        <p class="nav-title">Integrating</p>
+                        <ul class="nav-list">
+                            <li><a href="api.html">REST API</a></li>
+                        </ul>
+                    </div>
+                    <div class="nav-group">
+                        <p class="nav-title">Operating</p>
+                        <ul class="nav-list">
+                            <li><a href="deployment.html">Deployment</a></li>
+                            <li><a href="contributing.html">Contributing</a></li>
+                        </ul>
+                    </div>
+                </nav>
+            </aside>
+
+            <main class="content" id="main">
+                <p class="eyebrow">Start</p>
+                <h1>Quick start</h1>
+                <p class="lead">
+                    Two ways to run LightLMS: a local install with PHP and Node, or a single
+                    Docker Compose stack. The Docker route is the shorter one.
+                </p>
+
+                <h2>With Docker</h2>
+                <pre><code>git clone https://github.com/lendradev/lightlms.git
+cd lightlms
+docker compose up -d
+</code></pre>
+                <p>
+                    The stack brings up the application, PostgreSQL, Redis, and the queue worker.
+                    Open the address the console prints and the setup wizard walks you through the
+                    environment check, the first administrator, and whether people may sign up on
+                    their own.
+                </p>
+                <p>
+                    The default credentials are in <code>.env.example</code>. Change them before
+                    the site is reachable from anywhere but your own machine.
+                </p>
+
+                <h2>Locally</h2>
+                <p>You need PHP 8.3 or newer, Composer, Node 22 or newer, and pnpm.</p>
+                <pre><code>git clone https://github.com/lendradev/lightlms.git
+cd lightlms
+
+corepack enable pnpm
+composer install
+pnpm install
+
+cp .env.example .env
+php artisan key:generate
+touch database/database.sqlite
+php artisan migrate --seed
+
+pnpm run build
+php artisan serve
+</code></pre>
+                <p>
+                    The site runs on <code>http://localhost:8000</code>. The seeder creates an
+                    administrator, an instructor, and a student, so you can look at every side of
+                    the product without making accounts by hand.
+                </p>
+
+                <h2>Development</h2>
+                <p>
+                    Run the PHP server and the Vite dev server side by side, and the front end
+                    reloads on every change.
+                </p>
+                <pre><code>php artisan serve
+pnpm run dev
+</code></pre>
+
+                <h2>The commands that must pass</h2>
+                <p>
+                    A change is done when the suite and the linters pass. Run all four before you
+                    open a pull request.
+                </p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Command</th>
+                            <th>What it checks</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>php artisan test</code></td>
+                            <td>The whole test suite.</td>
+                        </tr>
+                        <tr>
+                            <td><code>composer run lint</code></td>
+                            <td>PHP style, with Pint.</td>
+                        </tr>
+                        <tr>
+                            <td><code>pnpm run typecheck</code></td>
+                            <td>TypeScript types.</td>
+                        </tr>
+                        <tr>
+                            <td><code>pnpm run lint</code></td>
+                            <td>ESLint rules.</td>
+                        </tr>
+                        <tr>
+                            <td><code>pnpm run build</code></td>
+                            <td>The production bundle builds.</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="note">
+                    <p>
+                        <code>pnpm run format:check</code> reports issues in files that were never
+                        formatted. It is only meaningful for the files you touched.
+                    </p>
+                </div>
+
+                <div class="footer">
+                    <span>LightLMS documentation</span>
+                    <nav aria-label="Footer">
+                        <a href="https://github.com/lendradev/lightlms">Repository</a>
+                        <a href="configuration.html">Configuration</a>
+                        <a href="deployment.html">Deployment</a>
+                    </nav>
+                </div>
+            </main>
+        </div>
+    </body>
+</html>

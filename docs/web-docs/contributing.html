@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Contributing · LightLMS</title>
+        <meta name="description" content="How the LightLMS codebase is built, and how to contribute to it." />
+        <link rel="stylesheet" href="assets/styles.css" />
+        <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='5' fill='%234c56c4'/%3E%3Ctext x='16' y='22' font-family='sans-serif' font-size='18' font-weight='700' fill='white' text-anchor='middle'%3EL%3C/text%3E%3C/svg%3E" />
+    </head>
+    <body>
+        <a class="skip" href="#main">Skip to content</a>
+        <div class="shell">
+            <aside class="sidebar">
+                <a class="brand" href="index.html">
+                    <span class="brand-mark" aria-hidden="true">L</span>
+                    LightLMS
+                </a>
+                <nav aria-label="Documentation">
+                    <div class="nav-group">
+                        <p class="nav-title">Start</p>
+                        <ul class="nav-list">
+                            <li><a href="index.html">Overview</a></li>
+                            <li><a href="quick-start.html">Quick start</a></li>
+                            <li><a href="configuration.html">Configuration</a></li>
+                        </ul>
+                    </div>
+                    <div class="nav-group">
+                        <p class="nav-title">Using it</p>
+                        <ul class="nav-list">
+                            <li><a href="courses.html">Courses and lessons</a></li>
+                            <li><a href="grading.html">Assignments and quizzes</a></li>
+                            <li><a href="certificates.html">Certificates</a></li>
+                            <li><a href="notifications.html">Notifications</a></li>
+                        </ul>
+                    </div>
+                    <div class="nav-group">
+                        <p class="nav-title">Integrating</p>
+                        <ul class="nav-list">
+                            <li><a href="api.html">REST API</a></li>
+                        </ul>
+                    </div>
+                    <div class="nav-group">
+                        <p class="nav-title">Operating</p>
+                        <ul class="nav-list">
+                            <li><a href="deployment.html">Deployment</a></li>
+                            <li><a href="contributing.html" aria-current="page">Contributing</a></li>
+                        </ul>
+                    </div>
+                </nav>
+            </aside>
+
+            <main class="content" id="main">
+                <p class="eyebrow">Operating</p>
+                <h1>Contributing</h1>
+                <p class="lead">
+                    LightLMS is a conventional Laravel application. A front-end developer, a PHP
+                    developer, and a designer should all be able to read it without a briefing.
+                </p>
+
+                <h2>The layout</h2>
+                <pre><code>app/
+  Enums/          Backed enums for domain values
+  Http/Controllers/  Learning/ for learners, Teaching/ for instructors
+  Models/         Eloquent models
+  Services/       Domain logic that is not tied to HTTP
+  Support/        Small shared helpers
+bootstrap/app.php  Where the error page and the API errors are registered
+database/         Migrations, factories, seeders
+resources/
+  css/app.css     The design tokens. The only source of colour
+  js/components/  shadcn/ui components and the shared shell
+  js/pages/       One Inertia page component per route
+routes/web.php    All web routes
+docs/             Screenshots, the API reference, the engineering notes
+</code></pre>
+
+                <h2>The rules that matter</h2>
+                <ul>
+                    <li>
+                        Every permission check happens on the server. A hidden button is a
+                        convenience, never the control.
+                    </li>
+                    <li>
+                        Quiz answers and marking logic stay on the server. The learner page never
+                        receives the correct answer.
+                    </li>
+                    <li>
+                        Controllers stay thin: validate, resolve the course, check the permission,
+                        call the service, return a response.
+                    </li>
+                    <li>
+                        Colours come from the tokens in <code>resources/css/app.css</code>. A raw
+                        hex value in a component breaks one of the two themes.
+                    </li>
+                    <li>
+                        Every screen has to work in light and dark mode, be keyboard operable, and
+                        have an empty, a loading, and an error state.
+                    </li>
+                    <li>
+                        Every behavioural change comes with a test, including the path where the
+                        request is refused.
+                    </li>
+                </ul>
+
+                <h2>Working on it</h2>
+                <pre><code>corepack enable pnpm
+composer install
+pnpm install
+cp .env.example .env
+php artisan key:generate
+touch database/database.sqlite
+php artisan migrate --seed
+</code></pre>
+                <p>
+                    Run <code>php artisan serve</code> and <code>pnpm run dev</code> side by side
+                    while you work.
+                </p>
+
+                <h2>Before you open a pull request</h2>
+                <pre><code>php artisan test
+composer run lint
+pnpm run typecheck
+pnpm run lint
+pnpm run build
+</code></pre>
+                <p>
+                    <code>composer run lint</code> reports one known issue in
+                    <code>bootstrap/app.php</code>. It is deliberate, and the reason is in
+                    <code>docs/engineering-notes.md</code>.
+                </p>
+
+                <h2>Commit messages</h2>
+                <p>
+                    Conventional Commits, in English, with the AI attribution trailer when an
+                    agent wrote the code.
+                </p>
+                <pre><code>feat(grading): mark quiz essays by hand
+
+Short answers and essays cannot be scored automatically, so the grader
+gets a panel to give each one a mark and a note.
+
+Prompted-By: Lendra
+Generated-By: Lendra AI Agents
+</code></pre>
+
+                <h2>Working with an AI agent</h2>
+                <p>
+                    The repository holds an <code>AGENTS.md</code> for coding agents. It maps the
+                    codebase, lists the commands that must pass, and records the traps that have
+                    cost the project time. Point your agent at it before it writes anything.
+                </p>
+                <p>
+                    <code>docs/engineering-notes.md</code> is worth reading even without an agent.
+                    Every entry is a mistake that was made, its cause, and its fix.
+                </p>
+
+                <h2>Good first changes</h2>
+                <ul>
+                    <li>A forum discussion for a course. The data model is ready for it.</li>
+                    <li>A PDF export of the certificate.</li>
+                    <li>An Open Badges assertion for a certificate.</li>
+                    <li>Course categories in the catalogue.</li>
+                    <li>A calendar view of deadlines.</li>
+                </ul>
+
+                <div class="footer">
+                    <span>LightLMS documentation</span>
+                    <nav aria-label="Footer">
+                        <a href="https://github.com/lendradev/lightlms">Repository</a>
+                        <a href="quick-start.html">Quick start</a>
+                        <a href="api.html">API reference</a>
+                    </nav>
+                </div>
+            </main>
+        </div>
+    </body>
+</html>

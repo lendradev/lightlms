@@ -1,0 +1,57 @@
+name: Pages
+
+on:
+    push:
+        branches: [main]
+        paths:
+            - 'docs/web-docs/**'
+            - '.github/workflows/pages.yml'
+    workflow_dispatch:
+
+permissions:
+    contents: read
+    pages: write
+    id-token: write
+
+concurrency:
+    group: pages
+    cancel-in-progress: false
+
+jobs:
+    build:
+        name: Build the documentation site
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Check the internal links
+              run: |
+                  cd docs/web-docs
+                  for page in *.html; do
+                      for link in $(grep -o 'href="[^"#]*\.html' "$page" | sed 's/href="//'); do
+                          if [ ! -f "$link" ]; then
+                              echo "broken link in $page: $link"
+                              exit 1
+                          fi
+                      done
+                  done
+
+            - name: Configure Pages
+              uses: actions/configure-pages@v5
+
+            - name: Upload the site
+                uses: actions/upload-pages-artifact@v3
+                with:
+                    path: docs/web-docs
+
+    deploy:
+        name: Deploy to GitHub Pages
+        needs: build
+        runs-on: ubuntu-latest
+        environment:
+            name: github-pages
+            url: ${{ steps.deployment.outputs.page_url }}
+        steps:
+            - name: Deploy
+              id: deployment
+              uses: actions/deploy-pages@v4

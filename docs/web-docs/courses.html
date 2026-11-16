@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Courses and lessons · LightLMS</title>
+        <meta name="description" content="How courses, sections, and activities work in LightLMS." />
+        <link rel="stylesheet" href="assets/styles.css" />
+        <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='5' fill='%234c56c4'/%3E%3Ctext x='16' y='22' font-family='sans-serif' font-size='18' font-weight='700' fill='white' text-anchor='middle'%3EL%3C/text%3E%3C/svg%3E" />
+    </head>
+    <body>
+        <a class="skip" href="#main">Skip to content</a>
+        <div class="shell">
+            <aside class="sidebar">
+                <a class="brand" href="index.html">
+                    <span class="brand-mark" aria-hidden="true">L</span>
+                    LightLMS
+                </a>
+                <nav aria-label="Documentation">
+                    <div class="nav-group">
+                        <p class="nav-title">Start</p>
+                        <ul class="nav-list">
+                            <li><a href="index.html">Overview</a></li>
+                            <li><a href="quick-start.html">Quick start</a></li>
+                            <li><a href="configuration.html">Configuration</a></li>
+                        </ul>
+                    </div>
+                    <div class="nav-group">
+                        <p class="nav-title">Using it</p>
+                        <ul class="nav-list">
+                            <li><a href="courses.html" aria-current="page">Courses and lessons</a></li>
+                            <li><a href="grading.html">Assignments and quizzes</a></li>
+                            <li><a href="certificates.html">Certificates</a></li>
+                            <li><a href="notifications.html">Notifications</a></li>
+                        </ul>
+                    </div>
+                    <div class="nav-group">
+                        <p class="nav-title">Integrating</p>
+                        <ul class="nav-list">
+                            <li><a href="api.html">REST API</a></li>
+                        </ul>
+                    </div>
+                    <div class="nav-group">
+                        <p class="nav-title">Operating</p>
+                        <ul class="nav-list">
+                            <li><a href="deployment.html">Deployment</a></li>
+                            <li><a href="contributing.html">Contributing</a></li>
+                        </ul>
+                    </div>
+                </nav>
+            </aside>
+
+            <main class="content" id="main">
+                <p class="eyebrow">Using it</p>
+                <h1>Courses and lessons</h1>
+                <p class="lead">
+                    A course holds sections. A section holds activities. A learner moves through
+                    them in order, and their progress is the share of activities they have
+                    completed.
+                </p>
+
+                <h2>Building a course</h2>
+                <ol>
+                    <li>
+                        An instructor creates a course under <strong>Teaching</strong>. It starts
+                        as a draft and is not in the catalogue.
+                    </li>
+                    <li>
+                        Sections are added to group the activities. A section may be hidden, which
+                        keeps it out of the learner view without deleting it.
+                    </li>
+                    <li>Activities are added to a section: a reading, a video, a quiz, an assignment.</li>
+                    <li>
+                        The first activity of the first section may be marked as a preview, so a
+                        visitor sees the course before enrolling.
+                    </li>
+                    <li>
+                        Publishing puts the course in the catalogue and makes it visible to
+                        learners.
+                    </li>
+                </ol>
+
+                <h2>Activity types</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>What it does</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Reading</td>
+                            <td>Long text. A learner marks it complete when they are done.</td>
+                        </tr>
+                        <tr>
+                            <td>Video</td>
+                            <td>
+                                A video, with material files that can be downloaded. The video
+                                itself is not hosted by LightLMS.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Quiz</td>
+                            <td>Questions with a time limit, an attempt limit, and a pass mark.</td>
+                        </tr>
+                        <tr>
+                            <td>Assignment</td>
+                            <td>Written work, with an optional attachment, marked by a person.</td>
+                        </tr>
+                        <tr>
+                            <td>Forum</td>
+                            <td>A discussion. The forum itself is not implemented yet.</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h2>Enrolment</h2>
+                <p>
+                    A course may let people enrol themselves, or only accept people added by a
+                    teacher. The catalogue page and the course page follow the setting.
+                </p>
+                <p>
+                    A teacher can also set a course role for somebody: <code>student</code>,
+                    <code>assistant</code>, or <code>instructor</code>. An assistant sees the
+                    roster and the course, but not the gradebook.
+                </p>
+
+                <h2>Progress</h2>
+                <p>
+                    Progress is the share of activities a learner has completed. Activities that
+                    cannot be completed, such as a preview, do not count towards it, so the
+                    number never flatters a learner.
+                </p>
+                <div class="note">
+                    <p>
+                        When progress reaches 100%, the learner becomes <code>completed</code> and
+                        the course is checked for a certificate.
+                    </p>
+                </div>
+
+                <h2>Files</h2>
+                <p>
+                    A teacher can attach files to an activity. Uploaded files are stored outside
+                    the public folder and served by a controller that checks the permission
+                    first. The file name on disk is generated by the server; the name you upload
+                    is kept only as a label.
+                </p>
+
+                <div class="footer">
+                    <span>LightLMS documentation</span>
+                    <nav aria-label="Footer">
+                        <a href="https://github.com/lendradev/lightlms">Repository</a>
+                        <a href="grading.html">Assignments and quizzes</a>
+                        <a href="certificates.html">Certificates</a>
+                    </nav>
+                </div>
+            </main>
+        </div>
+    </body>
+</html>

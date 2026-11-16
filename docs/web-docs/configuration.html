@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Configuration · LightLMS</title>
+        <meta name="description" content="Environment variables and settings for LightLMS." />
+        <link rel="stylesheet" href="assets/styles.css" />
+        <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='5' fill='%234c56c4'/%3E%3Ctext x='16' y='22' font-family='sans-serif' font-size='18' font-weight='700' fill='white' text-anchor='middle'%3EL%3C/text%3E%3C/svg%3E" />
+    </head>
+    <body>
+        <a class="skip" href="#main">Skip to content</a>
+        <div class="shell">
+            <aside class="sidebar">
+                <a class="brand" href="index.html">
+                    <span class="brand-mark" aria-hidden="true">L</span>
+                    LightLMS
+                </a>
+                <nav aria-label="Documentation">
+                    <div class="nav-group">
+                        <p class="nav-title">Start</p>
+                        <ul class="nav-list">
+                            <li><a href="index.html">Overview</a></li>
+                            <li><a href="quick-start.html">Quick start</a></li>
+                            <li><a href="configuration.html" aria-current="page">Configuration</a></li>
+                        </ul>
+                    </div>
+                    <div class="nav-group">
+                        <p class="nav-title">Using it</p>
+                        <ul class="nav-list">
+                            <li><a href="courses.html">Courses and lessons</a></li>
+                            <li><a href="grading.html">Assignments and quizzes</a></li>
+                            <li><a href="certificates.html">Certificates</a></li>
+                            <li><a href="notifications.html">Notifications</a></li>
+                        </ul>
+                    </div>
+                    <div class="nav-group">
+                        <p class="nav-title">Integrating</p>
+                        <ul class="nav-list">
+                            <li><a href="api.html">REST API</a></li>
+                        </ul>
+                    </div>
+                    <div class="nav-group">
+                        <p class="nav-title">Operating</p>
+                        <ul class="nav-list">
+                            <li><a href="deployment.html">Deployment</a></li>
+                            <li><a href="contributing.html">Contributing</a></li>
+                        </ul>
+                    </div>
+                </nav>
+            </aside>
+
+            <main class="content" id="main">
+                <p class="eyebrow">Start</p>
+                <h1>Configuration</h1>
+                <p class="lead">
+                    Everything LightLMS needs to run lives in <code>.env</code>. Copy
+                    <code>.env.example</code> and change what matters for your installation.
+                </p>
+
+                <h2>The variables that matter</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Variable</th>
+                            <th>What it does</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>APP_KEY</code></td>
+                            <td>
+                                Encrypts sessions and cookies. Generate it with
+                                <code>php artisan key:generate</code>. Never share it.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><code>APP_DEBUG</code></td>
+                            <td>
+                                Set it to <code>false</code> in production. With it on, an error
+                                page shows the stack trace.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><code>APP_URL</code></td>
+                            <td>The public address of the site.</td>
+                        </tr>
+                        <tr>
+                            <td><code>DB_CONNECTION</code></td>
+                            <td>
+                                <code>sqlite</code> for a small install, <code>pgsql</code> for
+                                anything a school would use.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><code>QUEUE_CONNECTION</code></td>
+                            <td>
+                                <code>database</code> or <code>redis</code>. A worker has to run
+                                for queued jobs to be processed.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><code>CACHE_STORE</code></td>
+                            <td><code>database</code> or <code>redis</code>.</td>
+                        </tr>
+                        <tr>
+                            <td><code>MAIL_MAILER</code></td>
+                            <td>
+                                <code>log</code> writes mail to the log file instead of sending it.
+                                Use <code>smtp</code> in production.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><code>FILESYSTEM_DISK</code></td>
+                            <td>
+                                Where uploaded files land. Uploaded files are never served
+                                directly; a controller checks permission first.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h2>Settings inside the site</h2>
+                <p>
+                    Some things belong to the running site rather than to the server. An
+                    administrator sets them under <strong>Administration &rarr; Settings</strong>:
+                </p>
+                <ul>
+                    <li>The name of the site.</li>
+                    <li>Whether people may sign up on their own, or only with an invite code.</li>
+                </ul>
+                <p>
+                    The setup wizard asks for both. They can be changed later without touching the
+                    server.
+                </p>
+
+                <h2>Roles</h2>
+                <p>
+                    There are two kinds of role, and they are not the same thing.
+                </p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Role</th>
+                            <th>Where it lives</th>
+                            <th>What it means</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Site role</td>
+                            <td><code>users.role</code></td>
+                            <td>
+                                <code>student</code>, <code>instructor</code>, or
+                                <code>admin</code>. It decides what a person may do anywhere.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Course role</td>
+                            <td><code>course_user.role</code></td>
+                            <td>
+                                <code>student</code>, <code>assistant</code>, or
+                                <code>instructor</code>. It decides what a person may do inside one
+                                course.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="note">
+                    <p>
+                        Every permission check happens on the server. A hidden button is a
+                        convenience, never the control.
+                    </p>
+                </div>
+
+                <div class="footer">
+                    <span>LightLMS documentation</span>
+                    <nav aria-label="Footer">
+                        <a href="https://github.com/lendradev/lightlms">Repository</a>
+                        <a href="deployment.html">Deployment</a>
+                        <a href="api.html">API reference</a>
+                    </nav>
+                </div>
+            </main>
+        </div>
+    </body>
+</html>

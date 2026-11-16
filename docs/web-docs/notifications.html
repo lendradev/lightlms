@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Notifications · LightLMS</title>
+        <meta name="description" content="The in-app inbox, email, and per-person preferences in LightLMS." />
+        <link rel="stylesheet" href="assets/styles.css" />
+        <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='5' fill='%234c56c4'/%3E%3Ctext x='16' y='22' font-family='sans-serif' font-size='18' font-weight='700' fill='white' text-anchor='middle'%3EL%3C/text%3E%3C/svg%3E" />
+    </head>
+    <body>
+        <a class="skip" href="#main">Skip to content</a>
+        <div class="shell">
+            <aside class="sidebar">
+                <a class="brand" href="index.html">
+                    <span class="brand-mark" aria-hidden="true">L</span>
+                    LightLMS
+                </a>
+                <nav aria-label="Documentation">
+                    <div class="nav-group">
+                        <p class="nav-title">Start</p>
+                        <ul class="nav-list">
+                            <li><a href="index.html">Overview</a></li>
+                            <li><a href="quick-start.html">Quick start</a></li>
+                            <li><a href="configuration.html">Configuration</a></li>
+                        </ul>
+                    </div>
+                    <div class="nav-group">
+                        <p class="nav-title">Using it</p>
+                        <ul class="nav-list">
+                            <li><a href="courses.html">Courses and lessons</a></li>
+                            <li><a href="grading.html">Assignments and quizzes</a></li>
+                            <li><a href="certificates.html">Certificates</a></li>
+                            <li><a href="notifications.html" aria-current="page">Notifications</a></li>
+                        </ul>
+                    </div>
+                    <div class="nav-group">
+                        <p class="nav-title">Integrating</p>
+                        <ul class="nav-list">
+                            <li><a href="api.html">REST API</a></li>
+                        </ul>
+                    </div>
+                    <div class="nav-group">
+                        <p class="nav-title">Operating</p>
+                        <ul class="nav-list">
+                            <li><a href="deployment.html">Deployment</a></li>
+                            <li><a href="contributing.html">Contributing</a></li>
+                        </ul>
+                    </div>
+                </nav>
+            </aside>
+
+            <main class="content" id="main">
+                <p class="eyebrow">Using it</p>
+                <h1>Notifications</h1>
+                <p class="lead">
+                    LightLMS keeps an in-app inbox for every person and can send the same message
+                    by email. Every person decides, per event and per channel, what they want.
+                </p>
+
+                <h2>The inbox</h2>
+                <p>
+                    The bell in the header carries the number of unread messages, on every page.
+                    The count is shared with the page rather than fetched on its own, so the badge
+                    is right after any navigation.
+                </p>
+                <p>
+                    A message can be marked as read, and the whole inbox can be marked as read at
+                    once. A notification links to the thing it is about, so one click lands on the
+                    hand-in or the grade.
+                </p>
+
+                <h2>The events</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Event</th>
+                            <th>When it fires</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>submission.received</code></td>
+                            <td>A learner hands in an assignment.</td>
+                        </tr>
+                        <tr>
+                            <td><code>submission.graded</code></td>
+                            <td>A teacher marks a hand-in.</td>
+                        </tr>
+                        <tr>
+                            <td><code>quiz.attempted</code></td>
+                            <td>A learner submits a quiz attempt.</td>
+                        </tr>
+                        <tr>
+                            <td><code>certificate.issued</code></td>
+                            <td>A certificate of completion is issued.</td>
+                        </tr>
+                        <tr>
+                            <td><code>deadline.upcoming</code></td>
+                            <td>An assignment deadline is near.</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h2>Preferences</h2>
+                <p>
+                    A person controls the preferences under
+                    <strong>Notifications &rarr; Preferences</strong>. The choice is per event and
+                    per channel, so somebody may keep the in-app message and switch the email off.
+                </p>
+                <div class="note">
+                    <p>
+                        When no preference exists for a channel, the default of the event decides.
+                        A preference for one channel says nothing about the other.
+                    </p>
+                </div>
+
+                <h2>Email</h2>
+                <p>
+                    Email is sent through the queue, so a slow mail server never blocks a request.
+                    With <code>MAIL_MAILER=log</code> the messages are written to the log file
+                    instead of being sent, which is the right setting for a test installation.
+                </p>
+                <p>
+                    A queue worker has to run for queued jobs to be processed at all. See
+                    <a href="deployment.html">Deployment</a>.
+                </p>
+
+                <div class="footer">
+                    <span>LightLMS documentation</span>
+                    <nav aria-label="Footer">
+                        <a href="https://github.com/lendradev/lightlms">Repository</a>
+                        <a href="courses.html">Courses and lessons</a>
+                        <a href="deployment.html">Deployment</a>
+                    </nav>
+                </div>
+            </main>
+        </div>
+    </body>
+</html>

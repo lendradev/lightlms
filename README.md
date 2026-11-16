@@ -377,6 +377,12 @@ The reference, including the error contract and every endpoint, is in
 Courses can issue a certificate of completion, with a public verification page. How a course
 decides who is finished is described in [`docs/certificates.md`](docs/certificates.md).
 
+## Documentation site
+
+The public documentation is a static site with no build step, in
+[`docs/web-docs/`](docs/web-docs/). The workflow `.github/workflows/pages.yml` publishes it to
+GitHub Pages on every push to `main` that touches the folder.
+
 ---
 
 ## Contributing
