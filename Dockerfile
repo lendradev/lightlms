@@ -1,17 +1,28 @@
 # syntax=docker/dockerfile:1
 
+# One shared package cache for every stage and every ecosystem: pnpm's store and
+# Composer's download cache live side by side under the same BuildKit cache
+# mount, so both survive across rebuilds and across containers.
+
 # ---------- Frontend build ----------
 FROM docker.io/library/node:24.22.3-slim AS frontend
 
+ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0 \
+    COREPACK_HOME=/pkg-cache/corepack \
+    CI=true
+
 WORKDIR /app
 
-COPY package.json package-lock.json* ./
-RUN npm ci --ignore-scripts --no-audit --no-fund
+RUN corepack enable pnpm
+
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+RUN --mount=type=cache,id=lightlms-pkg-cache,target=/pkg-cache \
+    pnpm install --frozen-lockfile --ignore-scripts --store-dir=/pkg-cache/pnpm/store
 
 COPY vite.config.ts tsconfig.json ./
 COPY resources ./resources
 
-RUN npm run build
+RUN pnpm run build
 
 
 # ---------- PHP dependencies ----------
@@ -24,10 +35,13 @@ RUN apk add --no-cache --virtual .build-deps git unzip icu-dev oniguruma-dev pos
 
 COPY --from=composer:2.11.2 /usr/bin/composer /usr/bin/composer
 
+ENV COMPOSER_CACHE_DIR=/pkg-cache/composer
+
 WORKDIR /app
 
 COPY composer.json composer.lock ./
-RUN composer install --no-dev --no-scripts --no-interaction --no-progress --prefer-dist --no-autoloader
+RUN --mount=type=cache,id=lightlms-pkg-cache,target=/pkg-cache \
+    composer install --no-dev --no-scripts --no-interaction --no-progress --prefer-dist --no-autoloader
 
 COPY . .
 RUN composer dump-autoload --optimize --no-dev --no-interaction \

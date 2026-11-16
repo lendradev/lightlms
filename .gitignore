@@ -26,6 +26,10 @@ Homestead.json
 Homestead.yaml
 Thumbs.db
 
+# pnpm
+/node_modules/.pnpm-store
+.pnpm-store
+
 # Local container helper
 /.test-output
 /.docker/data

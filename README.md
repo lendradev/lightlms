@@ -164,7 +164,14 @@ LightLMS takes the middle path:
 
 - PHP 8.3 or newer, with `pdo_sqlite` (or `pdo_pgsql`), `mbstring`, `openssl`, `curl`, `zip`
 - Composer 2.x
-- Node.js 22+ and npm 10+
+- Node.js 22+ and pnpm 12 (via Corepack, pinned in `package.json`)
+
+Enable pnpm once per machine:
+
+```bash
+corepack enable pnpm
+```
+
 - SQLite (bundled) or PostgreSQL
 
 ### Install
@@ -174,7 +181,7 @@ git clone https://github.com/lendradev/lightlms.git
 cd lightlms
 
 composer install
-npm install
+pnpm install
 
 cp .env.example .env
 php artisan key:generate
@@ -182,7 +189,7 @@ php artisan key:generate
 touch database/database.sqlite
 php artisan migrate
 
-npm run build
+pnpm run build
 php artisan serve
 ```
 
@@ -205,7 +212,7 @@ Run the PHP server and Vite in two terminals:
 
 ```bash
 php artisan serve
-npm run dev
+pnpm run dev
 ```
 
 ---
@@ -214,6 +221,10 @@ npm run dev
 
 LightLMS ships a production-oriented multi-stage image: Node builds the assets, Composer installs
 PHP dependencies, and the runtime layer runs nginx and php-fpm as a non-root user.
+
+The image build uses one shared BuildKit cache mount (`lightlms-pkg-cache`) that holds pnpm's
+content-addressable store next to Composer's download cache. Both ecosystems reuse it across
+rebuilds, so only the layers whose sources actually changed are re-run.
 
 ### 1. Configure
 
@@ -326,14 +337,23 @@ php artisan db:seed       # seed demo content
 php artisan tinker         # REPL
 
 # Front-end
-npm run dev                # Vite dev server with hot reload
-npm run build              # production build into public/build
-npm run typecheck          # tsc --noEmit
-npm run lint               # ESLint
-npm run format             # Prettier
+pnpm run dev                # Vite dev server with hot reload
+pnpm run build              # production build into public/build
+pnpm run typecheck          # tsc --noEmit
+pnpm run lint               # ESLint
+pnpm run format             # Prettier
 
 # Code style
 composer run lint          # Laravel Pint
+```
+
+If you prefer to work inside containers, `docker/dev.sh` starts a Node and a PHP container that
+share one package cache volume (`lightlms-pkg-cache`) for pnpm, Composer and Corepack:
+
+```bash
+bash docker/dev.sh start    # start both build containers
+bash docker/dev.sh status
+bash docker/dev.sh stop
 ```
 
 **Design tokens** live in `resources/css/app.css` under `@theme`. The palette is intentionally
@@ -351,8 +371,8 @@ system sans.
 
 ```bash
 php artisan test           # PHP / Pest-style feature + unit tests
-npm run typecheck          # TypeScript
-npm run lint               # ESLint
+pnpm run typecheck          # TypeScript
+pnpm run lint               # ESLint
 ```
 
 Tests use an in-memory SQLite database, so the suite runs without any external service.
@@ -367,7 +387,7 @@ Contributions are welcome and are credited in the commit history.
 2. Create a branch from `main` with a descriptive name.
 3. Keep commits focused; use [Conventional Commits](https://www.conventionalcommits.org/):
    `feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`.
-4. Make sure `composer run lint`, `npm run typecheck`, `npm run lint` and `php artisan test` pass.
+4. Make sure `composer run lint`, `pnpm run typecheck`, `pnpm run lint` and `php artisan test` pass.
 5. Open a pull request describing the change and the reasoning behind it.
 
 Development documentation for contributors lives alongside the source code. Product plans,
@@ -414,9 +434,9 @@ shadcn/ui, PostgreSQL, Redis, dan Docker.
 **Menjalankan secara lokal**
 
 ```bash
-composer install && npm install
+composer install && pnpm install
 cp .env.example .env && php artisan key:generate
-php artisan migrate && npm run build && php artisan serve
+php artisan migrate && pnpm run build && php artisan serve
 ```
 
 Setelah itu buka <http://127.0.0.1:8000> dan ikuti wizard konfigurasi awal. Untuk melihat

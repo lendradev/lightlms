@@ -13,22 +13,23 @@ acceptable in issues, pull requests, or discussions.
 
 ## Getting set up
 
-You need PHP 8.3+, Composer 2, and Node.js 22+.
+You need PHP 8.3+, Composer 2, and Node.js 22+ with pnpm 12 (Corepack ships with Node.js).
 
 ```bash
 git clone https://github.com/lendradev/lightlms.git
 cd lightlms
+corepack enable pnpm
 composer install
-npm install
+pnpm install
 cp .env.example .env
 php artisan key:generate
 touch database/database.sqlite
 php artisan migrate --seed
-npm run build
+pnpm run build
 php artisan serve
 ```
 
-For hot reload, run `npm run dev` in a second terminal.
+For hot reload, run `pnpm run dev` in a second terminal.
 
 ### Working in Docker
 
@@ -39,6 +40,17 @@ docker compose up -d
 docker compose exec app php artisan migrate --force
 ```
 
+The image build keeps one shared package cache (`lightlms-pkg-cache`) for pnpm and Composer, so
+repeated builds only re-run the layers whose sources changed.
+
+If you prefer a local toolchain inside containers, `docker/dev.sh start` creates the same shared
+cache volume and mounts the working tree read-only:
+
+```bash
+bash docker/dev.sh start
+bash docker/dev.sh stop
+```
+
 ## Before you open a pull request
 
 Run the full check suite:
@@ -46,9 +58,9 @@ Run the full check suite:
 ```bash
 composer run lint          # Laravel Pint (PHP style)
 php artisan test           # PHP test suite
-npm run typecheck          # TypeScript
-npm run lint               # ESLint
-npm run format:check       # Prettier
+pnpm run typecheck          # TypeScript
+pnpm run lint               # ESLint
+pnpm run format:check       # Prettier
 ```
 
 All of them must pass.
@@ -81,8 +93,8 @@ Types: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`
 ## Code style
 
 - **PHP**: Laravel Pint is the single source of truth. Run `composer run lint`.
-- **TypeScript**: Prettier for formatting, ESLint for correctness. Run `npm run format`
-  and `npm run lint`.
+- **TypeScript**: Prettier for formatting, ESLint for correctness. Run `pnpm run format`
+  and `pnpm run lint`.
 - **Design tokens**: never hardcode colours, spacing, or radii in components. Add or
   change tokens in `resources/css/app.css` under `@theme`, then use the utility classes.
 - **Comments**: comment the *why*, never the *what*. The code should explain itself.
