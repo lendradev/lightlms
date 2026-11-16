@@ -8,6 +8,7 @@ use App\Enums\QuestionType;
 use App\Enums\UserRole;
 use App\Models\Assignment;
 use App\Models\Course;
+use App\Models\FileAsset;
 use App\Models\Lesson;
 use App\Models\Module;
 use App\Models\Question;
@@ -19,6 +20,7 @@ use App\Support\Setup;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class DemoSeeder extends Seeder
@@ -262,6 +264,25 @@ class DemoSeeder extends Seeder
                         'content' => 'I mapped the cycle of a city bus route: the more buses that run, the more reliable the service feels, which brings more riders, which needs more buses. The balancing loop is congestion: more buses slow each other down, so headways stretch and riders wait longer.',
                         'status' => 'submitted',
                         'submitted_at' => now()->subDays(2),
+                    ],
+                );
+            }
+
+            $material = $assignment?->lesson;
+
+            if ($material !== null) {
+                $stored = 'demo/'.now()->format('Y/m').'/'.Str::uuid()->toString().'.pdf';
+
+                Storage::disk('local')->put($stored, "%PDF-1.4\n% demo course material\n");
+
+                FileAsset::query()->firstOrCreate(
+                    ['lesson_id' => $material->id, 'original_name' => 'system-mapping-template.pdf'],
+                    [
+                        'uploader_id' => $instructor->id,
+                        'disk' => 'local',
+                        'path' => $stored,
+                        'mime_type' => 'application/pdf',
+                        'size' => 42,
                     ],
                 );
             }

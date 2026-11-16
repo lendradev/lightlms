@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\FileController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Learning\AssignmentController as LearningAssignmentController;
 use App\Http\Controllers\Learning\QuizController as LearningQuizController;
@@ -53,6 +54,9 @@ Route::middleware('installed')->group(function (): void {
         Route::post('/quizzes/{quiz}', [LearningQuizController::class, 'store'])
             ->name('learning.quizzes.store');
 
+        Route::get('/files/{file}', [FileController::class, 'show'])
+            ->name('files.show');
+
         Route::middleware('role:instructor,admin')->group(function (): void {
             Route::get('/teaching', [TeachingController::class, 'index'])->name('teaching.index');
             Route::get('/teaching/{course}', [TeachingController::class, 'show'])->name('teaching.course');
@@ -84,6 +88,11 @@ Route::middleware('installed')->group(function (): void {
                 ->name('teaching.quizzes.questions.destroy');
             Route::post('/teaching/{course}/quizzes/{quiz}/attempts/{attempt}/mark', [TeachingQuizController::class, 'mark'])
                 ->name('teaching.quizzes.attempts.mark');
+
+            Route::post('/teaching/{course}/lessons/{lesson}/files', [TeachingController::class, 'storeFile'])
+                ->name('teaching.lessons.files.store');
+            Route::delete('/teaching/{course}/files/{file}', [TeachingController::class, 'destroyFile'])
+                ->name('teaching.files.destroy');
         });
     });
 });

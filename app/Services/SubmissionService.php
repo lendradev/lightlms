@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Assignment;
+use App\Models\FileAsset;
 use App\Models\GradeItem;
 use App\Models\Submission;
 use App\Models\User;
@@ -57,8 +58,12 @@ class SubmissionService
      *
      * @throws \RuntimeException when the learner has used every attempt
      */
-    public function submit(Assignment $assignment, User $learner, string $content): Submission
-    {
+    public function submit(
+        Assignment $assignment,
+        User $learner,
+        string $content,
+        ?FileAsset $file = null,
+    ): Submission {
         if ($this->attemptsLeft($assignment, $learner) === 0) {
             throw new \RuntimeException('You have used every attempt for this assignment.');
         }
@@ -66,6 +71,7 @@ class SubmissionService
         return Submission::query()->create([
             'assignment_id' => $assignment->id,
             'user_id' => $learner->id,
+            'file_id' => $file?->id,
             'content' => $content,
             'status' => 'submitted',
             'submitted_at' => now(),

@@ -1,11 +1,20 @@
 import { Head, Link, useForm } from '@inertiajs/react';
-import { ArrowLeft, Clock, FileText, Send } from 'lucide-react';
+import { ArrowLeft, Clock, FileText, Paperclip, Send } from 'lucide-react';
 import { AppShell } from '@/components/AppShell';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+
+type Attachment = {
+    id: number;
+    name: string;
+    mime_type: string | null;
+    size: number;
+    url: string;
+};
 
 type Attempt = {
     id: number;
@@ -15,6 +24,7 @@ type Attempt = {
     feedback: string | null;
     submitted_at: string | null;
     graded_at: string | null;
+    file: Attachment | null;
 };
 
 type Props = {
@@ -46,6 +56,18 @@ function formatDate(value: string | null) {
     });
 }
 
+function formatSize(bytes: number) {
+    if (bytes < 1024) {
+        return `${bytes} B`;
+    }
+
+    if (bytes < 1024 * 1024) {
+        return `${Math.round(bytes / 1024)} KB`;
+    }
+
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
 export default function LearningAssignment({
     course,
     assignment,
@@ -54,15 +76,16 @@ export default function LearningAssignment({
     submissions,
     latest,
 }: Props) {
-    const form = useForm({ content: '' });
+    const form = useForm({ content: '', file: null as File | null });
     const dueAt = formatDate(assignment.due_at);
     const overdue = dueAt !== null && new Date(dueAt).getTime() < Date.now() && !assignment.allow_late;
     const exhausted = attemptsLeft <= 0;
 
     const submit = () => {
         form.post(`/assignments/${assignment.id}`, {
+            forceFormData: true,
             preserveScroll: true,
-            onSuccess: () => form.reset('content'),
+            onSuccess: () => form.reset(),
         });
     };
 
@@ -141,6 +164,18 @@ export default function LearningAssignment({
                                         {latest.feedback}
                                     </p>
                                 )}
+                                {latest.file && (
+                                    <a
+                                        href={latest.file.url}
+                                        className="inline-flex items-center gap-2 text-sm text-primary underline-offset-4 hover:underline"
+                                    >
+                                        <Paperclip className="size-3.5" aria-hidden />
+                                        {latest.file.name}
+                                        <span className="text-xs text-muted-foreground">
+                                            ({formatSize(latest.file.size)})
+                                        </span>
+                                    </a>
+                                )}
                                 <p className="text-xs text-muted-foreground">
                                     Graded {formatDate(latest.graded_at) ?? 'recently'}
                                 </p>
@@ -171,6 +206,26 @@ export default function LearningAssignment({
                                 />
                                 {form.errors.content && (
                                     <p className="text-xs text-destructive">{form.errors.content}</p>
+                                )}
+                            </div>
+
+                            <div className="grid gap-2">
+                                <Label htmlFor="file">Attachment</Label>
+                                <Input
+                                    id="file"
+                                    type="file"
+                                    onChange={(event) =>
+                                        form.setData('file', event.target.files?.[0] ?? null)
+                                    }
+                                    disabled={exhausted || overdue}
+                                    accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip,.txt,.md,.csv,.jpg,.jpeg,.png,.gif,.webp"
+                                />
+                                <p className="text-xs text-muted-foreground">
+                                    Optional. Up to 10 MB. PDF, Word, spreadsheet, slide, zip, text or
+                                    image.
+                                </p>
+                                {form.errors.file && (
+                                    <p className="text-xs text-destructive">{form.errors.file}</p>
                                 )}
                             </div>
                             <div className="mt-4 flex items-center gap-3">
@@ -217,6 +272,15 @@ export default function LearningAssignment({
                                                     {attempt.score !== null &&
                                                         ` · scored ${attempt.score}/${assignment.grade_max}`}
                                                 </p>
+                                                {attempt.file && (
+                                                    <a
+                                                        href={attempt.file.url}
+                                                        className="mt-1 inline-flex items-center gap-1.5 text-xs text-primary underline-offset-4 hover:underline"
+                                                    >
+                                                        <Paperclip className="size-3" aria-hidden />
+                                                        {attempt.file.name}
+                                                    </a>
+                                                )}
                                             </div>
                                             <Badge
                                                 variant={attempt.status === 'graded' ? 'secondary' : 'outline'}

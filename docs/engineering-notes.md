@@ -142,6 +142,39 @@ const form = useForm<{ answers: Record<string, AnswerValue> }>({ answers: {} });
 
 **Fix.** Track the state locally with `useState`, and clear it in `onFinish`.
 
+## An upload file name must never come from the client
+
+**Symptom.** A crafted upload name such as `../../etc/passwd.pdf` decides where the file lands.
+
+**Cause.** The original name was used to build the path on disk.
+
+**Fix.** The path is generated on the server from a UUID, the original name is kept in the database
+for display only, and the file never enters `public/`:
+
+```php
+$name = Str::uuid()->toString().'.'.$extension;
+Storage::disk('local')->putFileAs(now()->format('Y/m'), $upload, $name);
+```
+
+The MIME type is checked against an allowlist, not a blocklist, and the size is capped. A test
+uploads a name with `../` in it and asserts the stored path contains neither.
+
+## The storage disk has a private root
+
+`config/filesystems.php` points the `local` disk at `storage_path('app/private')`. The `public` disk
+points at `storage_path('app/public')`. Uploaded files go to `local`, never to `public`, so they are
+served through a controller that checks permission rather than by a direct URL.
+
+## A file is served by a controller, not by a URL
+
+**Symptom.** A student outside the course could read another student's attachment.
+
+**Cause.** The file was written under the public disk.
+
+**Fix.** `/files/{file}` is a controller route. It resolves the owning submission, then allows the
+owner or anyone with `submission.viewall` in that course, and aborts otherwise. The response uses
+the recorded original name, never the name on disk.
+
 ## A test that passes once is not a passing test
 
 **Symptom.** The suite reported one failure on one run and none on the next.

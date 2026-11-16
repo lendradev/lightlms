@@ -5,9 +5,11 @@ namespace App\Http\Controllers\Learning;
 use App\Http\Controllers\Controller;
 use App\Models\Assignment;
 use App\Models\Course;
+use App\Models\FileAsset;
 use App\Models\Submission;
 use App\Services\AuditService;
 use App\Services\EnrollmentService;
+use App\Services\FileStorageService;
 use App\Services\PermissionService;
 use App\Services\SubmissionService;
 use Illuminate\Http\RedirectResponse;
@@ -25,6 +27,7 @@ class AssignmentController extends Controller
         private readonly EnrollmentService $enrollments,
         private readonly PermissionService $permissions,
         private readonly AuditService $audit,
+        private readonly FileStorageService $files,
     ) {}
 
     public function show(Request $request, Assignment $assignment): Response
@@ -68,6 +71,7 @@ class AssignmentController extends Controller
                 'feedback' => $submission->feedback,
                 'submitted_at' => $submission->submitted_at?->toIso8601String(),
                 'graded_at' => $submission->graded_at?->toIso8601String(),
+                'file' => $this->fileProps($submission->file),
             ])->values(),
             'latest' => $latest === null ? null : [
                 'id' => $latest->id,
@@ -76,6 +80,7 @@ class AssignmentController extends Controller
                 'score' => $latest->score === null ? null : (float) $latest->score,
                 'feedback' => $latest->feedback,
                 'submitted_at' => $latest->submitted_at?->toIso8601String(),
+                'file' => $this->fileProps($latest->file),
             ],
         ]);
     }
@@ -98,12 +103,28 @@ class AssignmentController extends Controller
         }
 
         $validated = $request->validate([
-            'content' => ['required', 'string', 'min:10', 'max:20000'],
+            'content' => ['required_without:file', 'string', 'min:10', 'max:20000'],
+            'file' => ['nullable', 'file', 'max:'.FileStorageService::MAX_SIZE_KB, 'mimetypes:'.implode(',', FileStorageService::ALLOWED_MIME_TYPES)],
         ]);
 
+        $file = null;
+
+        if ($request->hasFile('file')) {
+            $file = $this->files->store($request->file('file'), $user, $lesson?->id);
+        }
+
         try {
-            $submission = $this->submissions->submit($assignment, $user, $validated['content']);
+            $submission = $this->submissions->submit(
+                $assignment,
+                $user,
+                $validated['content'] ?? '',
+                $file,
+            );
         } catch (\RuntimeException $exception) {
+            if ($file !== null) {
+                $this->files->delete($file);
+            }
+
             return back()->with('error', $exception->getMessage());
         }
 
@@ -130,5 +151,25 @@ class AssignmentController extends Controller
         abort_if($course === null, 404, 'This assignment is not attached to a course.');
 
         return $course;
+    }
+
+    /**
+     * The parts of an attachment that are safe to send to the browser.
+     *
+     * @return array<string, mixed>|null
+     */
+    private function fileProps(?FileAsset $file): ?array
+    {
+        if ($file === null) {
+            return null;
+        }
+
+        return [
+            'id' => $file->id,
+            'name' => $file->original_name,
+            'mime_type' => $file->mime_type,
+            'size' => $file->size,
+            'url' => route('files.show', ['file' => $file->id]),
+        ];
     }
 }

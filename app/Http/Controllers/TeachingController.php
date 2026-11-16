@@ -4,7 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Enums\ActivityType;
 use App\Models\Course;
+use App\Models\FileAsset;
+use App\Models\Lesson;
 use App\Services\AuditService;
+use App\Services\FileStorageService;
 use App\Services\PermissionService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
@@ -18,6 +21,7 @@ class TeachingController extends Controller
     public function __construct(
         private readonly PermissionService $permissions,
         private readonly AuditService $audit,
+        private readonly FileStorageService $files,
     ) {}
 
     public function index(Request $request): Response
@@ -45,7 +49,7 @@ class TeachingController extends Controller
     {
         $this->authorizeCourse($request, $course);
 
-        $course->load('modules.lessons.assignment', 'modules.lessons.quiz');
+        $course->load('modules.lessons.assignment', 'modules.lessons.quiz', 'modules.lessons.files');
 
         return Inertia::render('Teaching/Course', [
             'course' => $course,
@@ -171,6 +175,61 @@ class TeachingController extends Controller
         }
 
         return back()->with('success', 'Activity added.');
+    }
+
+    /**
+     * Attach a file to an activity.
+     */
+    public function storeFile(Request $request, Course $course, Lesson $lesson): RedirectResponse
+    {
+        $this->authorizeCourse($request, $course);
+
+        abort_unless($lesson->module?->course_id === $course->id, 404);
+
+        $validated = $request->validate([
+            'file' => [
+                'required',
+                'file',
+                'max:'.FileStorageService::MAX_SIZE_KB,
+                'mimetypes:'.implode(',', FileStorageService::ALLOWED_MIME_TYPES),
+            ],
+        ]);
+
+        $file = $this->files->store($request->file('file'), $request->user(), $lesson->id);
+
+        $this->audit->record(
+            'file.create',
+            $file,
+            FileAsset::class,
+            $file->id,
+            $course->id,
+            [],
+            ['lesson_id' => $lesson->id, 'original_name' => $file->original_name],
+        );
+
+        return back()->with('success', 'File attached.');
+    }
+
+    /**
+     * Remove a file from an activity.
+     */
+    public function destroyFile(Request $request, Course $course, FileAsset $file): RedirectResponse
+    {
+        $this->authorizeCourse($request, $course);
+
+        abort_unless($file->lesson?->module?->course_id === $course->id, 404);
+
+        $this->files->delete($file);
+
+        $this->audit->record(
+            'file.delete',
+            $file,
+            FileAsset::class,
+            $file->id,
+            $course->id,
+        );
+
+        return back()->with('success', 'File removed.');
     }
 
     private function authorizeCourse(Request $request, Course $course): void

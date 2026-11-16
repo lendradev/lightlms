@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Teaching;
 use App\Http\Controllers\Controller;
 use App\Models\Assignment;
 use App\Models\Course;
+use App\Models\FileAsset;
 use App\Models\Submission;
 use App\Services\AuditService;
 use App\Services\PermissionService;
@@ -62,6 +63,7 @@ class AssignmentController extends Controller
                 'submitted_at' => $submission->submitted_at?->toIso8601String(),
                 'graded_at' => $submission->graded_at?->toIso8601String(),
                 'grader' => $submission->grader?->name,
+                'file' => $this->fileProps($submission->file),
             ])->values(),
             'stats' => [
                 'submitted' => $latest->count(),
@@ -115,5 +117,25 @@ class AssignmentController extends Controller
     private function belongsToCourse(Assignment $assignment, Course $course): bool
     {
         return $assignment->lesson?->module?->course_id === $course->id;
+    }
+
+    /**
+     * The parts of an attachment that are safe to send to the browser.
+     *
+     * @return array<string, mixed>|null
+     */
+    private function fileProps(?FileAsset $file): ?array
+    {
+        if ($file === null) {
+            return null;
+        }
+
+        return [
+            'id' => $file->id,
+            'name' => $file->original_name,
+            'mime_type' => $file->mime_type,
+            'size' => $file->size,
+            'url' => route('files.show', ['file' => $file->id]),
+        ];
     }
 }

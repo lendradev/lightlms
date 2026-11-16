@@ -74,7 +74,7 @@ Run these before proposing a change. A change that breaks lint, type-check or te
 | `composer run lint` | Laravel Pint, formats PHP |
 | `pnpm run typecheck` | `tsc --noEmit` |
 | `pnpm run lint` | ESLint |
-| `pnpm run format:check` | Prettier, read-only check |
+| `pnpm run format:check` | Prettier, read-only check. Only meaningful for the files you touched; the repository baseline is not fully formatted. |
 | `pnpm run build` | Vite production build into `public/build/` |
 | `pnpm run dev` | Vite dev server with hot reload |
 | `php artisan serve` | PHP dev server |
@@ -230,8 +230,11 @@ A change is done when:
 
 1. `php artisan test` passes.
 2. `composer run lint`, `pnpm run typecheck`, `pnpm run lint` and `pnpm run build` pass.
+   `composer run lint` reports one known issue in `bootstrap/app.php`; it is deliberate,
+   and the reason is in `docs/engineering-notes.md`.
 3. New behaviour is covered by a test, including the permission refusal path.
 4. New screens work in light and dark mode, are keyboard operable, and have empty, loading and
    error states.
 5. No secrets, no personal data, and no unexplained generated files are in the diff.
 6. The screenshot catalogue is updated when a screen is added or changed.
+7. `docs/engineering-notes.md` gains an entry whenever you solve something surprising.

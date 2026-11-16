@@ -93,6 +93,12 @@ Shown once, before the site has an administrator.
 |---|---|
 | ![Quiz attempt](screenshots/16-quiz-submitted.png) | ![Quiz attempt in dark mode](screenshots/16-quiz-submitted-dark.png) |
 
+### Assignment with an attachment
+
+| Light | Dark |
+|---|---|
+| ![Assignment with an attachment](screenshots/17-assignment-with-attachment.png) | ![Assignment with an attachment in dark mode](screenshots/17-assignment-with-attachment-dark.png) |
+
 ## Instructor
 
 ### Dashboard
@@ -136,6 +142,12 @@ Shown once, before the site has an administrator.
 | Light | Dark |
 |---|---|
 | ![Quiz question bank](screenshots/26-quiz-question-bank.png) | ![Quiz question bank in dark mode](screenshots/26-quiz-question-bank-dark.png) |
+
+### Course material
+
+| Light | Dark |
+|---|---|
+| ![Course material](screenshots/27-course-materials.png) | ![Course material in dark mode](screenshots/27-course-materials-dark.png) |
 
 ## Administration
 

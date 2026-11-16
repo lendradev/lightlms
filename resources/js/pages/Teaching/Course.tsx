@@ -1,4 +1,5 @@
 import { Head, Link, router, useForm } from '@inertiajs/react';
+import { Paperclip } from 'lucide-react';
 import { useState } from 'react';
 import { AppShell } from '@/components/AppShell';
 import { Badge } from '@/components/ui/badge';
@@ -54,6 +55,12 @@ type Props = {
                 duration_minutes: number;
                 assignment?: { id: number } | null;
                 quiz?: { id: number } | null;
+                files: {
+                    id: number;
+                    original_name: string;
+                    size: number;
+                    mime_type: string | null;
+                }[];
             }[];
         }[];
     };
@@ -64,6 +71,64 @@ type Props = {
         pivot: { status: string; progress: number; enrolled_at: string | null };
     }[];
 };
+
+function FileUploadDialog({ courseSlug, lessonId }: { courseSlug: string; lessonId: number }) {
+    const [open, setOpen] = useState(false);
+    const form = useForm({ file: null as File | null });
+
+    const upload = () => {
+        if (!form.data.file) {
+            return;
+        }
+
+        form.post(`/teaching/${courseSlug}/lessons/${lessonId}/files`, {
+            forceFormData: true,
+            preserveScroll: true,
+            onSuccess: () => {
+                setOpen(false);
+                form.reset();
+            },
+        });
+    };
+
+    return (
+        <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+                <Button size="sm" variant="outline">
+                    <Paperclip className="size-3.5" aria-hidden />
+                    Attach
+                </Button>
+            </DialogTrigger>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Attach a file</DialogTitle>
+                    <DialogDescription>
+                        The file is stored outside the public folder and served only to the people
+                        in this course.
+                    </DialogDescription>
+                </DialogHeader>
+                <div className="grid gap-2">
+                    <Label htmlFor={`lesson-file-${lessonId}`}>File</Label>
+                    <Input
+                        id={`lesson-file-${lessonId}`}
+                        type="file"
+                        onChange={(event) => form.setData('file', event.target.files?.[0] ?? null)}
+                        accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip,.txt,.md,.csv,.jpg,.jpeg,.png,.gif,.webp"
+                    />
+                    <p className="text-xs text-muted-foreground">Up to 10 MB.</p>
+                    {form.errors.file && (
+                        <p className="text-xs text-destructive">{form.errors.file}</p>
+                    )}
+                </div>
+                <DialogFooter>
+                    <Button onClick={upload} disabled={form.processing || !form.data.file}>
+                        Upload
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    );
+}
 
 export default function TeachingCourse({ course, students }: Props) {
     const [sectionOpen, setSectionOpen] = useState(false);
@@ -224,10 +289,21 @@ export default function TeachingCourse({ course, students }: Props) {
                                                             >
                                                                 <span className="min-w-0 flex-1 truncate">
                                                                     {lesson.position}. {lesson.title}
+                                                                    {lesson.files.length > 0 && (
+                                                                        <span className="ml-2 inline-flex items-center gap-1 text-xs text-muted-foreground">
+                                                                            <Paperclip className="size-3" aria-hidden />
+                                                                            {lesson.files.length} file
+                                                                            {lesson.files.length === 1 ? '' : 's'}
+                                                                        </span>
+                                                                    )}
                                                                 </span>
                                                                 <Badge variant="outline" className="capitalize">
                                                                     {lesson.type}
                                                                 </Badge>
+                                                                <FileUploadDialog
+                                                                    courseSlug={course.slug}
+                                                                    lessonId={lesson.id}
+                                                                />
                                                                 {lesson.type === 'assignment' &&
                                                                     lesson.assignment && (
                                                                         <Button asChild size="sm" variant="outline">

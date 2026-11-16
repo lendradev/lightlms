@@ -1,5 +1,5 @@
 import { Head, Link, router } from '@inertiajs/react';
-import { ArrowLeft, CheckCircle2, Clock, Save } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, Clock, Paperclip, Save } from 'lucide-react';
 import { useState } from 'react';
 import { AppShell } from '@/components/AppShell';
 import { Badge } from '@/components/ui/badge';
@@ -8,6 +8,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+
+type Attachment = {
+    id: number;
+    name: string;
+    mime_type: string | null;
+    size: number;
+    url: string;
+};
 
 type HandIn = {
     id: number;
@@ -19,6 +27,7 @@ type HandIn = {
     submitted_at: string | null;
     graded_at: string | null;
     grader: string | null;
+    file: Attachment | null;
 };
 
 type Props = {
@@ -45,6 +54,18 @@ function formatDate(value: string | null) {
         dateStyle: 'medium',
         timeStyle: 'short',
     });
+}
+
+function formatSize(bytes: number) {
+    if (bytes < 1024) {
+        return `${bytes} B`;
+    }
+
+    if (bytes < 1024 * 1024) {
+        return `${Math.round(bytes / 1024)} KB`;
+    }
+
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
 export default function TeachingAssignment({
@@ -227,6 +248,18 @@ export default function TeachingAssignment({
                                             <p className="whitespace-pre-line text-sm leading-relaxed">
                                                 {current.content}
                                             </p>
+                                            {current.file && (
+                                                <a
+                                                    href={current.file.url}
+                                                    className="mt-3 inline-flex items-center gap-2 text-sm text-primary underline-offset-4 hover:underline"
+                                                >
+                                                    <Paperclip className="size-3.5" aria-hidden />
+                                                    {current.file.name}
+                                                    <span className="text-xs text-muted-foreground">
+                                                        ({formatSize(current.file.size)})
+                                                    </span>
+                                                </a>
+                                            )}
                                         </CardContent>
                                     </Card>
 
