@@ -31,6 +31,14 @@ php artisan serve
 
 For hot reload, run `pnpm run dev` in a second terminal.
 
+### Working with an AI agent
+
+If you use an AI coding agent, give it [`AGENTS.md`](AGENTS.md) as the entry point. The file
+describes the layout of the repository, the commands that have to pass before a change is
+finished, and the rules the project holds to: permissions are checked on the server, colours come
+from the design tokens, every screen works in light and dark mode, every behaviour change comes
+with a test, and dependency versions are pinned exactly.
+
 ### Working in Docker
 
 ```bash

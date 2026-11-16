@@ -4,9 +4,13 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\Learning\AssignmentController as LearningAssignmentController;
+use App\Http\Controllers\Learning\QuizController as LearningQuizController;
 use App\Http\Controllers\LearningController;
 use App\Http\Controllers\SetupController;
+use App\Http\Controllers\Teaching\AssignmentController as TeachingAssignmentController;
 use App\Http\Controllers\Teaching\GradebookController;
+use App\Http\Controllers\Teaching\QuizController as TeachingQuizController;
 use App\Http\Controllers\Teaching\RosterController;
 use App\Http\Controllers\TeachingController;
 use Illuminate\Support\Facades\Route;
@@ -39,6 +43,16 @@ Route::middleware('installed')->group(function (): void {
         Route::post('/learning/lessons/{lesson}/complete', [LearningController::class, 'complete'])
             ->name('learning.lesson.complete');
 
+        Route::get('/assignments/{assignment}', [LearningAssignmentController::class, 'show'])
+            ->name('learning.assignments.show');
+        Route::post('/assignments/{assignment}', [LearningAssignmentController::class, 'store'])
+            ->name('learning.assignments.store');
+
+        Route::get('/quizzes/{quiz}', [LearningQuizController::class, 'show'])
+            ->name('learning.quizzes.show');
+        Route::post('/quizzes/{quiz}', [LearningQuizController::class, 'store'])
+            ->name('learning.quizzes.store');
+
         Route::middleware('role:instructor,admin')->group(function (): void {
             Route::get('/teaching', [TeachingController::class, 'index'])->name('teaching.index');
             Route::get('/teaching/{course}', [TeachingController::class, 'show'])->name('teaching.course');
@@ -56,6 +70,20 @@ Route::middleware('installed')->group(function (): void {
             Route::post('/teaching/{course}/roster', [RosterController::class, 'store'])->name('teaching.roster.store');
             Route::put('/teaching/{course}/roster/{user}', [RosterController::class, 'update'])->name('teaching.roster.update');
             Route::delete('/teaching/{course}/roster/{user}', [RosterController::class, 'destroy'])->name('teaching.roster.destroy');
+
+            Route::get('/teaching/{course}/assignments/{assignment}', [TeachingAssignmentController::class, 'show'])
+                ->name('teaching.assignments.show');
+            Route::post('/teaching/{course}/assignments/{assignment}/{submission}/grade', [TeachingAssignmentController::class, 'grade'])
+                ->name('teaching.assignments.grade');
+
+            Route::get('/teaching/{course}/quizzes/{quiz}', [TeachingQuizController::class, 'show'])
+                ->name('teaching.quizzes.show');
+            Route::post('/teaching/{course}/quizzes/{quiz}/questions', [TeachingQuizController::class, 'storeQuestion'])
+                ->name('teaching.quizzes.questions.store');
+            Route::delete('/teaching/{course}/quizzes/{quiz}/questions/{question}', [TeachingQuizController::class, 'destroyQuestion'])
+                ->name('teaching.quizzes.questions.destroy');
+            Route::post('/teaching/{course}/quizzes/{quiz}/attempts/{attempt}/mark', [TeachingQuizController::class, 'mark'])
+                ->name('teaching.quizzes.attempts.mark');
         });
     });
 });

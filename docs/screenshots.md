@@ -69,6 +69,30 @@ Shown once, before the site has an administrator.
 |---|---|
 | ![Course player](screenshots/12-learning-course.png) | ![Course player in dark mode](screenshots/12-learning-course-dark.png) |
 
+### Assignment
+
+| Light | Dark |
+|---|---|
+| ![Assignment](screenshots/13-assignment-student.png) | ![Assignment in dark mode](screenshots/13-assignment-student-dark.png) |
+
+### Assignment handed in
+
+| Light | Dark |
+|---|---|
+| ![Assignment submitted](screenshots/14-assignment-submitted.png) | ![Assignment submitted in dark mode](screenshots/14-assignment-submitted-dark.png) |
+
+### Quiz
+
+| Light | Dark |
+|---|---|
+| ![Quiz](screenshots/15-quiz-student.png) | ![Quiz in dark mode](screenshots/15-quiz-student-dark.png) |
+
+### Quiz attempt
+
+| Light | Dark |
+|---|---|
+| ![Quiz attempt](screenshots/16-quiz-submitted.png) | ![Quiz attempt in dark mode](screenshots/16-quiz-submitted-dark.png) |
+
 ## Instructor
 
 ### Dashboard
@@ -100,6 +124,18 @@ Shown once, before the site has an administrator.
 | Light | Dark |
 |---|---|
 | ![Roster](screenshots/24-roster.png) | ![Roster in dark mode](screenshots/24-roster-dark.png) |
+
+### Grading an assignment
+
+| Light | Dark |
+|---|---|
+| ![Grading an assignment](screenshots/25-assignment-grading.png) | ![Grading an assignment in dark mode](screenshots/25-assignment-grading-dark.png) |
+
+### Quiz question bank
+
+| Light | Dark |
+|---|---|
+| ![Quiz question bank](screenshots/26-quiz-question-bank.png) | ![Quiz question bank in dark mode](screenshots/26-quiz-question-bank-dark.png) |
 
 ## Administration
 
@@ -185,6 +221,18 @@ every action stays reachable with a thumb.
 | Light | Dark |
 |---|---|
 | ![Mobile users](screenshots/47-mobile-admin-users.png) | ![Mobile users in dark mode](screenshots/47-mobile-admin-users-dark.png) |
+
+### Assignment
+
+| Light | Dark |
+|---|---|
+| ![Mobile assignment](screenshots/48-mobile-assignment.png) | ![Mobile assignment in dark mode](screenshots/48-mobile-assignment-dark.png) |
+
+### Quiz
+
+| Light | Dark |
+|---|---|
+| ![Mobile quiz](screenshots/49-mobile-quiz.png) | ![Mobile quiz in dark mode](screenshots/49-mobile-quiz-dark.png) |
 
 ---
 

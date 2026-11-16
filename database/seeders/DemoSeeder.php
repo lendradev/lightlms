@@ -2,12 +2,18 @@
 
 namespace Database\Seeders;
 
+use App\Enums\ActivityType;
 use App\Enums\CourseStatus;
+use App\Enums\QuestionType;
 use App\Enums\UserRole;
+use App\Models\Assignment;
 use App\Models\Course;
 use App\Models\Lesson;
 use App\Models\Module;
+use App\Models\Question;
+use App\Models\Quiz;
 use App\Models\Setting;
+use App\Models\Submission;
 use App\Models\User;
 use App\Support\Setup;
 use Illuminate\Database\Seeder;
@@ -57,6 +63,7 @@ class DemoSeeder extends Seeder
                     ['Application', 'Reading policy through the lens.', [
                         ['Reading', 'Unintended consequences', 22],
                         ['Forum', 'Discuss: a policy you have seen fail', 20],
+                        ['Quiz', 'Check your understanding of systems', 15],
                     ]],
                 ],
             ],
@@ -123,7 +130,7 @@ class DemoSeeder extends Seeder
                 );
 
                 foreach ($lessons as $lessonIndex => [$type, $title, $minutes]) {
-                    Lesson::query()->firstOrCreate(
+                    $lesson = Lesson::query()->firstOrCreate(
                         ['module_id' => $module->id, 'position' => $lessonIndex + 1],
                         [
                             'title' => $title,
@@ -131,8 +138,98 @@ class DemoSeeder extends Seeder
                             'duration_minutes' => $minutes,
                             'body' => 'This activity walks through '.$title.'. Read it carefully, then continue to the next one.',
                             'is_preview' => $moduleIndex === 0 && $lessonIndex === 0,
+                            'grade_max' => 100,
                         ],
                     );
+
+                    if ($lesson->type === ActivityType::Assignment) {
+                        Assignment::query()->firstOrCreate(
+                            ['lesson_id' => $lesson->id],
+                            [
+                                'submission_type' => 'text',
+                                'max_attempts' => 3,
+                                'allow_late' => true,
+                                'require_approval' => false,
+                            ],
+                        );
+
+                        $lesson->update([
+                            'instructions' => 'Describe the system you mapped: name its stocks and flows, point out at least one reinforcing loop and one balancing loop, and explain what happens if you delay one of the flows.',
+                            'due_at' => now()->addDays(14),
+                        ]);
+                    }
+                    if ($lesson->type === ActivityType::Quiz) {
+                        $quiz = Quiz::query()->firstOrCreate(
+                            ['lesson_id' => $lesson->id],
+                            [
+                                'max_attempts' => 3,
+                                'shuffle_questions' => false,
+                                'pass_mark' => 60,
+                                'time_limit_minutes' => 20,
+                            ],
+                        );
+
+                        $lesson->update([
+                            'instructions' => 'Answer every question. Short answers and essays are read by a marker; the rest are marked as soon as you submit.',
+                        ]);
+
+                        $questions = [
+                            [
+                                'type' => QuestionType::MultipleChoice,
+                                'prompt' => 'Which pair describes a reinforcing loop?',
+                                'options' => ['More cars, more drivers', 'More drivers, more cars', 'Fewer cars, fewer drivers', 'Neither pair is a loop'],
+                                'answer' => ['More drivers, more cars'],
+                                'points' => 2,
+                                'explanation' => 'A reinforcing loop amplifies what it is attached to: more drivers means more cars, which means more drivers.',
+                            ],
+                            [
+                                'type' => QuestionType::MultipleSelect,
+                                'prompt' => 'Which of these are delays?',
+                                'options' => ['Order processing time', 'Interest rate', 'Shipping lead time', 'Panel recruitment lag'],
+                                'answer' => ['Order processing time', 'Shipping lead time', 'Panel recruitment lag'],
+                                'points' => 3,
+                                'explanation' => 'A delay is time between an action and its effect. Interest rate acts immediately, so it is not a delay.',
+                            ],
+                            [
+                                'type' => QuestionType::TrueFalse,
+                                'prompt' => 'A stock is a quantity that accumulates over time.',
+                                'options' => ['True', 'False'],
+                                'answer' => [true],
+                                'points' => 1,
+                                'explanation' => 'Stocks accumulate; flows change them over time.',
+                            ],
+                            [
+                                'type' => QuestionType::ShortAnswer,
+                                'prompt' => 'Name the loop that keeps a policy problem in place.',
+                                'options' => [],
+                                'answer' => ['balancing loop'],
+                                'points' => 2,
+                                'explanation' => 'A balancing loop counteracts change and holds the system steady.',
+                            ],
+                            [
+                                'type' => QuestionType::Essay,
+                                'prompt' => 'Explain why a policy intervention can fail even when it targets the right stock.',
+                                'options' => [],
+                                'answer' => [],
+                                'points' => 4,
+                                'explanation' => 'Look for the surrounding structure: the intervention may push on a stock while the reinforcing loop rebuilds it.',
+                            ],
+                        ];
+
+                        foreach ($questions as $index => $question) {
+                            Question::query()->firstOrCreate(
+                                ['quiz_id' => $quiz->id, 'position' => $index + 1],
+                                [
+                                    'type' => $question['type'],
+                                    'prompt' => $question['prompt'],
+                                    'options' => $question['options'],
+                                    'answer' => $question['answer'],
+                                    'points' => $question['points'],
+                                    'explanation' => $question['explanation'],
+                                ],
+                            );
+                        }
+                    }
                 }
             }
         }
@@ -151,6 +248,21 @@ class DemoSeeder extends Seeder
                 DB::table('lesson_user')->updateOrInsert(
                     ['lesson_id' => $lesson->id, 'user_id' => $student->id],
                     ['completed' => true, 'completed_at' => now(), 'created_at' => now(), 'updated_at' => now()],
+                );
+            }
+
+            $assignment = Assignment::query()
+                ->whereHas('lesson.module', fn ($query) => $query->where('course_id', $firstCourse->id))
+                ->first();
+
+            if ($assignment !== null) {
+                Submission::query()->firstOrCreate(
+                    ['assignment_id' => $assignment->id, 'user_id' => $student->id],
+                    [
+                        'content' => 'I mapped the cycle of a city bus route: the more buses that run, the more reliable the service feels, which brings more riders, which needs more buses. The balancing loop is congestion: more buses slow each other down, so headways stretch and riders wait longer.',
+                        'status' => 'submitted',
+                        'submitted_at' => now()->subDays(2),
+                    ],
                 );
             }
         }

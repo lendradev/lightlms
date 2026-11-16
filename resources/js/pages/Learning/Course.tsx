@@ -1,4 +1,4 @@
-import { Head, router } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import { CheckCircle2, Circle, Clock, FileText, MessageSquare, Video } from 'lucide-react';
 import { AppShell } from '@/components/AppShell';
 import { Badge } from '@/components/ui/badge';
@@ -14,6 +14,8 @@ type Lesson = {
     duration_minutes: number;
     body: string | null;
     is_preview: boolean;
+    assignment?: { id: number } | null;
+    quiz?: { id: number } | null;
 };
 
 type Module = {
@@ -115,6 +117,16 @@ export default function LearningCourse({ course, completedLessonIds }: Props) {
                                                             <CheckCircle2 className="size-3" aria-hidden />
                                                             Done
                                                         </Badge>
+                                                    ) : lesson.type === 'assignment' && lesson.assignment ? (
+                                                        <Button asChild size="sm">
+                                                            <Link href={`/assignments/${lesson.assignment.id}`}>
+                                                                Open assignment
+                                                            </Link>
+                                                        </Button>
+                                                    ) : lesson.type === 'quiz' && lesson.quiz ? (
+                                                        <Button asChild size="sm">
+                                                            <Link href={`/quizzes/${lesson.quiz.id}`}>Open quiz</Link>
+                                                        </Button>
                                                     ) : lesson.is_preview ? (
                                                         <Badge variant="outline">Preview</Badge>
                                                     ) : (

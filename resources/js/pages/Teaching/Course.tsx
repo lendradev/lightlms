@@ -52,6 +52,8 @@ type Props = {
                 type: string;
                 position: number;
                 duration_minutes: number;
+                assignment?: { id: number } | null;
+                quiz?: { id: number } | null;
             }[];
         }[];
     };
@@ -226,6 +228,25 @@ export default function TeachingCourse({ course, students }: Props) {
                                                                 <Badge variant="outline" className="capitalize">
                                                                     {lesson.type}
                                                                 </Badge>
+                                                                {lesson.type === 'assignment' &&
+                                                                    lesson.assignment && (
+                                                                        <Button asChild size="sm" variant="outline">
+                                                                            <Link
+                                                                                href={`/teaching/${course.slug}/assignments/${lesson.assignment.id}`}
+                                                                            >
+                                                                                Grade
+                                                                            </Link>
+                                                                        </Button>
+                                                                    )}
+                                                                {lesson.type === 'quiz' && lesson.quiz && (
+                                                                    <Button asChild size="sm" variant="outline">
+                                                                        <Link
+                                                                            href={`/teaching/${course.slug}/quizzes/${lesson.quiz.id}`}
+                                                                        >
+                                                                            Questions
+                                                                        </Link>
+                                                                    </Button>
+                                                                )}
                                                             </li>
                                                         ))}
                                                     </ul>

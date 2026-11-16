@@ -378,6 +378,15 @@ Development documentation for contributors lives alongside the source code. Prod
 research notes and internal decisions are tracked separately in the project workspace and are not
 part of the public repository.
 
+### Contributing with an AI agent
+
+If you drive an AI coding agent (Claude Code, Codex, Cursor, Kilo, Copilot, or similar),
+point it at [`AGENTS.md`](AGENTS.md). It maps the codebase, lists the commands that must pass,
+and states the rules the project holds to: server-side authorisation, design tokens instead of
+raw colours, light and dark mode for every screen, tests for every behaviour change, and
+pinned dependency versions. Keeping your prompts and the agent's diffs in the pull request is
+the fastest way for a reviewer to follow the work.
+
 ---
 
 ## Security

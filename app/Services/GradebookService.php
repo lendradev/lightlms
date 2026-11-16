@@ -186,13 +186,16 @@ class GradebookService
 
     /**
      * Save a grade. An override is kept as entered and is never recomputed.
+     *
+     * A null grader means the mark came from an automatic source, such as a
+     * scored quiz attempt.
      */
     public function saveGrade(
         GradeItem $item,
         User $student,
         ?float $points,
         ?string $feedback,
-        User $grader,
+        ?User $grader = null,
         bool $override = false,
     ): GradeGrade {
         $grade = GradeGrade::query()->updateOrCreate(
@@ -202,11 +205,11 @@ class GradebookService
                 'final_points' => $points,
                 'feedback' => $feedback,
                 'status' => $points === null ? 'pending' : 'graded',
-                'source' => 'manual',
-                'graded_by' => $grader->id,
+                'source' => $grader === null ? 'auto' : 'manual',
+                'graded_by' => $grader?->id,
                 'graded_at' => now(),
                 'is_overridden' => $override,
-                'overridden_by' => $override ? $grader->id : null,
+                'overridden_by' => $override ? $grader?->id : null,
                 'overridden_at' => $override ? now() : null,
             ],
         );

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\ActivityType;
 use App\Models\Course;
 use App\Services\AuditService;
 use App\Services\PermissionService;
@@ -44,7 +45,7 @@ class TeachingController extends Controller
     {
         $this->authorizeCourse($request, $course);
 
-        $course->load('modules.lessons');
+        $course->load('modules.lessons.assignment', 'modules.lessons.quiz');
 
         return Inertia::render('Teaching/Course', [
             'course' => $course,
@@ -143,7 +144,7 @@ class TeachingController extends Controller
 
         $module = $course->modules()->whereKey($validated['module_id'])->firstOrFail();
 
-        $module->lessons()->create([
+        $lesson = $module->lessons()->create([
             'title' => $validated['title'],
             'type' => $validated['type'],
             'body' => $validated['body'] ?? null,
@@ -151,6 +152,23 @@ class TeachingController extends Controller
             'is_preview' => (bool) ($validated['is_preview'] ?? false),
             'position' => ((int) $module->lessons()->max('position')) + 1,
         ]);
+
+        if ($lesson->type === ActivityType::Assignment) {
+            $lesson->assignment()->firstOrCreate([], [
+                'submission_type' => 'text',
+                'max_attempts' => 1,
+                'allow_late' => true,
+                'require_approval' => false,
+            ]);
+        }
+
+        if ($lesson->type === ActivityType::Quiz) {
+            $lesson->quiz()->firstOrCreate([], [
+                'max_attempts' => 3,
+                'shuffle_questions' => false,
+                'pass_mark' => null,
+            ]);
+        }
 
         return back()->with('success', 'Activity added.');
     }

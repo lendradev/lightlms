@@ -45,7 +45,7 @@ class LearningController extends Controller
 
         abort_unless($this->enrollments->isEnrolled($user->id, $course->id), 403, 'You are not enrolled in this course.');
 
-        $course->load(['modules' => fn ($query) => $query->where('visible', true), 'modules.lessons']);
+        $course->load(['modules' => fn ($query) => $query->where('visible', true), 'modules.lessons.assignment', 'modules.lessons.quiz']);
 
         $completed = DB::table('lesson_user')
             ->where('user_id', $user->id)
