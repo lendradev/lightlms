@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Course;
+use App\Services\AuditService;
+use App\Services\PermissionService;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -11,12 +14,23 @@ use Inertia\Response;
 
 class TeachingController extends Controller
 {
+    public function __construct(
+        private readonly PermissionService $permissions,
+        private readonly AuditService $audit,
+    ) {}
+
     public function index(Request $request): Response
     {
         $user = $request->user();
 
         $courses = Course::query()
-            ->ownedBy($user)
+            ->where(function (Builder $query) use ($user): void {
+                $query->where('user_id', $user->id);
+
+                if ($user->isAdmin()) {
+                    $query->orWhereHas('students', fn ($students) => $students->where('users.id', $user->id));
+                }
+            })
             ->withCount(['modules', 'students'])
             ->orderByDesc('updated_at')
             ->get();
@@ -34,7 +48,7 @@ class TeachingController extends Controller
 
         return Inertia::render('Teaching/Course', [
             'course' => $course,
-            'students' => $course->students()->withPivot(['status', 'progress', 'enrolled_at'])->get(),
+            'students' => $course->students()->withPivot(['status', 'progress', 'role', 'enrolled_at'])->get(),
         ]);
     }
 
@@ -144,7 +158,7 @@ class TeachingController extends Controller
     private function authorizeCourse(Request $request, Course $course): void
     {
         abort_unless(
-            $course->user_id === $request->user()->id || $request->user()->isAdmin(),
+            $this->permissions->allows($request->user(), 'course.edit', $course),
             403,
             'You do not manage this course.',
         );

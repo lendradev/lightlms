@@ -1,4 +1,4 @@
-import { Head, router, useForm } from '@inertiajs/react';
+import { Head, Link, router, useForm } from '@inertiajs/react';
 import { useState } from 'react';
 import { AppShell } from '@/components/AppShell';
 import { Badge } from '@/components/ui/badge';
@@ -85,9 +85,18 @@ export default function TeachingCourse({ course, students }: Props) {
                 title={course.title}
                 actions={
                     <div className="flex items-center gap-2">
-                        <Badge variant={course.status === 'published' ? 'secondary' : 'outline'} className="capitalize">
+                        <Badge
+                            variant={course.status === 'published' ? 'secondary' : 'outline'}
+                            className="capitalize"
+                        >
                             {course.status}
                         </Badge>
+                        <Button asChild size="sm" variant="outline">
+                            <Link href={`/teaching/${course.slug}/roster`}>Roster</Link>
+                        </Button>
+                        <Button asChild size="sm" variant="outline">
+                            <Link href={`/teaching/${course.slug}/gradebook`}>Gradebook</Link>
+                        </Button>
                         <Button
                             size="sm"
                             variant={course.status === 'published' ? 'outline' : 'default'}

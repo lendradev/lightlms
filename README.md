@@ -50,6 +50,14 @@ every part of it is readable, testable and replaceable.
 
 ![Course builder](docs/screenshots/07-course-builder.png)
 
+### Gradebook
+
+![Gradebook](docs/screenshots/15-gradebook.png)
+
+### Roster
+
+![Roster](docs/screenshots/16-roster.png)
+
 ### Administration
 
 ![Administration](docs/screenshots/08-admin-users.png)
@@ -117,6 +125,10 @@ LightLMS takes the middle path:
 | Course player with per-activity completion and progress tracking | Available |
 | Administration: users, roles, invitations, site settings | Available |
 | One-click backup and restore (database + uploaded files) | Available |
+| Course-scoped roles: student, teaching assistant, instructor | Available |
+| Gradebook with weighted totals, inline grading and CSV export | Available |
+| Roster management with per-course role assignment | Available |
+| Audit log of privileged actions | Available |
 | Data model: courses, sections, activities, enrollments, grades | Available |
 | Docker image + compose stack (Postgres, Redis, worker) | Available |
 | Assignments, submissions and grading | In progress |

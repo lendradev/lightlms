@@ -6,6 +6,8 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LearningController;
 use App\Http\Controllers\SetupController;
+use App\Http\Controllers\Teaching\GradebookController;
+use App\Http\Controllers\Teaching\RosterController;
 use App\Http\Controllers\TeachingController;
 use Illuminate\Support\Facades\Route;
 
@@ -45,6 +47,15 @@ Route::middleware('installed')->group(function (): void {
             Route::post('/teaching/courses/{course}/publish', [TeachingController::class, 'publish'])->name('teaching.courses.publish');
             Route::post('/teaching/courses/{course}/modules', [TeachingController::class, 'storeModule'])->name('teaching.modules.store');
             Route::post('/teaching/courses/{course}/lessons', [TeachingController::class, 'storeLesson'])->name('teaching.lessons.store');
+
+            Route::get('/teaching/{course}/gradebook', [GradebookController::class, 'show'])->name('teaching.gradebook');
+            Route::post('/teaching/{course}/gradebook/{item}', [GradebookController::class, 'store'])->name('teaching.gradebook.store');
+            Route::get('/teaching/{course}/gradebook/export', [GradebookController::class, 'export'])->name('teaching.gradebook.export');
+
+            Route::get('/teaching/{course}/roster', [RosterController::class, 'index'])->name('teaching.roster');
+            Route::post('/teaching/{course}/roster', [RosterController::class, 'store'])->name('teaching.roster.store');
+            Route::put('/teaching/{course}/roster/{user}', [RosterController::class, 'update'])->name('teaching.roster.update');
+            Route::delete('/teaching/{course}/roster/{user}', [RosterController::class, 'destroy'])->name('teaching.roster.destroy');
         });
     });
 });

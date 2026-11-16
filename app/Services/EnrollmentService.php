@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\CourseRole;
 use App\Models\Course;
 use App\Models\Lesson;
 use App\Models\User;
@@ -18,14 +19,17 @@ class EnrollmentService
             ->exists();
     }
 
-    public function enroll(User $user, Course $course): bool
+    public function enroll(User $user, Course $course, CourseRole $role = CourseRole::Student): bool
     {
         if ($this->isEnrolled($user->id, $course->id)) {
             return false;
         }
 
-        if ($course->capacity !== null) {
-            $taken = DB::table('course_user')->where('course_id', $course->id)->count();
+        if ($course->capacity !== null && $role === CourseRole::Student) {
+            $taken = DB::table('course_user')
+                ->where('course_id', $course->id)
+                ->where('role', CourseRole::Student->value)
+                ->count();
 
             if ($taken >= $course->capacity) {
                 return false;
@@ -35,6 +39,7 @@ class EnrollmentService
         DB::table('course_user')->insert([
             'course_id' => $course->id,
             'user_id' => $user->id,
+            'role' => $role->value,
             'status' => 'active',
             'progress' => 0,
             'enrolled_at' => now(),
@@ -51,6 +56,24 @@ class EnrollmentService
             ->where('user_id', $userId)
             ->where('course_id', $courseId)
             ->delete();
+    }
+
+    /**
+     * Give someone a role inside a course. The course owner keeps their
+     * ownership; the role only describes what they may do there.
+     */
+    public function assignRole(Course $course, User $user, CourseRole $role): void
+    {
+        DB::table('course_user')->updateOrInsert(
+            ['course_id' => $course->id, 'user_id' => $user->id],
+            [
+                'role' => $role->value,
+                'status' => 'active',
+                'enrolled_at' => now(),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+        );
     }
 
     public function markLessonComplete(int $userId, int $lessonId): void
