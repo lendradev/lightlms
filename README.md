@@ -120,7 +120,7 @@ LightLMS takes the middle path:
 
 | Layer | Choice | Notes |
 |---|---|---|
-| Language | PHP 8.3+ | Tested on 8.5 |
+| Language | PHP 8.3+ | Tested on 8.3, 8.4 and 8.5 |
 | Framework | Laravel 13 | Conventional MVC, Eloquent, queues, scheduler |
 | Front-end bridge | Inertia.js v3 | Server-driven navigation, no separate SPA router |
 | UI library | React 19 + TypeScript 5.9 + shadcn/ui | Functional components, no state library needed |
@@ -382,6 +382,10 @@ decides who is finished is described in [`docs/certificates.md`](docs/certificat
 The public documentation is a static site with no build step, in
 [`docs/web-docs/`](docs/web-docs/). The workflow `.github/workflows/pages.yml` publishes it to
 GitHub Pages on every push to `main` that touches the folder.
+
+The site must be switched on once per repository: **Settings → Pages → Build and deployment →
+Source → GitHub Actions**. Until then the workflow fails on `actions/configure-pages` with
+`Get Pages site failed`.
 
 ---
 

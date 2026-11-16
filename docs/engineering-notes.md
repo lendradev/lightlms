@@ -239,3 +239,34 @@ nothing the second time.
 not tell "not eligible" from "already issued".
 **Fix.** The method returns the existing certificate when there is one. A caller that needs to
 know whether something was just issued checks the audit log, not the return value.
+
+## The lock file was resolved on a newer PHP than the app supports
+**Symptom.** `composer install` refused to install on PHP 8.3: the lock file wanted Symfony 8.1,
+which requires PHP 8.4.
+
+**Cause.** The lock file was generated on a PHP 8.5 machine. Composer resolves against the PHP it
+runs on, so the lock file silently became a PHP 8.5 lock file.
+
+**Fix.** `composer.json` pins the resolution target with `config.platform.php`, so the lock file is
+resolved as if PHP 8.3 were the runtime while the app requirement stays `php: ^8.3`. Check
+`composer.lock` for `platform-overrides` after every `composer update`.
+
+## A Pages workflow with the wrong indentation never runs a single job
+**Symptom.** The Pages run finished with `0 jobs` and conclusion `failure`, with no error message.
+
+**Cause.** YAML indentation. `uses:` was indented one level deeper than the step it belongs to, so
+the file parsed as a mapping inside a mapping and GitHub found no job to start.
+
+**Fix.** Run `actionlint` over `.github/workflows/` before pushing. It catches the indentation, the
+unknown inputs and the shell problems that a failed run only reports after the fact.
+
+## `getPagesSite` returns 404 for every repository when the request is unauthenticated
+**Symptom.** `GET /repos/{owner}/{repo}/pages` answered `404` even though the repository reports
+`has_pages: true`.
+
+**Cause.** The endpoint needs authentication. An anonymous request gets a 404 for every repository,
+so the response says nothing about whether Pages is configured.
+
+**Fix.** Do not read the API response as proof that Pages is off. Check the repository settings, or
+call the endpoint with a token. The same applies to `actions/configure-pages`: with
+`enablement: true` it needs a token that is not `GITHUB_TOKEN`.

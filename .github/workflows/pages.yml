@@ -8,11 +8,6 @@ on:
             - '.github/workflows/pages.yml'
     workflow_dispatch:
 
-permissions:
-    contents: read
-    pages: write
-    id-token: write
-
 concurrency:
     group: pages
     cancel-in-progress: false
@@ -21,37 +16,49 @@ jobs:
     build:
         name: Build the documentation site
         runs-on: ubuntu-latest
+        timeout-minutes: 10
+        permissions:
+            contents: read
+            pages: read
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
             - name: Check the internal links
               run: |
                   cd docs/web-docs
                   for page in *.html; do
-                      for link in $(grep -o 'href="[^"#]*\.html' "$page" | sed 's/href="//'); do
+                      missing=0
+                      while read -r link; do
                           if [ ! -f "$link" ]; then
                               echo "broken link in $page: $link"
-                              exit 1
+                              missing=1
                           fi
-                      done
+                      done < <(grep -o 'href="[^"#]*\.html' "$page" | sed 's/href="//')
+                      if [ "$missing" -ne 0 ]; then
+                          exit 1
+                      fi
                   done
 
             - name: Configure Pages
-              uses: actions/configure-pages@v5
+              uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
 
             - name: Upload the site
-                uses: actions/upload-pages-artifact@v3
-                with:
-                    path: docs/web-docs
+              uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+              with:
+                  path: docs/web-docs
 
     deploy:
         name: Deploy to GitHub Pages
         needs: build
         runs-on: ubuntu-latest
+        timeout-minutes: 15
+        permissions:
+            pages: write
+            id-token: write
         environment:
             name: github-pages
             url: ${{ steps.deployment.outputs.page_url }}
         steps:
             - name: Deploy
               id: deployment
-              uses: actions/deploy-pages@v4
+              uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
