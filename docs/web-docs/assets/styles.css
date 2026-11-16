@@ -2,36 +2,36 @@
  * LightLMS documentation site.
  *
  * A static site with no build step, deployed straight to GitHub Pages.
- * The colours are the same Ink Indigo tokens as the application, so the
+ * The colours are the same Adwaita tokens as the application, so the
  * documentation looks like the product it describes.
  */
 
 :root {
-    --radius: 5px;
-    --background: oklch(98.6% 0.003 264);
-    --foreground: oklch(21% 0.015 264);
-    --surface: oklch(100% 0 0);
-    --muted: oklch(95.5% 0.005 264);
-    --muted-foreground: oklch(45% 0.017 264);
-    --primary: oklch(47% 0.19 264);
-    --primary-foreground: oklch(99% 0.002 264);
-    --border: oklch(91% 0.008 264);
-    --code-background: oklch(97% 0.005 264);
-    --shadow: 0 1px 2px oklch(21% 0.015 264 / 0.06), 0 1px 3px oklch(21% 0.015 264 / 0.04);
+    --radius: 10px;
+    --background: #fafafa;
+    --foreground: #241f31;
+    --surface: #ffffff;
+    --muted: #f1f1f0;
+    --muted-foreground: #5e5c64;
+    --primary: #1c71d8;
+    --primary-foreground: #ffffff;
+    --border: #d0d0d0;
+    --code-background: #f1f1f0;
+    --shadow: 0 1px 2px rgb(0 0 0 / 0.08), 0 1px 3px rgb(0 0 0 / 0.04);
 }
 
 @media (prefers-color-scheme: dark) {
     :root {
-        --background: oklch(17% 0.012 264);
-        --foreground: oklch(95% 0.006 264);
-        --surface: oklch(21% 0.014 264);
-        --muted: oklch(25% 0.014 264);
-        --muted-foreground: oklch(70% 0.015 264);
-        --primary: oklch(68% 0.14 264);
-        --primary-foreground: oklch(17% 0.012 264);
-        --border: oklch(30% 0.014 264);
-        --code-background: oklch(23% 0.014 264);
-        --shadow: 0 1px 2px oklch(0% 0 0 / 0.4);
+        --background: #242424;
+        --foreground: #ffffff;
+        --surface: #303030;
+        --muted: #3a3a3a;
+        --muted-foreground: #c0bfbc;
+        --primary: #62a0ef;
+        --primary-foreground: #1a1a1a;
+        --border: #3f3f3f;
+        --code-background: #3a3a3a;
+        --shadow: 0 1px 2px rgb(0 0 0 / 0.4);
     }
 }
 
@@ -380,4 +380,39 @@ td code {
     border: 1px solid var(--border);
     border-radius: var(--radius);
     padding: 0.5rem 0.8rem;
+}
+/* Screenshots ----------------------------------------------------------- */
+.shot {
+    margin: 1.75rem 0 0;
+}
+.shot img {
+    display: block;
+    width: 100%;
+    height: auto;
+    /* A tall screenshot is scaled down so it does not take over the page. */
+    max-height: 32rem;
+    object-fit: cover;
+    object-position: top left;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+}
+.shot figcaption {
+    margin-top: 0.6rem;
+    color: var(--muted-foreground);
+    font-size: 0.85rem;
+}
+/* The dark variant is shown to a visitor whose system asks for a dark
+   surface; the light one is hidden in that case. The pictures are WebP, so
+   the page stays small without a separate build step. */
+.shot img.shot-dark {
+    display: none;
+}
+@media (prefers-color-scheme: dark) {
+    .shot img.shot-light {
+        display: none;
+    }
+    .shot img.shot-dark {
+        display: block;
+    }
 }

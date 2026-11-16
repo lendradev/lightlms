@@ -6,7 +6,7 @@
         <title>Assignments and quizzes · LightLMS</title>
         <meta name="description" content="Attempts, deadlines, marking, and the gradebook in LightLMS." />
         <link rel="stylesheet" href="assets/styles.css" />
-        <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='5' fill='%234c56c4'/%3E%3Ctext x='16' y='22' font-family='sans-serif' font-size='18' font-weight='700' fill='white' text-anchor='middle'%3EL%3C/text%3E%3C/svg%3E" />
+        <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%231c71d8'/%3E%3Ctext x='16' y='22' font-family='sans-serif' font-size='18' font-weight='700' fill='white' text-anchor='middle'%3EL%3C/text%3E%3C/svg%3E" />
     </head>
     <body>
         <a class="skip" href="#main">Skip to content</a>
@@ -154,16 +154,66 @@
                 <p>
                     The gradebook of a course shows every grade item and every mark. A teacher
                     can mark inline, override a mark, and export the whole thing as CSV.
-                </p>
+                </p>                <figure class="shot">
+                    <img class="shot-light" src="assets/shots/gradebook.webp" alt="The gradebook of a course, with the weights under each column." loading="lazy" />
+                    <img class="shot-dark" src="assets/shots/gradebook-dark.webp" alt="The gradebook of a course, with the weights under each column." loading="lazy" />
+                    <figcaption>The gradebook of a course, with the weights under each column.</figcaption>
+                </figure>
+
                 <p>
                     Grade items may belong to a category, and categories and items carry weights,
                     so the final total is a weighted mean rather than a plain average.
+                </p>
+                <h3>Categories and weights</h3>
+                <p>
+                    The total is computed in two layers. Every item rolls up into its category
+                    using the aggregation of that category, and then the top level categories and
+                    the items that have no category roll up into the course total. A category
+                    with a weight of three therefore counts three times as much as one with a
+                    weight of one.
+                </p>
+                <p>
+                    Four aggregations are available: <code>weighted_mean</code>,
+                    <code>mean</code>, <code>sum</code> and <code>weighted_sum</code>. The first
+                    is the default.
+                </p>
+                <p>
+                    The weight of an item is edited in the header of its column, so the shape of
+                    the sheet stays visible while the numbers change.
+                </p>
+                <h3>Manual items</h3>
+                <p>
+                    A mark does not have to belong to an activity. A teacher can add a manual
+                    item for a final project or for class participation, with its own maximum
+                    points, weight and pass mark.
+                </p>
+                <h3>Letter grades</h3>
+                <p>
+                    The course can also hand out a letter. The thresholds for A, B, C and D live
+                    in the course settings and are applied to the final percentage. The gradebook
+                    shows the letter next to the total, and the CSV export carries both the
+                    percentage and the letter.
+                </p>
+                <p>
+                    An item that is left empty, hidden or locked does not count towards the
+                    total, and a mark that is excluded is skipped as well. The total only ever
+                    covers the work that was actually counted.
                 </p>
                 <p>
                     A learner sees the same page with only their own marks. The totals are
                     calculated on the server, so nobody can read somebody else's mark by asking
                     for it.
-                </p>
+                </p>                <figure class="shot">
+                    <img class="shot-light" src="assets/shots/transcript.webp" alt="The transcript a learner sees." loading="lazy" />
+                    <img class="shot-dark" src="assets/shots/transcript-dark.webp" alt="The transcript a learner sees." loading="lazy" />
+                    <figcaption>The transcript a learner sees.</figcaption>
+                </figure>
+                <figure class="shot">
+                    <img class="shot-light" src="assets/shots/gradebook-settings.webp" alt="Categories, manual items and the letter grade thresholds." loading="lazy" />
+                    <img class="shot-dark" src="assets/shots/gradebook-settings-dark.webp" alt="Categories, manual items and the letter grade thresholds." loading="lazy" />
+                    <figcaption>Categories, manual items and the letter grade thresholds.</figcaption>
+                </figure>
+
 
                 <h2>Audit</h2>
                 <p>
