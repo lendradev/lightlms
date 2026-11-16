@@ -23,6 +23,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import type { AuthUser } from '@/types';
 
 type NavItem = {
@@ -125,6 +126,7 @@ export function AppShell({ title, actions, children }: { title: string; actions?
 
                     <div className="flex items-center gap-2">
                         {actions}
+                        <ThemeToggle />
                         {user && (
                             <div className="lg:hidden">
                                 <UserMenu user={user} compact />

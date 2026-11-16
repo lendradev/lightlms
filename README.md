@@ -26,50 +26,71 @@ every part of it is readable, testable and replaceable.
 
 ## Screenshots
 
+LightLMS ships a light and a dark theme. The toggle in the header follows the system setting
+by default and remembers your choice.
+
 ### Home
 
-![LightLMS home](docs/screenshots/01-home.png)
+| Light | Dark |
+|---|---|
+| ![LightLMS home](docs/screenshots/01-home.png) | ![LightLMS home in dark mode](docs/screenshots/01-home-dark.png) |
 
 ### Student dashboard
 
-![Student dashboard](docs/screenshots/02-dashboard-student.png)
+| Light | Dark |
+|---|---|
+| ![Student dashboard](docs/screenshots/02-dashboard-student.png) | ![Student dashboard in dark mode](docs/screenshots/02-dashboard-student-dark.png) |
 
 ### Course catalogue
 
-![Course catalogue](docs/screenshots/04-catalogue.png)
+| Light | Dark |
+|---|---|
+| ![Course catalogue](docs/screenshots/04-catalogue.png) | ![Course catalogue in dark mode](docs/screenshots/04-catalogue-dark.png) |
 
 ### Course detail
 
-![Course detail](docs/screenshots/05-course-detail.png)
+| Light | Dark |
+|---|---|
+| ![Course detail](docs/screenshots/05-course-detail.png) | ![Course detail in dark mode](docs/screenshots/05-course-detail-dark.png) |
 
 ### Course player
 
-![Course player](docs/screenshots/03-learning-course.png)
+| Light | Dark |
+|---|---|
+| ![Course player](docs/screenshots/03-learning-course.png) | ![Course player in dark mode](docs/screenshots/03-learning-course-dark.png) |
 
 ### Course builder
 
-![Course builder](docs/screenshots/07-course-builder.png)
+| Light | Dark |
+|---|---|
+| ![Course builder](docs/screenshots/07-course-builder.png) | ![Course builder in dark mode](docs/screenshots/07-course-builder-dark.png) |
 
 ### Gradebook
 
-![Gradebook](docs/screenshots/15-gradebook.png)
+| Light | Dark |
+|---|---|
+| ![Gradebook](docs/screenshots/15-gradebook.png) | ![Gradebook in dark mode](docs/screenshots/15-gradebook-dark.png) |
 
 ### Roster
 
-![Roster](docs/screenshots/16-roster.png)
+| Light | Dark |
+|---|---|
+| ![Roster](docs/screenshots/16-roster.png) | ![Roster in dark mode](docs/screenshots/16-roster-dark.png) |
 
 ### Administration
 
-![Administration](docs/screenshots/08-admin-users.png)
+| Light | Dark |
+|---|---|
+| ![Administration](docs/screenshots/08-admin-users.png) | ![Administration in dark mode](docs/screenshots/08-admin-users-dark.png) |
 
 ### Mobile
 
 The layout is designed for a phone first: the navigation collapses into a sheet, cards
 stack, and every action stays reachable with a thumb.
 
-| Mobile dashboard | Mobile catalogue |
-|---|---|
-| ![Mobile dashboard](docs/screenshots/10-mobile-dashboard.png) | ![Mobile catalogue](docs/screenshots/11-mobile-catalogue.png) |
+| Mobile dashboard | Mobile catalogue | Mobile course |
+|---|---|---|
+| ![Mobile dashboard](docs/screenshots/10-mobile-dashboard.png) | ![Mobile catalogue](docs/screenshots/11-mobile-catalogue.png) | ![Mobile course](docs/screenshots/12-mobile-course.png) |
 
 ---
 
@@ -100,7 +121,7 @@ and leave you with an admin panel and no coherent learner experience.
 LightLMS takes the middle path:
 
 - **A calm learner interface.** The visual language is deliberately restrained — generous
-  whitespace, a single deep bronze accent, a warm neutral type scale — in the spirit of MIT
+  whitespace, a single indigo ink accent, a cool neutral type scale — in the spirit of MIT
   OpenCourseWare. Nothing pulses for attention, because nothing should need to.
 - **A conventional stack.** Laravel 13, Inertia.js v3, React 19, Tailwind CSS v4 and
   shadcn/ui. No bespoke framework, no Vue/React hybrid, no lock-in.
@@ -357,9 +378,14 @@ bash docker/dev.sh stop
 ```
 
 **Design tokens** live in `resources/css/app.css` under `@theme`. The palette is intentionally
-small: a deep bronze brand scale for actions and links, a warm neutral ink scale for surfaces
-and text, and a dark teal accent used only for progress and completion states. Change the
-tokens there, not in components.
+small: an indigo ink scale for actions and links, a cool neutral scale for surfaces and text, and
+a steel-blue secondary used for status and progress. Change the tokens there, not in components.
+
+Both schemes are defined in the same file — `:root` for light, `.dark` for dark — and every
+text pair meets WCAG AA (4.5:1) in both. The theme is applied before first paint by a small
+inline script in `resources/views/app.blade.php`, so there is no flash of the wrong scheme.
+`resources/js/lib/theme.ts` owns the runtime half; `ThemeToggle` in the header offers
+Light, Dark and System, and stores the choice in `localStorage` under `lightlms-theme`.
 
 The shape language follows MIT OpenCourseWare: a tight 5px radius, a real card shadow rather
 than a flat outline, and a serif reserved for display headings while the chrome stays in the

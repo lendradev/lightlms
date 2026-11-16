@@ -10,7 +10,7 @@ type Props = {
 /**
  * Course covers are generated, not uploaded: a deterministic gradient keeps the
  * catalogue visually alive without shipping stock photography that would be
- * wrong for half the courses. The hue stays inside the bronze family so the
+ * wrong for half the courses. The hue stays inside the indigo family so the
  * covers read as one set.
  */
 function coverStyle(slug: string) {
@@ -21,10 +21,10 @@ function coverStyle(slug: string) {
         hash |= 0;
     }
 
-    const hue = 40 + (Math.abs(hash) % 40);
+    const hue = 240 + (Math.abs(hash) % 40);
 
     return {
-        backgroundImage: `linear-gradient(135deg, oklch(34% 0.055 ${hue}) 0%, oklch(24% 0.04 ${hue + 18}) 100%)`,
+        backgroundImage: `linear-gradient(135deg, oklch(34% 0.09 ${hue}) 0%, oklch(22% 0.06 ${hue + 18}) 100%)`,
     };
 }
 
@@ -35,7 +35,7 @@ export default function CourseCard({ course }: Props) {
     return (
         <Link
             href={`/courses/${course.slug}`}
-            className="group flex flex-col overflow-hidden rounded-md border bg-card shadow-[0_2px_4px_0_rgb(0_0_0/0.16)] transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_4px_10px_0_rgb(0_0_0/0.18)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+            className="group flex flex-col overflow-hidden rounded-md border bg-card shadow-soft transition duration-200 hover:-translate-y-0.5 hover:shadow-lifted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
         >
             <div
                 className="relative aspect-[16/9] shrink-0 overflow-hidden"

@@ -1,5 +1,6 @@
 import { Link } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import type { ReactNode } from 'react';
 
 type SiteHeaderProps = {
@@ -30,6 +31,7 @@ export function SiteHeader({ user }: SiteHeaderProps) {
                 </nav>
 
                 <div className="flex items-center gap-3">
+                    <ThemeToggle />
                     {user ? (
                         <Link
                             href="/dashboard"

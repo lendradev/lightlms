@@ -203,7 +203,7 @@ function StatCard({
 
     if (href) {
         return (
-            <Link href={href} className="transition hover:-translate-y-0.5 hover:shadow-[0_4px_10px_0_rgb(0_0_0/0.18)]">
+            <Link href={href} className="transition hover:-translate-y-0.5 hover:shadow-lifted">
                 <Card>{body}</Card>
             </Link>
         );
