@@ -44,6 +44,7 @@ routes/web.php      All web routes
 tests/Feature/      HTTP-level tests that exercise real routes and permissions
 tests/Unit/         Pure unit tests
 docs/screenshots/   Screenshot catalogue, light and dark
+docs/engineering-notes.md   Mistakes that cost time, with cause and fix
 ```
 
 ## 3. Setup
@@ -206,6 +207,9 @@ Types: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`
 
 - `README.md` is the public entry point. Keep it in English.
 - `docs/screenshots.md` is the screenshot catalogue. Every screen in both themes is listed there.
+- `docs/engineering-notes.md` records the mistakes that cost time, with their cause and their fix.
+  Check it before hitting a problem you recognise; add an entry whenever you solve something
+  surprising.
 - `CONTRIBUTING.md` covers the human contribution workflow.
 - When you add a screen, add its screenshot to the catalogue in both themes.
 

@@ -21,8 +21,9 @@ It is a conventional Laravel application with a React front end served through I
 every part of it is readable, testable and replaceable.
 
 > **Status:** the core platform is in place — authentication, role-based dashboards, a course
-> builder, a learner course player with progress tracking, and an administration area with
-> user management, invitations, settings and one-click backup. See the roadmap below.
+> builder, a learner course player with progress tracking, assignments with submissions and
+> grading, quizzes with five question types, and an administration area with user management,
+> invitations, settings and one-click backup. See the roadmap below.
 
 ## Screenshots
 
@@ -41,7 +42,7 @@ default and remembers your choice.
 |---|---|
 | ![Student dashboard](docs/screenshots/10-dashboard-student.png) | ![Gradebook](docs/screenshots/23-gradebook.png) |
 
-**See all 35 screens in both themes in [docs/screenshots.md](docs/screenshots.md).**
+**See all 39 screens in both themes in [docs/screenshots.md](docs/screenshots.md).**
 
 ---
 
@@ -103,8 +104,8 @@ LightLMS takes the middle path:
 | Audit log of privileged actions | Available |
 | Data model: courses, sections, activities, enrollments, grades | Available |
 | Docker image + compose stack (Postgres, Redis, worker) | Available |
-| Assignments, submissions and grading | In progress |
-| Quizzes with question types and attempt tracking | In progress |
+| Assignments, submissions and grading | Available |
+| Quizzes with question types and attempt tracking | Available |
 | File uploads (course material, submissions) | Planned |
 | Notifications by email and in-app | Planned |
 | Gradebook with categories and weighting | Planned |
@@ -330,7 +331,6 @@ bash docker/dev.sh stop
 
 To get a working demo site inside a build container, use `docker/demo.sh`. It keeps the demo
 database on a named volume, so the data survives container rebuilds and source syncs:
-
 ```bash
 bash docker/demo.sh sbx-lightlms-build
 ```
@@ -360,6 +360,10 @@ pnpm run lint               # ESLint
 ```
 
 Tests use an in-memory SQLite database, so the suite runs without any external service.
+
+Before you start, read [`docs/engineering-notes.md`](docs/engineering-notes.md). It lists the
+mistakes that have cost this project time, each with its cause and its fix, from Laravel 11's
+dropped exception handler to the container rules for formatting and build assets.
 
 ---
 
