@@ -125,6 +125,12 @@ a:hover {
     margin-bottom: 1.5rem;
 }
 
+@media (max-width: 60rem) {
+    .brand {
+        margin-bottom: 0.75rem;
+    }
+}
+
 .brand-mark {
     display: grid;
     place-items: center;
@@ -262,6 +268,12 @@ hr {
     margin: 1.5rem 0;
 }
 
+@media (max-width: 30rem) {
+    .grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
 .card-link {
     display: block;
     color: inherit;
@@ -345,8 +357,16 @@ td code {
     white-space: nowrap;
 }
 
-/* Footer ---------------------------------------------------------------- */
+/* A wide table scrolls sideways on a narrow screen instead of stretching the
+   page past the viewport. */
+@media (max-width: 45rem) {
+    table {
+        display: block;
+        overflow-x: auto;
+    }
+}
 
+/* Footer ---------------------------------------------------------------- */
 .footer {
     border-top: 1px solid var(--border);
     margin-top: 3rem;
@@ -365,8 +385,45 @@ td code {
     flex-wrap: wrap;
 }
 
-/* Skip link ------------------------------------------------------------- */
+/* Narrow screens -------------------------------------------------------- */
 
+/* A vertical navigation list would push the content off the screen, so the
+   navigation becomes one row that scrolls sideways. */
+@media (max-width: 60rem) {
+    .sidebar nav {
+        display: flex;
+        flex-wrap: nowrap;
+        gap: 0.4rem;
+        overflow-x: auto;
+        padding-bottom: 0.25rem;
+        scrollbar-width: thin;
+    }
+
+    .nav-group {
+        flex: 0 0 auto;
+        margin-top: 0;
+    }
+
+    .nav-group + .nav-group {
+        margin-top: 0;
+    }
+
+    .nav-title {
+        display: none;
+    }
+
+    .nav-list {
+        display: flex;
+        flex-wrap: nowrap;
+        gap: 0.25rem;
+    }
+
+    .nav-list a {
+        white-space: nowrap;
+    }
+}
+
+/* Skip link ------------------------------------------------------------- */
 .skip {
     position: absolute;
     left: -9999px;
@@ -389,10 +446,6 @@ td code {
     display: block;
     width: 100%;
     height: auto;
-    /* A tall screenshot is scaled down so it does not take over the page. */
-    max-height: 32rem;
-    object-fit: cover;
-    object-position: top left;
     border: 1px solid var(--border);
     border-radius: var(--radius);
     box-shadow: var(--shadow);
@@ -401,6 +454,18 @@ td code {
     margin-top: 0.6rem;
     color: var(--muted-foreground);
     font-size: 0.85rem;
+}
+
+/* A screenshot of a desktop application is unreadable when it is squeezed
+   into a phone screen, so it keeps a readable width and scrolls sideways. */
+@media (max-width: 45rem) {
+    .shot {
+        overflow-x: auto;
+    }
+
+    .shot img {
+        min-width: 34rem;
+    }
 }
 /* The dark variant is shown to a visitor whose system asks for a dark
    surface; the light one is hidden in that case. The pictures are WebP, so

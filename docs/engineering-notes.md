@@ -341,3 +341,24 @@ encrypted value too and got a second layer of encryption.
 **Fix.** Exclude the cookie from encryption with `$middleware->encryptCookies(except: [...])`, and
 use `withUnencryptedCookies()` in the tests. The value in the cookie is a language code, so there
 is nothing to protect.
+## A private method whose signature grew breaks every caller
+**Symptom.** The gradebook of a course and the transcript of a learner both returned 500 with
+`Too few arguments to function GradebookService::aggregateMax(), 1 passed in ... and exactly 2
+expected`. The course total still worked, so the bug was easy to miss.
+**Cause.** `aggregateMax()` was changed from one argument to two when the second aggregation layer
+was added, and one of the three call sites was left calling it with the old signature. The
+failure only shows up on the pages that render a category subtotal, and only once a course has
+marks in a category.
+**Fix.** Pass the aggregation of the category at every call site. A private method with a changed
+signature has no compiler to catch the callers, so the page that uses it needs a test.
+## A seeder that only appends leaves the demo data inconsistent
+**Symptom.** The gradebook showed six categories instead of three: Exams, Homework and Project,
+each twice. Every category card showed a dash for every learner, and the transcript listed Exams
+twice.
+**Cause.** The screenshot seeder created the three categories with `saveCategory()` on every run.
+The seeder ran a second time against a database that already had the categories, so the
+categories were duplicated. The items pointed at the second copy, while the page listed the first
+copy, so the lookup by category id found nothing.
+**Fix.** Look the category up by name before creating it, and delete any duplicate that is already
+there. A seeder that is run again against an existing database has to converge on the same state,
+not add to it.
