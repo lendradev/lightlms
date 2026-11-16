@@ -99,6 +99,18 @@ Shown once, before the site has an administrator.
 |---|---|
 | ![Assignment with an attachment](screenshots/17-assignment-with-attachment.png) | ![Assignment with an attachment in dark mode](screenshots/17-assignment-with-attachment-dark.png) |
 
+### Notification inbox
+
+| Light | Dark |
+|---|---|
+| ![Notification inbox](screenshots/18-notifications-inbox.png) | ![Notification inbox in dark mode](screenshots/18-notifications-inbox-dark.png) |
+
+### Notification preferences
+
+| Light | Dark |
+|---|---|
+| ![Notification preferences](screenshots/19-notification-preferences.png) | ![Notification preferences in dark mode](screenshots/19-notification-preferences-dark.png) |
+
 ## Instructor
 
 ### Dashboard
@@ -148,6 +160,12 @@ Shown once, before the site has an administrator.
 | Light | Dark |
 |---|---|
 | ![Course material](screenshots/27-course-materials.png) | ![Course material in dark mode](screenshots/27-course-materials-dark.png) |
+
+### Teacher notifications
+
+| Light | Dark |
+|---|---|
+| ![Teacher notifications](screenshots/28-teacher-notifications.png) | ![Teacher notifications in dark mode](screenshots/28-teacher-notifications-dark.png) |
 
 ## Administration
 
@@ -245,6 +263,12 @@ every action stays reachable with a thumb.
 | Light | Dark |
 |---|---|
 | ![Mobile quiz](screenshots/49-mobile-quiz.png) | ![Mobile quiz in dark mode](screenshots/49-mobile-quiz-dark.png) |
+
+### Notifications
+
+| Light | Dark |
+|---|---|
+| ![Mobile notifications](screenshots/52-mobile-notifications.png) | ![Mobile notifications in dark mode](screenshots/52-mobile-notifications-dark.png) |
 
 ---
 

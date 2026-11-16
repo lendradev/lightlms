@@ -1,5 +1,6 @@
 import { Link, usePage } from '@inertiajs/react';
 import {
+    Bell,
     BookOpen,
     DatabaseBackup,
     GraduationCap,
@@ -45,9 +46,10 @@ const NAV_ITEMS: NavItem[] = [
 ];
 
 export function AppShell({ title, actions, children }: { title: string; actions?: ReactNode; children: ReactNode }) {
-    const { auth, app } = usePage().props as unknown as {
+    const { auth, app, notifications } = usePage().props as unknown as {
         auth: { user: AuthUser | null };
         app: { name: string };
+        notifications: { unread: number };
     };
 
     const [menuOpen, setMenuOpen] = useState(false);
@@ -55,6 +57,7 @@ export function AppShell({ title, actions, children }: { title: string; actions?
     const user = auth.user;
     const role = user?.role ?? 'student';
     const items = NAV_ITEMS.filter((item) => item.roles.includes(role));
+    const unread = notifications?.unread ?? 0;
 
     return (
         <div className="flex min-h-screen bg-background">
@@ -126,6 +129,18 @@ export function AppShell({ title, actions, children }: { title: string; actions?
 
                     <div className="flex items-center gap-2">
                         {actions}
+                        {user && (
+                            <Button asChild variant="ghost" size="icon" className="relative">
+                                <Link href="/notifications" aria-label={`Notifications, ${unread} unread`}>
+                                    <Bell className="size-4" aria-hidden />
+                                    {unread > 0 && (
+                                        <span className="absolute -right-0.5 -top-0.5 grid min-w-4 place-items-center rounded-full bg-primary px-1 text-[10px] font-semibold text-primary-foreground">
+                                            {unread > 9 ? '9+' : unread}
+                                        </span>
+                                    )}
+                                </Link>
+                            </Button>
+                        )}
                         <ThemeToggle />
                         {user && (
                             <div className="lg:hidden">

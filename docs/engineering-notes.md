@@ -175,6 +175,37 @@ served through a controller that checks permission rather than by a direct URL.
 owner or anyone with `submission.viewall` in that course, and aborts otherwise. The response uses
 the recorded original name, never the name on disk.
 
+## A preference overrides the event default, per channel
+
+**Symptom.** A person switched off email notifications but kept receiving in-app ones, or the
+other way round.
+
+**Cause.** The preference was read as a single boolean per event.
+
+**Fix.** `notification_preferences` has a unique key on `(user_id, notification_event_id, channel)`.
+A preference for `email` says nothing about `inapp`. When no row exists for a channel, the event
+default decides. Both behaviours are covered by tests.
+
+## The unread badge is shared through Inertia, not fetched per page
+
+**Symptom.** The bell badge was stale until the page was reloaded.
+
+**Cause.** The count was only computed on the notifications page.
+
+**Fix.** `HandleInertiaRequests` shares `notifications.unread` with every page, so the header badge
+is always right after any navigation.
+
+## Screenshot file names collide across features
+
+**Symptom.** Two screens both wanted `50-mobile-notifications.png`, and the catalogue pointed at
+the wrong image.
+
+**Cause.** The numbering scheme had `50-51` reserved for error states, and the mobile screens
+started at `40`.
+
+**Fix.** Check the existing numbers before adding a screenshot, and pick a free block. The
+catalogue is the list of truth: `workspace/docs/screenshots.md`.
+
 ## A test that passes once is not a passing test
 
 **Symptom.** The suite reported one failure on one run and none on the next.

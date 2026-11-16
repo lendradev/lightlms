@@ -22,7 +22,9 @@ class ModuleFactory extends Factory
             'course_id' => Course::factory(),
             'title' => fake()->sentence(3),
             'summary' => fake()->sentence(10),
-            'position' => fake()->numberBetween(1, 20),
+            'position' => static fn (array $attributes): int => (int) Module::query()
+                ->where('course_id', $attributes['course_id'])
+                ->max('position') + 1,
             'visible' => true,
         ];
     }

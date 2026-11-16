@@ -21,6 +21,7 @@ class SubmissionService
 {
     public function __construct(
         private readonly GradebookService $gradebook,
+        private readonly NotificationService $notifications,
     ) {}
 
     /**
@@ -99,6 +100,36 @@ class SubmissionService
     }
 
     /**
+     * Tell the teaching staff that a learner handed something in.
+     */
+    public function announceSubmission(Assignment $assignment, Submission $submission): int
+    {
+        $course = $assignment->lesson?->module?->course;
+
+        if ($course === null) {
+            return 0;
+        }
+
+        $staff = User::query()
+            ->where('id', $course->user_id)
+            ->get();
+
+        $staff = $staff->merge(
+            $course->students()
+                ->wherePivot('role', '!=', 'student')
+                ->get(),
+        );
+
+        return $this->notifications->notifyMany(
+            $staff,
+            'submission.received',
+            $submission->student->name.' handed in '.($assignment->lesson?->title ?? 'an assignment').'.',
+            '/teaching/'.$course->slug.'/assignments/'.$assignment->id,
+            ['assignment_id' => $assignment->id, 'submission_id' => $submission->id],
+        );
+    }
+
+    /**
      * Grade a submission and mirror the mark into the course gradebook.
      */
     public function grade(
@@ -130,6 +161,14 @@ class SubmissionService
             if ($item !== null) {
                 $this->gradebook->saveGrade($item, $submission->student, $points, $feedback, $grader);
             }
+
+            $this->notifications->notify(
+                $submission->student,
+                'submission.graded',
+                'Your submission has been graded.',
+                $course !== null ? '/learning/'.$course->slug : null,
+                ['assignment_id' => $assignment->id, 'score' => $points],
+            );
         }
 
         return $submission;

@@ -22,9 +22,9 @@ every part of it is readable, testable and replaceable.
 
 > **Status:** the core platform is in place — authentication, role-based dashboards, a course
 > builder, a learner course player with progress tracking, assignments with submissions and
-> grading, quizzes with five question types, file uploads for course material and hand-ins, and
-> an administration area with user management, invitations, settings and one-click backup.
-> See the roadmap below.
+> grading, quizzes with five question types, file uploads for course material and hand-ins, in-app
+> notifications with per-person preferences, and an administration area with user management,
+> invitations, settings and one-click backup. See the roadmap below.
 
 ## Screenshots
 
@@ -43,7 +43,7 @@ default and remembers your choice.
 |---|---|
 | ![Student dashboard](docs/screenshots/10-dashboard-student.png) | ![Gradebook](docs/screenshots/23-gradebook.png) |
 
-**See all 41 screens in both themes in [docs/screenshots.md](docs/screenshots.md).**
+**See all 45 screens in both themes in [docs/screenshots.md](docs/screenshots.md).**
 
 ---
 
@@ -108,7 +108,7 @@ LightLMS takes the middle path:
 | Assignments, submissions and grading | Available |
 | Quizzes with question types and attempt tracking | Available |
 | File uploads (course material, submissions) | Available |
-| Notifications by email and in-app | Planned |
+| Notifications by email and in-app | Available |
 | Gradebook with categories and weighting | Planned |
 | Certificates of completion | Planned |
 | REST API for integrations | Planned |

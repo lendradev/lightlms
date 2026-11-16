@@ -128,6 +128,8 @@ class AssignmentController extends Controller
             return back()->with('error', $exception->getMessage());
         }
 
+        $this->submissions->announceSubmission($assignment, $submission);
+
         $this->audit->record(
             'submission.create',
             $submission,

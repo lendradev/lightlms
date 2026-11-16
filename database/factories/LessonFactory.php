@@ -21,7 +21,9 @@ class LessonFactory extends Factory
             'module_id' => Module::factory(),
             'title' => fake()->sentence(4),
             'type' => fake()->randomElement(ActivityType::cases()),
-            'position' => fake()->numberBetween(1, 30),
+            'position' => static fn (array $attributes): int => (int) Lesson::query()
+                ->where('module_id', $attributes['module_id'])
+                ->max('position') + 1,
             'duration_minutes' => fake()->numberBetween(3, 90),
             'body' => fake()->paragraphs(2, true),
             'is_preview' => false,

@@ -8,6 +8,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Learning\AssignmentController as LearningAssignmentController;
 use App\Http\Controllers\Learning\QuizController as LearningQuizController;
 use App\Http\Controllers\LearningController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\SetupController;
 use App\Http\Controllers\Teaching\AssignmentController as TeachingAssignmentController;
 use App\Http\Controllers\Teaching\GradebookController;
@@ -56,6 +57,17 @@ Route::middleware('installed')->group(function (): void {
 
         Route::get('/files/{file}', [FileController::class, 'show'])
             ->name('files.show');
+
+        Route::get('/notifications', [NotificationController::class, 'index'])
+            ->name('notifications.index');
+        Route::get('/notifications/preferences', [NotificationController::class, 'preferences'])
+            ->name('notifications.preferences');
+        Route::post('/notifications/preferences', [NotificationController::class, 'updatePreferences'])
+            ->name('notifications.preferences.update');
+        Route::get('/notifications/{notification}/read', [NotificationController::class, 'read'])
+            ->name('notifications.read');
+        Route::post('/notifications/read-all', [NotificationController::class, 'readAll'])
+            ->name('notifications.read-all');
 
         Route::middleware('role:instructor,admin')->group(function (): void {
             Route::get('/teaching', [TeachingController::class, 'index'])->name('teaching.index');

@@ -16,6 +16,7 @@ use App\Models\Quiz;
 use App\Models\Setting;
 use App\Models\Submission;
 use App\Models\User;
+use App\Services\NotificationService;
 use App\Support\Setup;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -30,6 +31,8 @@ class DemoSeeder extends Seeder
         Setting::put(Setup::KEY_INSTALLED, 'true', 'setup');
         Setting::put(Setup::KEY_SITE_NAME, 'LightLMS', 'general');
         Setting::put(Setup::KEY_REGISTRATION, Setup::REGISTRATION_OPEN, 'auth');
+
+        app(NotificationService::class)->syncEvents();
 
         $admin = User::query()->firstOrCreate(
             ['email' => 'admin@lightlms.test'],
