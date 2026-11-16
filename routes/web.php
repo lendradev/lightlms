@@ -47,6 +47,7 @@ Route::middleware('installed')->group(function (): void {
 
         Route::get('/learning', [LearningController::class, 'index'])->name('learning.index');
         Route::get('/learning/{course}', [LearningController::class, 'show'])->name('learning.course');
+        Route::get('/learning/{course}/grades', [LearningController::class, 'grades'])->name('learning.grades');
         Route::post('/learning/lessons/{lesson}/complete', [LearningController::class, 'complete'])
             ->name('learning.lesson.complete');
 
@@ -96,8 +97,15 @@ Route::middleware('installed')->group(function (): void {
             Route::post('/teaching/courses/{course}/lessons', [TeachingController::class, 'storeLesson'])->name('teaching.lessons.store');
 
             Route::get('/teaching/{course}/gradebook', [GradebookController::class, 'show'])->name('teaching.gradebook');
-            Route::post('/teaching/{course}/gradebook/{item}', [GradebookController::class, 'store'])->name('teaching.gradebook.store');
+            Route::get('/teaching/{course}/gradebook/settings', [GradebookController::class, 'settings'])->name('teaching.gradebook.settings');
             Route::get('/teaching/{course}/gradebook/export', [GradebookController::class, 'export'])->name('teaching.gradebook.export');
+            Route::post('/teaching/{course}/gradebook/categories', [GradebookController::class, 'storeCategory'])->name('teaching.gradebook.categories.store');
+            Route::put('/teaching/{course}/gradebook/categories/{category}', [GradebookController::class, 'updateCategory'])->name('teaching.gradebook.categories.update');
+            Route::delete('/teaching/{course}/gradebook/categories/{category}', [GradebookController::class, 'destroyCategory'])->name('teaching.gradebook.categories.destroy');
+            Route::post('/teaching/{course}/gradebook/items', [GradebookController::class, 'storeManualItem'])->name('teaching.gradebook.items.store');
+            Route::put('/teaching/{course}/gradebook/items/{item}', [GradebookController::class, 'updateItem'])->name('teaching.gradebook.items.update');
+            Route::put('/teaching/{course}/gradebook/settings', [GradebookController::class, 'updateSettings'])->name('teaching.gradebook.settings.update');
+            Route::post('/teaching/{course}/gradebook/{item}', [GradebookController::class, 'store'])->name('teaching.gradebook.store');
 
             Route::get('/teaching/{course}/roster', [RosterController::class, 'index'])->name('teaching.roster');
             Route::post('/teaching/{course}/roster', [RosterController::class, 'store'])->name('teaching.roster.store');

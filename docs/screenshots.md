@@ -142,6 +142,18 @@ Shown once, before the site has an administrator.
 |---|---|
 | ![Gradebook](screenshots/23-gradebook.png) | ![Gradebook in dark mode](screenshots/23-gradebook-dark.png) |
 
+### Gradebook settings
+
+| Light | Dark |
+|---|---|
+| ![Gradebook settings](screenshots/36-gradebook-settings.png) | ![Gradebook settings in dark mode](screenshots/36-gradebook-settings-dark.png) |
+
+### Learner transcript
+
+| Light | Dark |
+|---|---|
+| ![Learner transcript](screenshots/37-learning-gradebook.png) | ![Learner transcript in dark mode](screenshots/37-learning-gradebook-dark.png) |
+
 ### Roster
 
 | Light | Dark |

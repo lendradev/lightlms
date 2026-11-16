@@ -1,6 +1,7 @@
 import { Head, Link, router } from '@inertiajs/react';
-import { Download } from 'lucide-react';
+import { Download, Settings2 } from 'lucide-react';
 import { AppShell } from '@/components/AppShell';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -21,6 +22,19 @@ type Props = {
         max_points: number;
         weight: number | null;
         sort_order: number;
+        category_id: number | null;
+        source_type: string;
+        hidden: boolean;
+        locked: boolean;
+    }[];
+    categories: {
+        id: number;
+        name: string;
+        parent_id: number | null;
+        aggregation: string;
+        weight: number | null;
+        sort_order: number;
+        hidden: boolean;
     }[];
     students: { id: number; name: string; email: string }[];
     grades: {
@@ -30,10 +44,25 @@ type Props = {
         status: string;
         is_overridden: boolean;
     }[];
-    totals: Record<string, { points: number | null; max: number; percent: number | null }>;
+    totals: Record<
+        string,
+        { points: number | null; max: number; percent: number | null; graded: number; letter: string | null }
+    >;
+    categoryTotals: Record<
+        string,
+        Record<string, { points: number | null; max: number; percent: number | null; graded: number }>
+    >;
 };
 
-export default function TeachingGradebook({ course, items, students, grades, totals }: Props) {
+export default function TeachingGradebook({
+    course,
+    items,
+    categories,
+    students,
+    grades,
+    totals,
+    categoryTotals,
+}: Props) {
     const gradeFor = (itemId: number, userId: number) =>
         grades.find((grade) => grade.item_id === itemId && grade.user_id === userId);
 
@@ -45,6 +74,18 @@ export default function TeachingGradebook({ course, items, students, grades, tot
         );
     };
 
+    const saveWeight = (itemId: number, value: string) => {
+        router.put(
+            `/teaching/${course.slug}/gradebook/items/${itemId}`,
+            { weight: value === '' ? null : Number(value) },
+            { preserveScroll: true },
+        );
+    };
+
+    const topLevel = categories.filter((category) => category.parent_id === null);
+    const categoryName = (categoryId: number | null) =>
+        categories.find((category) => category.id === categoryId)?.name;
+
     return (
         <>
             <Head title={`Gradebook — ${course.title}`} />
@@ -52,22 +93,28 @@ export default function TeachingGradebook({ course, items, students, grades, tot
             <AppShell
                 title="Gradebook"
                 actions={
-                    <Button asChild size="sm" variant="outline">
-                        <Link
-                            href={`/teaching/${course.slug}/gradebook/export`}
-                            as="a"
-                        >
-                            <Download aria-hidden />
-                            Export CSV
-                        </Link>
-                    </Button>
+                    <div className="flex gap-2">
+                        <Button asChild size="sm" variant="outline">
+                            <Link href={`/teaching/${course.slug}/gradebook/settings`} as="button">
+                                <Settings2 aria-hidden />
+                                Settings
+                            </Link>
+                        </Button>
+                        <Button asChild size="sm" variant="outline">
+                            <Link href={`/teaching/${course.slug}/gradebook/export`} as="a">
+                                <Download aria-hidden />
+                                Export CSV
+                            </Link>
+                        </Button>
+                    </div>
                 }
             >
                 <Card>
                     <CardHeader>
                         <CardTitle className="text-base">{course.title}</CardTitle>
                         <CardDescription>
-                            Grades are weighted by item weight. Leave a cell empty to clear it.
+                            Enter a mark in a cell to grade it. The weight under each column decides how
+                            much that activity counts. Leave a cell empty to clear the mark.
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -85,15 +132,37 @@ export default function TeachingGradebook({ course, items, students, grades, tot
                                 <TableHeader>
                                     <TableRow>
                                         <TableHead>Student</TableHead>
-                                        {items.map((item) => (
-                                            <TableHead key={item.id} className="text-right">
-                                                {item.name}
-                                                <span className="ml-1 font-normal text-muted-foreground">
-                                                    /{item.max_points}
-                                                </span>
-                                            </TableHead>
-                                        ))}
+                                        {items.map((item) => {
+                                            const category = categoryName(item.category_id);
+
+                                            return (
+                                                <TableHead key={item.id} className="text-right">
+                                                    <span className="block">{item.name}</span>
+                                                    <span className="block text-xs font-normal text-muted-foreground">
+                                                        /{item.max_points}
+                                                    </span>
+                                                    {category && (
+                                                        <Badge variant="outline" className="mt-1 font-normal">
+                                                            {category}
+                                                        </Badge>
+                                                    )}
+                                                    <Input
+                                                        type="number"
+                                                        step="0.01"
+                                                        min="0"
+                                                        max="1000"
+                                                        defaultValue={item.weight ?? ''}
+                                                        onBlur={(event) =>
+                                                            saveWeight(item.id, event.target.value)
+                                                        }
+                                                        className="mt-1 h-7 w-20 text-right text-xs tabular-nums"
+                                                        aria-label={`Weight for ${item.name}`}
+                                                    />
+                                                </TableHead>
+                                            );
+                                        })}
                                         <TableHead className="text-right">Total</TableHead>
+                                        <TableHead className="text-right">Grade</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -153,6 +222,14 @@ export default function TeachingGradebook({ course, items, students, grades, tot
                                                         </span>
                                                     )}
                                                 </TableCell>
+
+                                                <TableCell className="text-right">
+                                                    {total?.letter ? (
+                                                        <Badge>{total.letter}</Badge>
+                                                    ) : (
+                                                        <span className="text-muted-foreground">—</span>
+                                                    )}
+                                                </TableCell>
                                             </TableRow>
                                         );
                                     })}
@@ -162,10 +239,56 @@ export default function TeachingGradebook({ course, items, students, grades, tot
                     </CardContent>
                 </Card>
 
+                {topLevel.length > 0 && (
+                    <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                        {topLevel.map((category) => (
+                            <Card key={category.id}>
+                                <CardHeader>
+                                    <CardTitle className="text-sm">{category.name}</CardTitle>
+                                    <CardDescription>
+                                        {category.weight !== null ? `Weight ×${category.weight}` : 'No weight'}
+                                        {' · '}
+                                        {category.aggregation.replace('_', ' ')}
+                                    </CardDescription>
+                                </CardHeader>
+                                <CardContent>
+                                    <ul className="space-y-1 text-sm">
+                                        {students.map((student) => {
+                                            const subtotal =
+                                                categoryTotals[String(student.id)]?.[String(category.id)];
+
+                                            return (
+                                                <li
+                                                    key={student.id}
+                                                    className="flex justify-between gap-3 tabular-nums"
+                                                >
+                                                    <span className="truncate text-muted-foreground">
+                                                        {student.name}
+                                                    </span>
+                                                    <span>
+                                                        {subtotal?.points === null ||
+                                                        subtotal === undefined ? (
+                                                            '—'
+                                                        ) : (
+                                                            <>
+                                                                {subtotal.points} / {subtotal.max}
+                                                            </>
+                                                        )}
+                                                    </span>
+                                                </li>
+                                            );
+                                        })}
+                                    </ul>
+                                </CardContent>
+                            </Card>
+                        ))}
+                    </div>
+                )}
+
                 {items.length > 0 && students.length > 0 && (
                     <p className="mt-4 text-xs text-muted-foreground">
-                        Totals use a weighted mean across graded items. Items that are left empty do not count
-                        toward the total.
+                        The course total rolls up the categories first and then the items that have no
+                        category. Items that are left empty, hidden or locked do not count.
                     </p>
                 )}
             </AppShell>

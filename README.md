@@ -113,7 +113,7 @@ LightLMS takes the middle path:
 | Notifications by email and in-app | Available |
 | REST API for integrations (bearer tokens, `/api/v1`) | Available |
 | Certificates of completion with a public verification page | Available |
-| Gradebook with categories and weighting | Planned |
+| Gradebook with categories, weights and letter grades | Available |
 | Multi-language UI (English primary, Bahasa Indonesia secondary) | Planned |
 
 ---

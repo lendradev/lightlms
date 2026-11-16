@@ -316,3 +316,18 @@ error behind a second `ViewException`.
 **Fix.** `$this->withoutVite()` in `tests/TestCase.php`. The suite no longer reads the manifest,
 so it runs on a clean checkout with no front-end build. The manifest is cached per path in a
 static array, so a build that exists is still used.
+## A static route segment swallows the ones after it
+**Symptom.** `POST /teaching/{course}/gradebook/categories` returned 404 for a student, and the
+category was never created for an instructor.
+**Cause.** The route `POST /teaching/{course}/gradebook/{item}` was declared before the fixed
+segments. Laravel matches routes in order, so `{item}` captured the literal string `categories`
+and the request was routed to the grade-saving action with a non-numeric item.
+**Fix.** Declare the fixed segments first and the parameterised one last. The order of the routes
+in `routes/web.php` is part of the routing contract, not a matter of taste.
+## `validated` only holds the keys the rules allowed
+**Symptom.** Creating a manual grade item returned 500 with `Undefined array key "weight"`.
+**Cause.** The controller read `$validated['weight']` directly, but a `nullable` rule on a field
+the request never sent leaves that key out of the validated array entirely. Only the keys that
+were actually present, or that have a default, are present in the result.
+**Fix.** Read optional fields with `array_key_exists('weight', $validated)`, the same way the item
+update action already did.

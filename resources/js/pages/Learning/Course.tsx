@@ -29,6 +29,7 @@ type Props = {
     course: {
         id: number;
         title: string;
+        slug: string;
         summary: string;
         instructor_name: string | null;
         modules: Module[];
@@ -164,6 +165,21 @@ export default function LearningCourse({ course, completedLessonIds }: Props) {
                                 <p className="mt-2 text-xs text-muted-foreground">
                                     {done} of {total} activities complete ({progress}%)
                                 </p>
+                            </CardContent>
+                        </Card>
+
+                        <Card className="mt-4">
+                            <CardHeader>
+                                <CardTitle className="text-sm">Your grades</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <p className="text-xs text-muted-foreground">
+                                    Marks for every graded activity, with the category totals and the
+                                    final grade.
+                                </p>
+                                <Button asChild size="sm" variant="outline" className="mt-3">
+                                    <Link href={`/learning/${course.slug}/grades`}>Open transcript</Link>
+                                </Button>
                             </CardContent>
                         </Card>
 
