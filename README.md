@@ -43,7 +43,7 @@ default and remembers your choice.
 |---|---|
 | ![Student dashboard](docs/screenshots/10-dashboard-student.png) | ![Gradebook](docs/screenshots/23-gradebook.png) |
 
-**See all 49 screens in both themes in [docs/screenshots.md](docs/screenshots.md).**
+**See all 50 screens in both themes in [docs/screenshots.md](docs/screenshots.md).**
 
 ---
 
@@ -109,9 +109,9 @@ LightLMS takes the middle path:
 | Quizzes with question types and attempt tracking | Available |
 | File uploads (course material, submissions) | Available |
 | Notifications by email and in-app | Available |
+| REST API for integrations (bearer tokens, `/api/v1`) | Available |
 | Gradebook with categories and weighting | Planned |
 | Certificates of completion | Planned |
-| REST API for integrations | Planned |
 | Multi-language UI (English primary, Bahasa Indonesia secondary) | Planned |
 
 ---
@@ -365,6 +365,14 @@ Tests use an in-memory SQLite database, so the suite runs without any external s
 Before you start, read [`docs/engineering-notes.md`](docs/engineering-notes.md). It lists the
 mistakes that have cost this project time, each with its cause and its fix, from Laravel 11's
 dropped exception handler to the container rules for formatting and build assets.
+
+---
+
+## API
+
+LightLMS ships a REST API for integrations under `/api/v1`, authenticated with bearer tokens.
+The reference, including the error contract and every endpoint, is in
+[`docs/api.md`](docs/api.md).
 
 ---
 

@@ -4,6 +4,7 @@ use App\Http\Middleware\EnsureInstalled;
 use App\Http\Middleware\EnsureUserHasRole;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\SecurityHeaders;
+use App\Support\ApiError;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -16,6 +17,7 @@ use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
+        api: __DIR__.'/../routes/api.php',
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
         then: function (): void {
@@ -30,6 +32,10 @@ return Application::configure(basePath: dirname(__DIR__))
             SecurityHeaders::class,
         ]);
 
+        $middleware->api(append: [
+            EnsureInstalled::class,
+        ]);
+
         $middleware->alias([
             'installed' => EnsureInstalled::class,
             'role' => EnsureUserHasRole::class,
@@ -41,6 +47,18 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
         );
+
+        // The API answers every failure with the same body, so a client can
+        // read one field instead of parsing prose.
+        $exceptions->render(function (\Throwable $e, Request $request) {
+            if (! $request->is('api/*')) {
+                return null;
+            }
+
+            $described = ApiError::describe($e);
+
+            return ApiError::response($request, $e, $described['status'], $described['details']);
+        });
 
         // Browser requests that reach an HTTP error get the themed error page
         // instead of Laravel's default one, which ignores the design tokens.

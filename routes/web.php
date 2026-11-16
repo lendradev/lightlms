@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ApiTokenController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\DashboardController;
@@ -68,6 +69,13 @@ Route::middleware('installed')->group(function (): void {
             ->name('notifications.read');
         Route::post('/notifications/read-all', [NotificationController::class, 'readAll'])
             ->name('notifications.read-all');
+
+        Route::get('/settings/api-tokens', [ApiTokenController::class, 'index'])
+            ->name('settings.api-tokens.index');
+        Route::post('/settings/api-tokens', [ApiTokenController::class, 'store'])
+            ->name('settings.api-tokens.store');
+        Route::delete('/settings/api-tokens/{token}', [ApiTokenController::class, 'destroy'])
+            ->name('settings.api-tokens.destroy');
 
         Route::middleware('role:instructor,admin')->group(function (): void {
             Route::get('/teaching', [TeachingController::class, 'index'])->name('teaching.index');

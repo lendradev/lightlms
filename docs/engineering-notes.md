@@ -214,3 +214,20 @@ catalogue is the list of truth: `workspace/docs/screenshots.md`.
 the outcome.
 
 **Fix.** Run the suite several times before believing it, and make every test build its own data.
+
+## The auth manager keeps its guards between requests in one test
+**Symptom.** A second API request in the same test was answered as the first caller: a student
+read the participants of a course they do not teach.
+**Cause.** The Sanctum guard is a `RequestGuard`, and the auth manager keeps the resolved user on
+it. The first request in the test resolved the user, and the second request reused it.
+**Fix.** Call `Auth::forgetGuards()` before a request that must be made as a different person.
+The API test helper does it for every request.
+
+## `syncItems` removes grade items that no longer match an activity
+
+**Symptom.** A test that created a grade item by hand found no marks and no item.
+
+**Cause.** `GradebookService::syncItems()` deletes every item whose source activity is gone, and
+the API gradebook calls it first. A hand-made item with a made-up `source_id` did not survive.
+
+**Fix.** In tests, build the item from a real activity of the course, so `syncItems()` keeps it.

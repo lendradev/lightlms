@@ -22,6 +22,11 @@ class EnsureInstalled
             return $next($request);
         }
 
+        if ($request->is('api/*')) {
+            // An API client cannot follow a redirect to the setup wizard.
+            abort(503, 'LightLMS is not installed yet.');
+        }
+
         return redirect()->route('setup.index');
     }
 }

@@ -111,6 +111,11 @@ Shown once, before the site has an administrator.
 |---|---|
 | ![Notification preferences](screenshots/19-notification-preferences.png) | ![Notification preferences in dark mode](screenshots/19-notification-preferences-dark.png) |
 
+### API tokens
+| Light | Dark |
+|---|---|
+| ![API tokens](screenshots/29-api-tokens.png) | ![API tokens in dark mode](screenshots/29-api-tokens-dark.png) |
+
 ## Instructor
 
 ### Dashboard
