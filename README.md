@@ -26,71 +26,22 @@ every part of it is readable, testable and replaceable.
 
 ## Screenshots
 
-LightLMS ships a light and a dark theme. The toggle in the header follows the system setting
-by default and remembers your choice.
+LightLMS ships a light and a dark theme. The toggle in the header follows the system setting by
+default and remembers your choice.
 
 ### Home
 
-| Light | Dark |
+| Home | Course catalogue |
 |---|---|
-| ![LightLMS home](docs/screenshots/01-home.png) | ![LightLMS home in dark mode](docs/screenshots/01-home-dark.png) |
+| ![Home](docs/screenshots/01-home.png) | ![Course catalogue](docs/screenshots/05-catalogue.png) |
 
-### Student dashboard
+### Learning and teaching
 
-| Light | Dark |
+| Student dashboard | Gradebook |
 |---|---|
-| ![Student dashboard](docs/screenshots/02-dashboard-student.png) | ![Student dashboard in dark mode](docs/screenshots/02-dashboard-student-dark.png) |
+| ![Student dashboard](docs/screenshots/10-dashboard-student.png) | ![Gradebook](docs/screenshots/23-gradebook.png) |
 
-### Course catalogue
-
-| Light | Dark |
-|---|---|
-| ![Course catalogue](docs/screenshots/04-catalogue.png) | ![Course catalogue in dark mode](docs/screenshots/04-catalogue-dark.png) |
-
-### Course detail
-
-| Light | Dark |
-|---|---|
-| ![Course detail](docs/screenshots/05-course-detail.png) | ![Course detail in dark mode](docs/screenshots/05-course-detail-dark.png) |
-
-### Course player
-
-| Light | Dark |
-|---|---|
-| ![Course player](docs/screenshots/03-learning-course.png) | ![Course player in dark mode](docs/screenshots/03-learning-course-dark.png) |
-
-### Course builder
-
-| Light | Dark |
-|---|---|
-| ![Course builder](docs/screenshots/07-course-builder.png) | ![Course builder in dark mode](docs/screenshots/07-course-builder-dark.png) |
-
-### Gradebook
-
-| Light | Dark |
-|---|---|
-| ![Gradebook](docs/screenshots/15-gradebook.png) | ![Gradebook in dark mode](docs/screenshots/15-gradebook-dark.png) |
-
-### Roster
-
-| Light | Dark |
-|---|---|
-| ![Roster](docs/screenshots/16-roster.png) | ![Roster in dark mode](docs/screenshots/16-roster-dark.png) |
-
-### Administration
-
-| Light | Dark |
-|---|---|
-| ![Administration](docs/screenshots/08-admin-users.png) | ![Administration in dark mode](docs/screenshots/08-admin-users-dark.png) |
-
-### Mobile
-
-The layout is designed for a phone first: the navigation collapses into a sheet, cards
-stack, and every action stays reachable with a thumb.
-
-| Mobile dashboard | Mobile catalogue | Mobile course |
-|---|---|---|
-| ![Mobile dashboard](docs/screenshots/10-mobile-dashboard.png) | ![Mobile catalogue](docs/screenshots/11-mobile-catalogue.png) | ![Mobile course](docs/screenshots/12-mobile-course.png) |
+**See all 27 screens in both themes in [docs/screenshots.md](docs/screenshots.md).**
 
 ---
 
@@ -375,6 +326,13 @@ share one package cache volume (`lightlms-pkg-cache`) for pnpm, Composer and Cor
 bash docker/dev.sh start    # start both build containers
 bash docker/dev.sh status
 bash docker/dev.sh stop
+```
+
+To get a working demo site inside a build container, use `docker/demo.sh`. It keeps the demo
+database on a named volume, so the data survives container rebuilds and source syncs:
+
+```bash
+bash docker/demo.sh sbx-lightlms-build
 ```
 
 **Design tokens** live in `resources/css/app.css` under `@theme`. The palette is intentionally

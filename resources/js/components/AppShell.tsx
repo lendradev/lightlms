@@ -167,18 +167,15 @@ function UserMenu({ user, compact = false }: { user: AuthUser; compact?: boolean
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
                 <DropdownMenuLabel>{user.email}</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                    <Link href="/profile">
-                        <Users className="size-4" aria-hidden /> Profile
-                    </Link>
-                </DropdownMenuItem>
                 {user.role === 'admin' && (
-                    <DropdownMenuItem asChild>
-                        <Link href="/admin/settings">
-                            <ShieldCheck className="size-4" aria-hidden /> Administration
-                        </Link>
-                    </DropdownMenuItem>
+                    <>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem asChild>
+                            <Link href="/admin/settings">
+                                <ShieldCheck className="size-4" aria-hidden /> Administration
+                            </Link>
+                        </DropdownMenuItem>
+                    </>
                 )}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>

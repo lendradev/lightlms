@@ -51,6 +51,18 @@ bash docker/dev.sh start
 bash docker/dev.sh stop
 ```
 
+### Demo data
+
+`docker/demo.sh` prepares a working demo environment in a build container:
+
+```bash
+bash docker/demo.sh sbx-lightlms-build
+```
+
+The demo database lives on a named volume (`sbx-lightlms-db`), so it survives container rebuilds
+and source syncs — there is no need to migrate and re-seed for every change. The script only
+seeds when the database is still empty, and prints what it did.
+
 ## Before you open a pull request
 
 Run the full check suite:

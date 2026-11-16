@@ -4,9 +4,12 @@
 # Layout inside the container:
 #   /work/app       synced source tree (replaced on every sync)
 #   /work/deps      installed dependencies (vendor/, node_modules/), survives syncs
+#   /work/db        demo database, on a named volume so it survives container rebuilds
 #
 # /work/app/vendor and /work/app/node_modules are symlinks into /work/deps, so
 # a sync never wipes an install and never leaves a stale tree behind.
+# /work/app/database/database.sqlite and /work/app/.env point at /work/db, so
+# the demo data and the local environment survive every sync.
 #
 # Usage: sync-container.sh <container> [dest-dir] [deps-dir]
 set -euo pipefail
@@ -14,11 +17,12 @@ set -euo pipefail
 CONTAINER="${1:?container name required}"
 DEST="${2:-/work/app}"
 DEPS="${3:-/work/deps}"
+DB_DIR="${DB_DIR:-/work/db}"
 SRC="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 
-docker exec -e DEST="$DEST" -e DEPS="$DEPS" "$CONTAINER" sh -c '
+docker exec -e DEST="$DEST" -e DEPS="$DEPS" -e DB_DIR="$DB_DIR" "$CONTAINER" sh -c '
 set -e
-mkdir -p "$DEPS"
+mkdir -p "$DEPS" "$DB_DIR"
 rm -rf "$DEST"
 mkdir -p "$DEST"
 '
@@ -29,11 +33,11 @@ tar -C "$SRC" \
   --exclude=database/database.sqlite --exclude=.env \
   -cf - . | docker exec -i -e DEST="$DEST" "$CONTAINER" sh -c 'tar -C "$DEST" -xf -'
 
-docker exec -e DEST="$DEST" -e DEPS="$DEPS" "$CONTAINER" sh -c '
+docker exec -e DEST="$DEST" -e DEPS="$DEPS" -e DB_DIR="$DB_DIR" "$CONTAINER" sh -c '
 set -e
 mkdir -p "$DEST/storage/framework/cache/data" "$DEST/storage/framework/sessions" \
          "$DEST/storage/framework/views" "$DEST/storage/logs" "$DEST/bootstrap/cache"
-mkdir -p "$DEST/public"
+mkdir -p "$DEST/public" "$DB_DIR"
 for d in vendor node_modules; do
   if [ -d "$DEPS/$d" ]; then
     ln -sfn "$DEPS/$d" "$DEST/$d"
@@ -45,6 +49,7 @@ fi
 if [ -f "$DEPS/.env" ]; then
   ln -sfn "$DEPS/.env" "$DEST/.env"
 fi
+ln -sfn "$DB_DIR/database.sqlite" "$DEST/database/database.sqlite"
 '
 echo "synced $SRC -> $CONTAINER:$DEST"
 
