@@ -303,3 +303,16 @@ supplied the database connection, overriding the test configuration.
 
 **Fix.** Put a `.env` in place before running the suite, or set the variables in the shell. The
 run in CI copies `.env.example` to `.env` for the same reason.
+
+## The PHP suite must not need a front-end build
+**Symptom.** 50 of 170 tests failed with `Vite manifest not found at: public/build/manifest.json`,
+on every PHP version, while the same suite passed on the developer machine.
+
+**Cause.** The developer machine had a `public/build` directory left over from a local
+`pnpm run build`. The CI runner had none. Both the root view and the error page call `@vite`, so
+every request that rendered HTML failed, and the error page failed the same way, hiding the real
+error behind a second `ViewException`.
+
+**Fix.** `$this->withoutVite()` in `tests/TestCase.php`. The suite no longer reads the manifest,
+so it runs on a clean checkout with no front-end build. The manifest is cached per path in a
+static array, so a build that exists is still used.
