@@ -37,7 +37,13 @@ class DashboardController extends Controller
             ->with('modules')
             ->orderByDesc('course_user.last_accessed_at')
             ->limit(6)
-            ->get();
+            ->get()
+            ->map(function ($course) {
+                $course->progress = (int) ($course->pivot->progress ?? 0);
+                $course->status = $course->pivot->status ?? 'active';
+
+                return $course;
+            });
 
         $upcoming = Course::query()
             ->join('course_user', 'course_user.course_id', '=', 'courses.id')
