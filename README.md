@@ -43,7 +43,7 @@ default and remembers your choice.
 |---|---|
 | ![Student dashboard](docs/screenshots/10-dashboard-student.png) | ![Gradebook](docs/screenshots/23-gradebook.png) |
 
-**See all 45 screens in both themes in [docs/screenshots.md](docs/screenshots.md).**
+**See all 49 screens in both themes in [docs/screenshots.md](docs/screenshots.md).**
 
 ---
 
