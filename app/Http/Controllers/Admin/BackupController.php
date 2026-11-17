@@ -54,8 +54,14 @@ class BackupController extends Controller
             'archive' => ['required', 'file', 'mimes:zip,tar,gz,tgz'],
         ]);
 
-        $path = storage_path('app/backups/restore-'.now()->format('Ymd-His').'.upload');
-        $validated['archive']->moveTo($path);
+        // The uploaded name is never trusted: the archive is stored under a
+        // generated name, and the extension is kept so the service can tell a
+        // zip from a tar.
+        $extension = strtolower($validated['archive']->guessExtension() ?: 'zip');
+        $directory = storage_path('app/backups');
+        $name = 'restore-'.now()->format('Ymd-His').'-'.uniqid().'.'.$extension;
+        $path = $directory.'/'.$name;
+        $validated['archive']->move($directory, $name);
 
         try {
             $this->backups->restore($path);

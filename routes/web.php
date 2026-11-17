@@ -31,15 +31,15 @@ Route::middleware('installed')->group(function (): void {
 
 Route::prefix('setup')->name('setup.')->group(function (): void {
     Route::get('/', [SetupController::class, 'index'])->name('index');
-    Route::post('/', [SetupController::class, 'install'])->name('install');
+    Route::post('/', [SetupController::class, 'install'])->middleware('throttle:setup')->name('install');
 });
 
 Route::middleware('installed')->group(function (): void {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
-    Route::post('/login', [AuthController::class, 'login'])->middleware('guest');
+    Route::post('/login', [AuthController::class, 'login'])->middleware(['guest', 'throttle:login']);
 
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
-    Route::post('/register', [AuthController::class, 'register'])->middleware('guest');
+    Route::post('/register', [AuthController::class, 'register'])->middleware(['guest', 'throttle:register']);
 
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 

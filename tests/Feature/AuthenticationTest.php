@@ -114,4 +114,47 @@ class AuthenticationTest extends TestCase
     {
         $this->get('/dashboard')->assertRedirect(route('login'));
     }
+
+    public function test_repeated_wrong_passwords_are_throttled(): void
+    {
+        User::factory()->create([
+            'email' => 'target@example.test',
+            'password' => 'a-very-long-password',
+        ]);
+
+        for ($attempt = 0; $attempt < 5; $attempt++) {
+            $this->post('/login', [
+                'email' => 'target@example.test',
+                'password' => 'definitely-not-the-password',
+            ])->assertSessionHasErrors('email');
+        }
+
+        // The sixth attempt is refused by the limiter, not by the credentials.
+        $this->post('/login', [
+            'email' => 'target@example.test',
+            'password' => 'definitely-not-the-password',
+        ])->assertStatus(429);
+    }
+
+    public function test_a_correct_password_still_works_after_a_few_wrong_ones(): void
+    {
+        $user = User::factory()->create([
+            'email' => 'almost@example.test',
+            'password' => 'a-very-long-password',
+        ]);
+
+        for ($attempt = 0; $attempt < 3; $attempt++) {
+            $this->post('/login', [
+                'email' => 'almost@example.test',
+                'password' => 'wrong-password-here',
+            ]);
+        }
+
+        $this->post('/login', [
+            'email' => 'almost@example.test',
+            'password' => 'a-very-long-password',
+        ])->assertRedirect(route('dashboard'));
+
+        $this->assertAuthenticatedAs($user);
+    }
 }

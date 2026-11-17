@@ -7,7 +7,11 @@ use App\Models\Setting;
 use App\Models\User;
 use App\Support\Setup;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Schema;
+use Phar;
+use PharData;
 use Tests\TestCase;
 
 class AdminPanelTest extends TestCase
@@ -126,9 +130,57 @@ class AdminPanelTest extends TestCase
         Course::query()->where('title', 'Survives the round trip')->delete();
 
         $this->actingAs($admin)
-            ->post('/admin/backup/restore', ['archive' => $archives[0]])
-            ->assertRedirect();
+            ->post('/admin/backup/restore', [
+                'archive' => new UploadedFile($archives[0], basename($archives[0]), null, null, true),
+            ])
+            ->assertRedirect()
+            ->assertSessionHasNoErrors();
 
         $this->assertDatabaseHas('courses', ['title' => 'Survives the round trip']);
+    }
+
+    public function test_a_backup_restores_the_stored_files_with_their_folders(): void
+    {
+        $admin = User::factory()->admin()->create();
+        $folder = storage_path('app/uploads/2026/01');
+        File::ensureDirectoryExists($folder);
+        File::put($folder.'/note.txt', 'kept');
+
+        $this->actingAs($admin)->post('/admin/backup')->assertRedirect();
+
+        $archives = glob(storage_path('app/backups/lightlms-*'));
+        $this->assertNotEmpty($archives);
+
+        File::delete($folder.'/note.txt');
+
+        $this->actingAs($admin)
+            ->post('/admin/backup/restore', [
+                'archive' => new UploadedFile($archives[0], basename($archives[0]), null, null, true),
+            ])
+            ->assertRedirect()
+            ->assertSessionHasNoErrors();
+
+        $this->assertSame('kept', File::get($folder.'/note.txt'));
+    }
+
+    public function test_a_restore_refuses_an_archive_that_carries_other_statements(): void
+    {
+        $admin = User::factory()->admin()->create();
+        $directory = storage_path('app/backups');
+        File::ensureDirectoryExists($directory);
+        $archive = $directory.'/hostile.tar';
+        File::delete($archive);
+
+        $tar = new PharData($archive, 0, null, Phar::TAR);
+        $tar->addFromString('database.sql', "DELETE FROM settings;\nDROP TABLE users;\n");
+        unset($tar);
+
+        $this->actingAs($admin)
+            ->post('/admin/backup/restore', [
+                'archive' => new UploadedFile($archive, 'hostile.tar', null, null, true),
+            ])->assertStatus(500);
+
+        // The users table is still there: the refused statement never ran.
+        $this->assertTrue(Schema::hasTable('users'));
     }
 }

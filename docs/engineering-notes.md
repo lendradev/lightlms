@@ -362,3 +362,49 @@ copy, so the lookup by category id found nothing.
 **Fix.** Look the category up by name before creating it, and delete any duplicate that is already
 there. A seeder that is run again against an existing database has to converge on the same state,
 not add to it.
+## `UploadedFile::moveTo()` does not exist
+**Symptom.** Restoring a backup in the admin area returned 500 with
+`BadMethodCallException: Method Illuminate\Http\UploadedFile::moveTo does not exist`.
+**Cause.** `moveTo()` was never part of Symfony's `UploadedFile`. The methods are `move()` and
+`store()`. The code had been written from memory, and no test reached the controller, so the
+method was never called in a test run.
+**Fix.** Use `move($directory, $name)`, which takes the target folder and the target file name.
+`move()` also refuses to overwrite an existing file, so the name still has to be generated on
+the server.
+
+## A test that posts a path where a file is expected proves nothing
+**Symptom.** The backup round-trip test passed while the restore action was broken.
+**Cause.** The test posted `['archive' => '/path/to/backup.tar']`, a string, where the controller
+expected an uploaded file. The `file` validation rule rejected it and the request returned a
+redirect, which is exactly what `assertRedirect()` accepts. The follow-up `assertDatabaseHas()`
+passed as well, because the course had been soft deleted rather than removed.
+**Fix.** Post a real `UploadedFile`, assert `assertSessionHasNoErrors()`, and assert on the state
+that the action is supposed to change. A redirect is the answer to a validation failure, not to a
+successful action.
+
+## A tar member is not addressed by its basename
+**Symptom.** Restoring a backup brought the database back but left every uploaded file missing.
+**Cause.** `PharData` members were read with `getFilename()`, which is the basename alone. The
+filter that only accepts members under `storage/` therefore rejected every member, because the
+basename never carries that prefix. The same loop also lost the folder structure of the storage
+tree, so a file restored from `storage/2026/01/note.pdf` would have landed in the root.
+**Fix.** Take the path from the phar URI of the member and strip the archive prefix. Read the
+dump with `getContent()` as well: a `PharFile` cast to a string gives its path, not its contents.
+
+## Reserved words break a hand written dump
+**Symptom.** Restoring a backup failed with `SQLSTATE[HY000]: General error: 1 near "group":
+syntax error`.
+**Cause.** The dump wrote column names as they came from the row, without quoting. The settings
+table has columns called `key` and `group`, which are reserved words in SQLite, so the `INSERT`
+could not be parsed.
+**Fix.** Quote every identifier for the driver in use: double quotes on SQLite and PostgreSQL,
+backticks on MySQL. Quote string literals for the driver as well, because MySQL treats a
+backslash as an escape character.
+
+## A rate limit belongs on the way in
+**Symptom.** Nothing stopped a script from trying a password thousands of times a minute.
+**Cause.** Only the API had a rate limit. The web sign-in, the registration form and the setup
+wizard were open, because a limiter that is not registered in `AppServiceProvider` does nothing.
+**Fix.** Register a limiter per form and attach it to the route. Count sign-in attempts per
+address and per email address, so one attacker cannot lock a whole office out and one account
+cannot be guessed from many addresses.

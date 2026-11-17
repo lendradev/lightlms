@@ -5,7 +5,9 @@ namespace App\Services;
 use App\Models\Setting;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
+use Phar;
 use PharData;
+use RecursiveIteratorIterator;
 use RuntimeException;
 use ZipArchive;
 
@@ -79,7 +81,7 @@ class BackupService
             return $destination;
         }
 
-        $tar = new PharData($destination, 0, null, \Phar::TAR);
+        $tar = new PharData($destination, 0, null, Phar::TAR);
         foreach ($payload as $name => $contents) {
             $tar->addFromString($name, $contents);
         }
@@ -117,13 +119,12 @@ class BackupService
 
         for ($i = 0; $i < $archive->numFiles; $i++) {
             $name = $archive->getNameIndex($i);
-            if ($name === false || ! str_starts_with($name, 'storage/') || str_contains($name, '..')) {
+            if ($name === false || ! str_starts_with($name, 'storage/')) {
                 continue;
             }
 
             $target = $storageRoot.'/'.substr($name, strlen('storage/'));
-            File::ensureDirectoryExists(dirname($target));
-            File::put($target, (string) $archive->getFromIndex($i));
+            $this->writeFile($target, (string) $archive->getFromIndex($i));
         }
 
         $archive->close();
@@ -140,19 +141,52 @@ class BackupService
             throw new RuntimeException('The archive does not contain a database dump.');
         }
 
-        foreach ($tar as $file) {
-            $name = $file->getFilename();
+        foreach (new RecursiveIteratorIterator($tar) as $file) {
+            $name = $this->relativeName($archivePath, $file->getPathname());
 
-            if (! str_starts_with($name, 'storage/') || str_contains($name, '..')) {
+            if ($name === null || ! str_starts_with($name, 'storage/')) {
                 continue;
             }
 
             $target = $storageRoot.'/'.substr($name, strlen('storage/'));
-            File::ensureDirectoryExists(dirname($target));
-            File::put($target, $file->getContent());
+            $this->writeFile($target, $file->getContent());
         }
 
-        $this->load((string) $dump);
+        $this->load($dump->getContent());
+    }
+
+    /**
+     * The path of an archive member, relative to the archive root.
+     *
+     * `getFilename()` on a PharData member is the basename alone, which loses
+     * the folder structure, so the path is taken from the phar URI instead.
+     */
+    private function relativeName(string $archivePath, string $memberPath): ?string
+    {
+        $prefix = 'phar://'.realpath($archivePath);
+        if (! str_starts_with($memberPath, $prefix)) {
+            return null;
+        }
+
+        $name = substr($memberPath, strlen($prefix));
+        $name = ltrim($name, '/');
+
+        return $name === '' ? null : $name;
+    }
+
+    /**
+     * Write an extracted file, refusing any path that escapes the storage root.
+     */
+    private function writeFile(string $target, string $contents): void
+    {
+        $normalised = str_replace('\\', '/', $target);
+
+        if (str_contains($normalised, '../') || str_ends_with($normalised, '/..')) {
+            return;
+        }
+
+        File::ensureDirectoryExists(dirname($target));
+        File::put($target, $contents);
     }
 
     private function dump(): string
@@ -176,14 +210,15 @@ class BackupService
 
             $columns = array_keys((array) $rows->first());
 
-            $sql .= "DELETE FROM {$table};\n";
+            $sql .= 'DELETE FROM '.$this->quoteIdentifier($table).";\n";
 
             foreach ($rows as $row) {
                 $values = array_map(
                     fn ($value) => $value === null ? 'NULL' : $this->quote((string) $value),
                     (array) $row,
                 );
-                $sql .= "INSERT INTO {$table} (".implode(', ', $columns).') VALUES ('.implode(', ', $values).");\n";
+                $columnList = implode(', ', array_map($this->quoteIdentifier(...), $columns));
+                $sql .= 'INSERT INTO '.$this->quoteIdentifier($table).' ('.$columnList.') VALUES ('.implode(', ', $values).");\n";
             }
 
             $sql .= "\n";
@@ -194,19 +229,68 @@ class BackupService
         return $sql;
     }
 
+    /**
+     * Run the statements from a dump.
+     *
+     * A dump only ever holds a `DELETE` and an `INSERT` per table, and only
+     * for the tables this service knows. Anything else in the archive is
+     * refused, so a crafted backup cannot drop a table or rewrite rows that
+     * the dump format never writes.
+     */
     private function load(string $sql): void
     {
         $this->disableForeignKeys();
 
-        foreach (array_filter(array_map('trim', explode(";\n", $sql))) as $statement) {
-            if ($statement === '' || str_starts_with($statement, '--')) {
+        try {
+            foreach (explode(";\n", $sql) as $chunk) {
+                $statement = $this->stripComments($chunk);
+
+                if ($statement === '') {
+                    continue;
+                }
+
+                if (! $this->isRestoreStatement($statement)) {
+                    throw new RuntimeException('The archive contains a statement this restore does not run.');
+                }
+
+                DB::unprepared($statement);
+            }
+        } finally {
+            $this->enableForeignKeys();
+        }
+    }
+
+    /**
+     * The statement without its comment lines.
+     */
+    private function stripComments(string $chunk): string
+    {
+        $lines = [];
+        foreach (explode("\n", $chunk) as $line) {
+            $trimmed = trim($line);
+            if ($trimmed === '' || str_starts_with($trimmed, '--')) {
                 continue;
             }
-
-            DB::unprepared($statement);
+            $lines[] = $trimmed;
         }
 
-        $this->enableForeignKeys();
+        return trim(implode(' ', $lines));
+    }
+
+    /**
+     * True when the statement is a delete or an insert for a known table.
+     */
+    private function isRestoreStatement(string $statement): bool
+    {
+        // The identifier may be double quoted or, on MySQL, in backticks.
+        $identifier = '(?:`|\")?([A-Za-z0-9_]+)(?:`|\")?';
+
+        if (! preg_match('/^DELETE\s+FROM\s+'.$identifier.'\s*;?$/i', $statement, $matches)
+            && ! preg_match('/^INSERT\s+INTO\s+'.$identifier.'\s*\(/i', $statement, $matches)) {
+            return false;
+        }
+
+        return in_array(strtolower($matches[1]), self::TABLES, true);
     }
 
     private function disableForeignKeys(): void
@@ -227,9 +311,35 @@ class BackupService
         };
     }
 
+    /**
+     * A string literal, quoted for the driver in use.
+     *
+     * MySQL treats a backslash as an escape character, so a backslash has to
+     * be doubled there as well. The other drivers use the SQL standard of
+     * doubling the quote.
+     */
     private function quote(string $value): string
     {
+        if (DB::connection()->getDriverName() === 'mysql') {
+            return "'".str_replace(['\\', "'"], ['\\\\', "''"], $value)."'";
+        }
+
         return "'".str_replace("'", "''", $value)."'";
+    }
+
+    /**
+     * An identifier, quoted for the driver in use.
+     *
+     * Some columns are reserved words, `key` and `group` among them, so they
+     * cannot be written unquoted.
+     */
+    private function quoteIdentifier(string $identifier): string
+    {
+        if (DB::connection()->getDriverName() === 'mysql') {
+            return '`'.str_replace('`', '``', $identifier).'`';
+        }
+
+        return '"'.str_replace('"', '""', $identifier).'"';
     }
 
     /** @return array<string, mixed> */

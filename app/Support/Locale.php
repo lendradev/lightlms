@@ -47,8 +47,6 @@ class Locale
      *
      * The header can carry a quality list, so the order matters: `id-ID,id;q=0.9`
      * has to pick Indonesian rather than the first tag it sees.
-     *
-     * @param  string|null  $header
      */
     public static function fromHeader(?string $header): ?string
     {
