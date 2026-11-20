@@ -5,11 +5,14 @@
 # and every re-sync. Re-running this script does not wipe the data: it only
 # migrates what is missing and seeds when the database is still empty.
 #
+# The dependency trees live outside the synced tree. DEPS points at them; the
+# dev containers keep them in the shared cache volume.
+#
 # Usage: bash docker/demo.sh <container> [db-volume]
 set -euo pipefail
-
 CONTAINER="${1:?container name required}"
 DB_VOLUME="${2:-sbx-lightlms-db}"
+DEPS="${DEPS:-/work/deps}"
 SRC="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 
 docker volume create "$DB_VOLUME" >/dev/null
@@ -21,16 +24,16 @@ docker run --rm -u 0 \
     --entrypoint sh docker.io/library/php:8.5-fpm-alpine \
     -c "chown -R $(id -u):$(id -g) /work/db"
 
-bash "$SRC/docker/sync-container.sh" "$CONTAINER" /work/app /work/deps
+bash "$SRC/docker/sync-container.sh" "$CONTAINER" /work/app "$DEPS"
 
-docker exec -e APP_ENV=local "$CONTAINER" sh -c '
+docker exec -e APP_ENV=local -e DEPS="$DEPS" "$CONTAINER" sh -c '
 set -e
 cd /work/app
 
-if [ ! -f /work/deps/.env ]; then
-    cp /work/app/docker/demo.env /work/deps/.env
+if [ ! -f "$DEPS/.env" ]; then
+    cp /work/app/docker/demo.env "$DEPS/.env"
     php artisan key:generate --force --env=local
-    echo "created /work/deps/.env from docker/demo.env"
+    echo "created $DEPS/.env from docker/demo.env"
 fi
 
 php artisan migrate --force

@@ -48,11 +48,14 @@ start() {
         -v "$ROOT:/src:ro" \
         -w /src \
         --entrypoint sh "$NODE_IMAGE" \
-        -c 'mkdir -p /pkg-cache/bin /work/app \
+        -c 'mkdir -p /pkg-cache/bin /pkg-cache/deps /work/app \
             && corepack enable --install-directory /pkg-cache/bin pnpm \
             && export PATH="/pkg-cache/bin:$PATH" \
             && cd /work/app \
             && cp -r /src/. /work/app/ \
+            && rm -rf /pkg-cache/deps/node_modules \
+            && export PATH="/pkg-cache/bin:$PATH" \
+            && corepack pnpm install --frozen-lockfile --store-dir /pkg-cache/pnpm/store \
             && exec sleep infinity' >/dev/null
 
     docker run -d --name "$PHP_CONTAINER" --network "$NETWORK" \
@@ -65,7 +68,12 @@ start() {
         -e COMPOSER_CACHE_DIR=/pkg-cache/composer/cache \
         -v "$ROOT:/src:ro" \
         --entrypoint sh "$COMPOSER_IMAGE" \
-        -c 'mkdir -p /work/app && cp -r /src/. /work/app/ && cd /work/app && exec sleep infinity' >/dev/null
+        -c 'mkdir -p /pkg-cache/deps /work/app \
+            && cp -r /src/. /work/app/ \
+            && mkdir -p /pkg-cache/deps \
+            && cd /work/app \
+            && composer install --no-interaction --no-progress \
+            && exec sleep infinity' >/dev/null
 
     echo "started $NODE_CONTAINER and $PHP_CONTAINER (shared cache volume: $CACHE_VOLUME)"
 }

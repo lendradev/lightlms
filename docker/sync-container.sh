@@ -23,6 +23,16 @@ SRC="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 docker exec -e DEST="$DEST" -e DEPS="$DEPS" -e DB_DIR="$DB_DIR" "$CONTAINER" sh -c '
 set -e
 mkdir -p "$DEPS" "$DB_DIR"
+# The installed trees are parked in "$DEPS" while the source tree is replaced.
+# They go back to "$DEST" afterwards: Composer derives the base directory of
+# its class map from the parent of the vendor directory, so a symlink out of
+# the source tree would point the autoloader at the wrong place.
+if [ -d "$DEST/vendor" ] && [ ! -d "$DEPS/vendor" ]; then
+  mv "$DEST/vendor" "$DEPS/vendor"
+fi
+if [ -d "$DEST/node_modules" ] && [ ! -d "$DEPS/node_modules" ]; then
+  mv "$DEST/node_modules" "$DEPS/node_modules"
+fi
 rm -rf "$DEST"
 mkdir -p "$DEST"
 '
@@ -40,7 +50,7 @@ mkdir -p "$DEST/storage/framework/cache/data" "$DEST/storage/framework/sessions"
 mkdir -p "$DEST/public" "$DB_DIR"
 for d in vendor node_modules; do
   if [ -d "$DEPS/$d" ]; then
-    ln -sfn "$DEPS/$d" "$DEST/$d"
+    mv "$DEPS/$d" "$DEST/$d"
   fi
 done
 if [ -d "$DEPS/public-build" ]; then
