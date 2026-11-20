@@ -1,4 +1,5 @@
 import { Head, Link, useForm } from '@inertiajs/react';
+import FlashMessage from '@/components/FlashMessage';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -44,7 +45,8 @@ export default function Login({ registrationMode, siteName }: Props) {
                             <CardTitle>{t('auth.signIn')}</CardTitle>
                             <CardDescription>{t('auth.welcomeBody')}</CardDescription>
                         </CardHeader>
-                        <CardContent>
+                        <CardContent className="grid gap-4">
+                            <FlashMessage />
                             <form
                                 onSubmit={(event) => {
                                     event.preventDefault();
@@ -65,7 +67,15 @@ export default function Login({ registrationMode, siteName }: Props) {
                                 </div>
 
                                 <div className="grid gap-2">
-                                    <Label htmlFor="password">{t('auth.password')}</Label>
+                                    <div className="flex items-center justify-between">
+                                        <Label htmlFor="password">{t('auth.password')}</Label>
+                                        <Link
+                                            href="/forgot-password"
+                                            className="text-xs font-medium text-primary hover:underline"
+                                        >
+                                            {t('auth.forgot')}
+                                        </Link>
+                                    </div>
                                     <Input
                                         id="password"
                                         type="password"

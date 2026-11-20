@@ -22,4 +22,22 @@ return [
     'auth.mode.closed' => 'Closed',
     'auth.failed' => 'Those credentials do not match our records.',
     'auth.throttled' => 'Too many attempts. Try again in a moment.',
+
+    'auth.resetTitle' => 'Reset your password',
+    'auth.resetIntro' => 'Enter the address you use to sign in and we will send you a link to choose a new password.',
+    'auth.resetSend' => 'Send reset link',
+    'auth.resetLinkSent' => 'If that address belongs to an account, a reset link is on its way.',
+    'auth.resetNewPassword' => 'Choose a new password',
+    'auth.resetNewPasswordIntro' => 'The link is valid once. Type the new password and confirm it.',
+    'auth.resetConfirmPassword' => 'Confirm the new password',
+    'auth.resetSubmit' => 'Set new password',
+    'auth.resetDone' => 'Your password has been changed. Please sign in again.',
+    'auth.resetLinkInvalid' => 'This reset link is no longer valid. Please ask for a new one.',
+    'auth.resetBackToLogin' => 'Back to sign in',
+
+    'auth.resetEmailSubject' => 'Reset your LightLMS password',
+    'auth.resetEmailIntro' => 'You are receiving this email because a password reset was requested for your account.',
+    'auth.resetEmailAction' => 'Choose a new password',
+    'auth.resetEmailExpires' => 'This link expires in :count minutes and can be used once.',
+    'auth.resetEmailIgnored' => 'If you did not ask for this, no action is needed. Your password stays as it is.',
 ];

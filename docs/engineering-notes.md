@@ -408,3 +408,43 @@ wizard were open, because a limiter that is not registered in `AppServiceProvide
 **Fix.** Register a limiter per form and attach it to the route. Count sign-in attempts per
 address and per email address, so one attacker cannot lock a whole office out and one account
 cannot be guessed from many addresses.
+
+## A session cookie does not make a second browser in a test
+
+**Symptom.** A test that wanted a second browser to reset a password while the first browser
+stayed signed in failed with "the expected notification was not sent": the request for the reset
+link came back as a redirect to the dashboard.
+
+**Cause.** The test client keeps one session, and `withCookie()` only changes the cookie that is
+sent. The session store itself was the same one, so the second request was still the signed-in
+person, and the `guest` middleware turned it away.
+
+**Fix.** Put the session aside instead: keep the attributes of the signed-in session, empty the
+session, make the request as a guest, and put the saved attributes back afterwards. That is what
+the test for a password reset does now.
+
+## A password change ends open sessions, and the test suite noticed
+
+**Symptom.** Four unrelated tests failed with a redirect to the login page after the session
+middleware that ends a stale session was turned on.
+
+**Cause.** The middleware compares the password hash the session was opened with against the
+hash the account has now. `actingAs()` swaps the user on the guard but leaves that hash alone, so
+the middleware read a hash of the previous user, decided the session was stale and logged it
+out.
+
+**Fix.** `tests/TestCase.php` drops the stored hash when the acting user changes, so the
+middleware stores the hash of the new user. The real browser does the same, because the session
+is opened by the sign-in that follows.
+
+## The vendor directory cannot be a symlink out of the source tree
+
+**Symptom.** `Class "App\Support\Locale" not found` after the dependency tree was moved to a
+shared volume and linked into the source tree.
+
+**Cause.** Composer derives the base directory of its class map from the parent of the vendor
+directory. A vendor directory that lives elsewhere makes the class map point at the wrong place.
+
+**Fix.** Keep the vendor directory inside the application tree. `docker/sync-container.sh` parks
+it in a directory outside the tree while the source is replaced and moves it back afterwards, so
+a sync never wipes an install.

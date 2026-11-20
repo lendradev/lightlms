@@ -47,6 +47,27 @@ class Translations
     }
 
     /**
+     * One string in one language, with English as the fallback.
+     *
+     * The interface keys are flat (`auth.signIn`), which Laravel's own `trans()`
+     * cannot read, because it would look for a file called `auth.php` holding
+     * a key called `signIn`. This reads the same flat map instead.
+     *
+     * @param  array<string, string|int>  $replace
+     */
+    public static function get(string $key, ?string $locale = null, array $replace = []): string
+    {
+        $strings = self::for($locale ?? app()->getLocale());
+        $value = $strings[$key] ?? $key;
+
+        foreach ($replace as $name => $replacement) {
+            $value = str_replace(':'.$name, (string) $replacement, $value);
+        }
+
+        return $value;
+    }
+
+    /**
      * @return array<string, string>
      */
     private static function load(string $locale, string $group): array

@@ -3,7 +3,9 @@
 namespace App\Models;
 
 use App\Enums\UserRole;
+use App\Notifications\ResetPassword;
 use Database\Factories\UserFactory;
+use Illuminate\Auth\Passwords\CanResetPassword as CanResetPasswordTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -15,7 +17,7 @@ use Laravel\Sanctum\HasApiTokens;
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use HasApiTokens, HasFactory, Notifiable, SoftDeletes;
+    use CanResetPasswordTrait, HasApiTokens, HasFactory, Notifiable, SoftDeletes;
 
     /** @var list<string> */
     protected $fillable = [
@@ -71,5 +73,13 @@ class User extends Authenticatable
     public function canTeach(): bool
     {
         return $this->role->canTeach();
+    }
+
+    /**
+     * Send the reset link in the language of the account.
+     */
+    public function sendPasswordResetNotification($token): void
+    {
+        $this->notify(new ResetPassword($token));
     }
 }

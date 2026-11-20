@@ -71,5 +71,26 @@ class AppServiceProvider extends ServiceProvider
                 Limit::perHour(5)->by('setup-ip:'.$request->ip()),
             ];
         });
+
+        // Asking for a reset link sends an email, so it is limited per
+        // address and per email address. One address must not be able to
+        // flood a mailbox, and one mailbox must not be flooded from many
+        // addresses.
+        RateLimiter::for('password-email', function (Request $request) {
+            $email = mb_strtolower((string) $request->input('email'));
+
+            return [
+                Limit::perMinute(5)->by('password-email-ip:'.$request->ip()),
+                Limit::perMinute(5)->by('password-email-address:'.$email),
+                Limit::perHour(20)->by('password-email-ip-hour:'.$request->ip()),
+            ];
+        });
+
+        // Trying tokens is cheap for the attacker, so it gets its own limit.
+        RateLimiter::for('password-update', function (Request $request) {
+            return [
+                Limit::perMinute(10)->by('password-update-ip:'.$request->ip()),
+            ];
+        });
     }
 }

@@ -22,4 +22,22 @@ return [
     'auth.mode.closed' => 'Ditutup',
     'auth.failed' => 'Email atau kata sandi tidak cocok.',
     'auth.throttled' => 'Terlalu banyak percobaan. Coba lagi sebentar lagi.',
+
+    'auth.resetTitle' => 'Atur ulang kata sandi',
+    'auth.resetIntro' => 'Masukkan email yang Anda pakai untuk masuk. Kami akan mengirim tautan untuk memilih kata sandi baru.',
+    'auth.resetSend' => 'Kirim tautan reset',
+    'auth.resetLinkSent' => 'Jika email itu terdaftar, tautan reset sudah dikirim.',
+    'auth.resetNewPassword' => 'Pilih kata sandi baru',
+    'auth.resetNewPasswordIntro' => 'Tautan ini hanya berlaku sekali. Masukkan kata sandi baru lalu ulangi untuk memastikan.',
+    'auth.resetConfirmPassword' => 'Ulangi kata sandi baru',
+    'auth.resetSubmit' => 'Simpan kata sandi baru',
+    'auth.resetDone' => 'Kata sandi Anda sudah diubah. Silakan masuk lagi.',
+    'auth.resetLinkInvalid' => 'Tautan reset ini sudah tidak berlaku. Minta tautan baru.',
+    'auth.resetBackToLogin' => 'Kembali ke halaman masuk',
+
+    'auth.resetEmailSubject' => 'Atur ulang kata sandi LightLMS Anda',
+    'auth.resetEmailIntro' => 'Anda menerima email ini karena ada permintaan pengaturan ulang kata sandi untuk akun Anda.',
+    'auth.resetEmailAction' => 'Pilih kata sandi baru',
+    'auth.resetEmailExpires' => 'Tautan ini berlaku :count menit dan hanya bisa dipakai sekali.',
+    'auth.resetEmailIgnored' => 'Jika Anda tidak meminta ini, tidak ada yang perlu dilakukan. Kata sandi Anda tetap seperti semula.',
 ];

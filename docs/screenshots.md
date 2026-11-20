@@ -29,6 +29,18 @@ Captured at 1440x900 (desktop) and 390x844 (mobile, 2x pixel density).
 |---|---|
 | ![Register](screenshots/03-register.png) | ![Register in dark mode](screenshots/03-register-dark.png) |
 
+### Forgot password
+
+| Light | Dark |
+|---|---|
+| ![Forgot password](screenshots/07-forgot-password.png) | ![Forgot password in dark mode](screenshots/07-forgot-password-dark.png) |
+
+### Reset password
+
+| Light | Dark |
+|---|---|
+| ![Reset password](screenshots/08-reset-password.png) | ![Reset password in dark mode](screenshots/08-reset-password-dark.png) |
+
 ### Setup wizard
 
 Shown once, before the site has an administrator.

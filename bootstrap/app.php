@@ -31,6 +31,11 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->encryptCookies(except: [
             App\Support\Locale::COOKIE,
         ]);
+
+        // The session carries the password hash it was opened with, so a
+        // session that was started before a password change ends by itself.
+        $middleware->authenticateSessions();
+
         $middleware->web(append: [
             SetLocale::class,
             HandleInertiaRequests::class,
