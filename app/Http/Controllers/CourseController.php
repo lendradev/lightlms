@@ -55,7 +55,9 @@ class CourseController extends Controller
     {
         abort_unless($course->isPublished(), 404);
 
-        $course->load('modules.lessons');
+        // A module the author hid stays hidden, on the public page as much as
+        // in the course itself.
+        $course->load(['modules' => fn ($query) => $query->where('visible', true), 'modules.lessons']);
 
         return Inertia::render('Courses/Show', [
             'course' => $course,

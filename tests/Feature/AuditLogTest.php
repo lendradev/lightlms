@@ -75,6 +75,18 @@ class AuditLogTest extends TestCase
             'updated_at' => now(),
         ]);
 
+        // A mark belongs to a participant, so the student has to be enrolled.
+        DB::table('course_user')->insert([
+            'course_id' => $course->id,
+            'user_id' => $student->id,
+            'role' => 'student',
+            'status' => 'active',
+            'progress' => 0,
+            'enrolled_at' => now(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
         Module::factory()->create(['course_id' => $course->id]);
         Lesson::factory()->assignment()->create([
             'module_id' => Module::query()->where('course_id', $course->id)->value('id'),

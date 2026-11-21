@@ -76,6 +76,16 @@ class LearningController extends Controller
             403,
         );
 
+        // A lesson outside its availability window cannot be finished, so a
+        // learner cannot mark their way to a finished course early.
+        abort_unless(
+            $lesson->isAvailable(),
+            403,
+            $lesson->available_from !== null && $lesson->available_from->isFuture()
+                ? 'This activity is not open yet.'
+                : 'This activity is closed.',
+        );
+
         $this->enrollments->markLessonComplete($user->id, $lesson->id);
 
         return back()->with('success', 'Activity marked as complete.');

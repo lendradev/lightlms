@@ -72,6 +72,11 @@ class AuthController extends Controller
             }
         }
 
+        // Registration is closed and no invitation came with the link.
+        if (Setup::registrationMode() === Setup::REGISTRATION_CLOSED) {
+            return redirect()->route('login');
+        }
+
         return Inertia::render('Auth/Register', [
             'requiresInviteCode' => true,
             'inviteCode' => '',
@@ -82,6 +87,14 @@ class AuthController extends Controller
     public function register(Request $request): RedirectResponse
     {
         $mode = Setup::registrationMode();
+
+        // The server decides whether registration is open. The page hiding its
+        // own link is a convenience, never the control.
+        abort_if(
+            $mode === Setup::REGISTRATION_CLOSED,
+            403,
+            'Registration is closed on this site.',
+        );
 
         $rules = [
             'name' => ['required', 'string', 'max:120'],
@@ -113,6 +126,14 @@ class AuthController extends Controller
             }
 
             if ($invitation !== null) {
+                // An invitation that expired or was already used carries no
+                // role. The page checks this too, but the page is only a view.
+                if (! $invitation->isPending()) {
+                    throw ValidationException::withMessages([
+                        'invite_code' => 'This invitation is not valid.',
+                    ]);
+                }
+
                 $role = UserRole::from($invitation->role);
                 $invitation->forceFill(['accepted_at' => now()])->save();
             }

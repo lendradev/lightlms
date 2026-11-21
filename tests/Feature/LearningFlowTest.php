@@ -86,4 +86,46 @@ class LearningFlowTest extends TestCase
     {
         $this->get('/learning')->assertRedirect(route('login'));
     }
+
+    public function test_an_activity_that_has_not_opened_yet_cannot_be_completed(): void
+    {
+        $student = User::factory()->create();
+        $course = Course::factory()->create();
+        $module = Module::factory()->create(['course_id' => $course->id]);
+        $lesson = Lesson::factory()->create([
+            'module_id' => $module->id,
+            'available_from' => now()->addWeek(),
+        ]);
+        $course->students()->attach($student->id, ['status' => 'active']);
+
+        $this->actingAs($student)
+            ->post("/learning/lessons/{$lesson->id}/complete")
+            ->assertForbidden();
+
+        $this->assertDatabaseMissing('lesson_user', [
+            'user_id' => $student->id,
+            'lesson_id' => $lesson->id,
+        ]);
+    }
+
+    public function test_an_activity_that_has_closed_cannot_be_completed(): void
+    {
+        $student = User::factory()->create();
+        $course = Course::factory()->create();
+        $module = Module::factory()->create(['course_id' => $course->id]);
+        $lesson = Lesson::factory()->create([
+            'module_id' => $module->id,
+            'available_to' => now()->subDay(),
+        ]);
+        $course->students()->attach($student->id, ['status' => 'active']);
+
+        $this->actingAs($student)
+            ->post("/learning/lessons/{$lesson->id}/complete")
+            ->assertForbidden();
+
+        $this->assertDatabaseMissing('lesson_user', [
+            'user_id' => $student->id,
+            'lesson_id' => $lesson->id,
+        ]);
+    }
 }

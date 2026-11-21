@@ -68,6 +68,37 @@ class CourseCatalogueTest extends TestCase
         $this->get("/courses/{$course->slug}")->assertNotFound();
     }
 
+    public function test_a_hidden_module_stays_hidden_on_the_public_course_page(): void
+    {
+        $course = Course::factory()->create(['title' => 'Open Course']);
+
+        $visible = Module::factory()->create(['course_id' => $course->id, 'title' => 'Visible section']);
+        Lesson::factory()->create(['module_id' => $visible->id, 'title' => 'Visible lesson']);
+
+        $hidden = Module::factory()->create([
+            'course_id' => $course->id,
+            'title' => 'Unreleased section',
+            'visible' => false,
+        ]);
+        Lesson::factory()->create(['module_id' => $hidden->id, 'title' => 'Unreleased lesson']);
+
+        $response = $this->get("/courses/{$course->slug}")->assertOk();
+
+        $response->assertInertia(fn ($page) => $page->component('Courses/Show')
+            ->has('course.modules', 1)
+            ->has('course.modules.0.lessons', 1));
+
+        $response->assertDontSee('Unreleased lesson');
+    }
+
+    public function test_the_not_found_page_does_not_name_the_model_it_looked_for(): void
+    {
+        $response = $this->get('/courses/no-such-course-slug')->assertNotFound();
+
+        $response->assertDontSee('App\Models\Course');
+        $response->assertDontSee('No query results for model');
+    }
+
     public function test_course_progress_is_tracked_on_the_pivot_table(): void
     {
         $user = User::factory()->create();

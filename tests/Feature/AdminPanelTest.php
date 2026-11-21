@@ -183,4 +183,81 @@ class AdminPanelTest extends TestCase
         // The users table is still there: the refused statement never ran.
         $this->assertTrue(Schema::hasTable('users'));
     }
+
+    public function test_a_restore_refuses_a_second_statement_tailed_behind_a_valid_one(): void
+    {
+        $admin = User::factory()->admin()->create();
+        $course = Course::factory()->create(['title' => 'Survives the attempt']);
+
+        $archive = $this->archiveWith(
+            'DELETE FROM "courses";'."\n"
+            .'INSERT INTO "users" ("id", "name", "email", "password", "role", "email_verified_at", "created_at", "updated_at") '
+            ."VALUES (999, 'x', 'x@example.test', 'x', 'admin', NULL, '2026-01-01', '2026-01-01'); DROP TABLE \"courses\";\n",
+        );
+
+        $this->actingAs($admin)
+            ->post('/admin/backup/restore', [
+                'archive' => new UploadedFile($archive, 'hostile.tar', null, null, true),
+            ])->assertStatus(500);
+
+        // The whole archive is checked before the first statement runs, so the
+        // table and its row are both still there.
+        $this->assertTrue(Schema::hasTable('courses'));
+        $this->assertDatabaseHas('courses', ['title' => 'Survives the attempt']);
+        $this->assertDatabaseMissing('users', ['email' => 'x@example.test']);
+    }
+
+    public function test_a_restore_refuses_an_update_that_rewrites_a_role(): void
+    {
+        $admin = User::factory()->admin()->create();
+        $victim = User::factory()->create(['role' => 'student', 'email' => 'victim@example.test']);
+
+        $archive = $this->archiveWith(
+            'DELETE FROM "users";'."\n"
+            .'UPDATE "users" SET "role" = \'admin\' WHERE "email" = \'victim@example.test\';'."\n",
+        );
+
+        $this->actingAs($admin)
+            ->post('/admin/backup/restore', [
+                'archive' => new UploadedFile($archive, 'hostile.tar', null, null, true),
+            ])->assertStatus(500);
+
+        $this->assertSame('student', $victim->fresh()->role->value);
+        $this->assertDatabaseHas('users', ['email' => 'victim@example.test']);
+    }
+
+    public function test_a_restore_refuses_an_insert_that_smuggles_a_subquery(): void
+    {
+        $admin = User::factory()->admin()->create();
+
+        $archive = $this->archiveWith(
+            'DELETE FROM "users";'."\n"
+            .'INSERT INTO "users" ("id", "name", "email", "password", "role", "email_verified_at", "created_at", "updated_at") '
+            ."VALUES (999, (SELECT \"password\" FROM \"users\"), 'x@example.test', 'x', 'admin', NULL, '2026-01-01', '2026-01-01');\n",
+        );
+
+        $this->actingAs($admin)
+            ->post('/admin/backup/restore', [
+                'archive' => new UploadedFile($archive, 'hostile.tar', null, null, true),
+            ])->assertStatus(500);
+
+        $this->assertDatabaseMissing('users', ['email' => 'x@example.test']);
+    }
+
+    /**
+     * A tar archive holding one dump file.
+     */
+    private function archiveWith(string $dump): string
+    {
+        $directory = storage_path('app/backups');
+        File::ensureDirectoryExists($directory);
+        $archive = $directory.'/hostile-'.uniqid().'.tar';
+        File::delete($archive);
+
+        $tar = new PharData($archive, 0, null, Phar::TAR);
+        $tar->addFromString('database.sql', $dump);
+        unset($tar);
+
+        return $archive;
+    }
 }

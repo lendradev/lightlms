@@ -47,6 +47,10 @@ class ApiError
             // The real reason may name a host, a query or a path. The client
             // gets a generic sentence instead.
             $message = 'The server ran into a problem. Please try again in a moment.';
+        } elseif ($status === 404) {
+            // A missing model reports its own class name, which tells a client
+            // about the inside of the application.
+            $message = 'The requested resource was not found.';
         }
 
         return response()->json([

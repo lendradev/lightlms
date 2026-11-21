@@ -101,6 +101,67 @@ class AuthenticationTest extends TestCase
         $this->assertDatabaseHas('users', ['email' => 'open@example.test']);
     }
 
+    public function test_registration_is_blocked_when_the_site_is_closed(): void
+    {
+        Setting::put(Setup::KEY_REGISTRATION, Setup::REGISTRATION_CLOSED, 'auth');
+
+        $this->post('/register', [
+            'name' => 'Closed Learner',
+            'email' => 'closed@example.test',
+            'password' => 'a-very-long-password',
+            'password_confirmation' => 'a-very-long-password',
+        ])->assertForbidden();
+
+        $this->assertDatabaseMissing('users', ['email' => 'closed@example.test']);
+        $this->assertGuest();
+    }
+
+    public function test_the_register_page_redirects_away_when_registration_is_closed(): void
+    {
+        Setting::put(Setup::KEY_REGISTRATION, Setup::REGISTRATION_CLOSED, 'auth');
+
+        $this->get('/register')->assertRedirect(route('login'));
+    }
+
+    public function test_an_expired_invitation_carries_no_role(): void
+    {
+        Invitation::factory()->expired()->create([
+            'email' => 'expired@example.test',
+            'role' => UserRole::Admin->value,
+            'token' => 'expired-token',
+        ]);
+
+        $this->post('/register', [
+            'name' => 'Late Arrival',
+            'email' => 'expired@example.test',
+            'password' => 'a-very-long-password',
+            'password_confirmation' => 'a-very-long-password',
+            'invite_code' => 'expired-token',
+        ])->assertSessionHasErrors('invite_code');
+
+        $this->assertDatabaseMissing('users', ['email' => 'expired@example.test']);
+    }
+
+    public function test_an_invitation_that_was_already_used_carries_no_role(): void
+    {
+        Invitation::factory()->create([
+            'email' => 'used@example.test',
+            'role' => UserRole::Admin->value,
+            'token' => 'used-token',
+            'accepted_at' => now()->subDay(),
+        ]);
+
+        $this->post('/register', [
+            'name' => 'Second Try',
+            'email' => 'used@example.test',
+            'password' => 'a-very-long-password',
+            'password_confirmation' => 'a-very-long-password',
+            'invite_code' => 'used-token',
+        ])->assertSessionHasErrors('invite_code');
+
+        $this->assertDatabaseMissing('users', ['email' => 'used@example.test']);
+    }
+
     public function test_a_user_can_sign_out(): void
     {
         $user = User::factory()->create();

@@ -448,3 +448,63 @@ directory. A vendor directory that lives elsewhere makes the class map point at 
 **Fix.** Keep the vendor directory inside the application tree. `docker/sync-container.sh` parks
 it in a directory outside the tree while the source is replaced and moves it back afterwards, so
 a sync never wipes an install.
+
+## A whitelist that only matched the start of a statement
+**Symptom.** A crafted backup archive could drop a table, change a user's role to `admin`, or
+insert an admin account, even though restoring a backup refused any statement that was not a
+`DELETE` or an `INSERT`.
+**Cause.** Two things. The check matched the beginning of a statement only, so a valid `INSERT`
+with a second statement trailing behind it passed. And the dump was cut into pieces on `";\n"`,
+which is not where a statement ends, so two statements written on one line never came apart. The
+regression test from the earlier audit only used a `DROP TABLE` on a line of its own, which that
+cut did separate, so the case never came up.
+**Fix.** Cut the dump on a semicolon that is not inside a string literal, and match the whole
+statement, not its beginning. The values of an insert have to be plain literals too, so a value
+cannot smuggle a subquery in. Every statement is checked before the first one runs, and the run is
+one transaction, so a refused archive leaves the database as it was.
+## A page that hides its own link is not a closed door
+**Symptom.** A site set to closed registration still accepted new accounts. The sign-in page had
+no sign-up link, but posting to the address directly made an account.
+**Cause.** The register action read the registration mode to decide whether an invite code was
+needed, and never looked at the closed mode. The check lived in the page, which is only a view.
+**Fix.** The action refuses the closed mode with a 403, and the page redirects to the sign-in
+form. The server decides; the page is a convenience.
+## An invitation that expired still carried its role
+**Symptom.** A token from an invitation that had expired still registered an account, and the
+account got the role the invitation carried, which could be `admin`.
+**Cause.** The register action looked the invitation up by email and token. The page checked
+whether the invitation was still pending, the action did not.
+**Fix.** The action asks the invitation whether it is pending before it takes the role from it.
+## A mark belongs to a participant
+**Symptom.** A teacher could write a mark onto any account in the system, including one that was
+never in the course.
+**Cause.** The grade form validated that the user existed, and nothing else.
+**Fix.** The form checks the course roster. A mark for someone outside the course is refused.
+## An activity outside its window could still be finished
+**Symptom.** A learner could mark an activity as complete before it opened, and finish a course
+early by hand.
+**Cause.** The lesson model knew how to answer whether it was open, and the action that marks an
+activity complete never asked.
+**Fix.** The action asks the lesson whether it is available, and refuses with a message that says
+which of the two cases it is.
+## A hidden section showed up on the public page
+**Symptom.** A section an author had hidden appeared, with its lessons, on the public page of the
+course.
+**Cause.** The course page loaded every section. The course player filtered the hidden ones, and
+the public page did not.
+**Fix.** Both load the visible sections now.
+## A missing model named itself on the error page
+**Symptom.** The not-found page read "No query results for model [App\Models\Course] gradebook".
+**Cause.** The error page passed the message of the exception through for every status below 500.
+The message of a missing model carries the name of the class it looked for.
+**Fix.** A 404 gets a sentence of its own, on the page and in the API body. A 403 keeps its
+message, because that one is written on purpose.
+## One statement that fails breaks the whole PostgreSQL transaction
+**Symptom.** A test passed on its own and failed in the full run, with "current transaction is
+aborted".
+**Cause.** PostgreSQL refuses every later command in a transaction once one has failed. The
+restore ran its statements inside the transaction the test framework had opened, so a refused
+statement poisoned the transaction for the tests that came after it.
+**Fix.** The restore runs its statements in a transaction of its own, which rolls back when one of
+them fails. Always run the suite on PostgreSQL as well as SQLite: a driver difference like this
+one only shows up there.

@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Course;
+use App\Models\GradeCategory;
 use App\Models\GradeGrade;
 use App\Models\GradeItem;
 use App\Models\Lesson;
@@ -489,6 +490,65 @@ class GradebookTest extends TestCase
 
         $this->assertNull($item->fresh()->category_id);
         $this->assertDatabaseMissing('grade_categories', ['id' => $category->id]);
+    }
+
+    public function test_an_instructor_cannot_grade_someone_outside_the_course(): void
+    {
+        $teacher = $this->instructorFor($course = Course::factory()->create(['user_id' => null]));
+        $outsider = User::factory()->create();
+
+        $category = GradeCategory::query()->create([
+            'course_id' => $course->id,
+            'name' => 'Assignments',
+            'aggregation' => 'weighted_mean',
+        ]);
+        $item = GradeItem::query()->create([
+            'course_id' => $course->id,
+            'category_id' => $category->id,
+            'name' => 'Essay 1',
+            'max_points' => 100,
+        ]);
+
+        $this->actingAs($teacher)
+            ->post("/teaching/{$course->slug}/gradebook/{$item->id}", [
+                'user_id' => $outsider->id,
+                'points' => 90,
+            ])->assertStatus(422);
+
+        $this->assertDatabaseMissing('grade_grades', [
+            'item_id' => $item->id,
+            'user_id' => $outsider->id,
+        ]);
+    }
+
+    public function test_an_instructor_can_grade_a_participant(): void
+    {
+        $teacher = $this->instructorFor($course = Course::factory()->create(['user_id' => null]));
+        $student = User::factory()->create();
+        $this->enrol($course, $student, 'student');
+
+        $category = GradeCategory::query()->create([
+            'course_id' => $course->id,
+            'name' => 'Assignments',
+            'aggregation' => 'weighted_mean',
+        ]);
+        $item = GradeItem::query()->create([
+            'course_id' => $course->id,
+            'category_id' => $category->id,
+            'name' => 'Essay 1',
+            'max_points' => 100,
+        ]);
+
+        $this->actingAs($teacher)
+            ->post("/teaching/{$course->slug}/gradebook/{$item->id}", [
+                'user_id' => $student->id,
+                'points' => 90,
+            ])->assertRedirect();
+
+        $this->assertDatabaseHas('grade_grades', [
+            'item_id' => $item->id,
+            'user_id' => $student->id,
+        ]);
     }
 
     private function instructorFor(Course $course): User

@@ -147,6 +147,14 @@ class GradebookController extends Controller
 
         $student = User::query()->findOrFail($validated['user_id']);
 
+        // A mark belongs to a participant of this course. Without this check
+        // a teacher could write a grade onto any account in the system.
+        abort_unless(
+            $course->students()->where('users.id', $student->id)->exists(),
+            422,
+            'That person is not enrolled in this course.',
+        );
+
         $previous = $item->grades()->where('user_id', $student->id)->first();
 
         $this->gradebook->saveGrade(

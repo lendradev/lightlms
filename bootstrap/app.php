@@ -93,11 +93,18 @@ return Application::configure(basePath: dirname(__DIR__))
                 default => 'Request could not be completed',
             };
 
+            // A 404 message can name the model that was missing, which tells a
+            // visitor about the inside of the application. A 403 message is
+            // written on purpose here, so it stays.
+            $message = match (true) {
+                $status >= 500 => 'The server ran into a problem. Please try again in a moment.',
+                $status === 404 => 'We could not find the page you asked for.',
+                default => $e->getMessage(),
+            };
+
             return response()->view('errors.error', [
                 'title' => $title,
-                'message' => $status >= 500
-                    ? 'The server ran into a problem. Please try again in a moment.'
-                    : $e->getMessage(),
+                'message' => $message,
             ], $status);
         });
     })->create();

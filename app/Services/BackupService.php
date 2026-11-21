@@ -236,61 +236,191 @@ class BackupService
      * for the tables this service knows. Anything else in the archive is
      * refused, so a crafted backup cannot drop a table or rewrite rows that
      * the dump format never writes.
+     *
+     * Every statement is checked before the first one runs. A dump that
+     * carries a statement this restore refuses leaves the database untouched
+     * rather than half-restored.
      */
     private function load(string $sql): void
     {
+        $statements = [];
+
+        foreach ($this->splitStatements($sql) as $statement) {
+            $statement = trim($statement);
+
+            if ($statement === '') {
+                continue;
+            }
+
+            if (! $this->isRestoreStatement($statement)) {
+                throw new RuntimeException('The archive contains a statement this restore does not run.');
+            }
+
+            $statements[] = $statement;
+        }
+
         $this->disableForeignKeys();
 
         try {
-            foreach (explode(";\n", $sql) as $chunk) {
-                $statement = $this->stripComments($chunk);
-
-                if ($statement === '') {
-                    continue;
+            // A statement that fails leaves PostgreSQL with an aborted
+            // transaction, so the whole run is one transaction that rolls
+            // back. The database is then left as it was.
+            DB::transaction(function () use ($statements): void {
+                foreach ($statements as $statement) {
+                    DB::unprepared($statement);
                 }
-
-                if (! $this->isRestoreStatement($statement)) {
-                    throw new RuntimeException('The archive contains a statement this restore does not run.');
-                }
-
-                DB::unprepared($statement);
-            }
+            });
         } finally {
             $this->enableForeignKeys();
         }
     }
 
     /**
-     * The statement without its comment lines.
+     * Split a dump into its statements.
+     *
+     * A statement ends at a semicolon that is not inside a string literal,
+     * and a comment runs to the end of its line. Both are tracked in one
+     * pass, so a crafted archive can neither hide a statement behind a
+     * semicolon that only looks like part of a value nor hide one inside a
+     * comment.
+     *
+     * @return list<string>
      */
-    private function stripComments(string $chunk): string
+    private function splitStatements(string $sql): array
     {
-        $lines = [];
-        foreach (explode("\n", $chunk) as $line) {
-            $trimmed = trim($line);
-            if ($trimmed === '' || str_starts_with($trimmed, '--')) {
+        $statements = [];
+        $current = '';
+        $inString = false;
+        $length = strlen($sql);
+
+        for ($i = 0; $i < $length; $i++) {
+            $char = $sql[$i];
+
+            if ($inString) {
+                $current .= $char;
+
+                if ($char === "'") {
+                    // A doubled quote is an escaped quote, not the end of the literal.
+                    if ($i + 1 < $length && $sql[$i + 1] === "'") {
+                        $current .= "'";
+                        $i++;
+
+                        continue;
+                    }
+
+                    $inString = false;
+                }
+
                 continue;
             }
-            $lines[] = $trimmed;
+
+            if ($char === '-' && $i + 1 < $length && $sql[$i + 1] === '-') {
+                while ($i < $length && $sql[$i] !== "\n") {
+                    $i++;
+                }
+
+                $current .= ' ';
+
+                continue;
+            }
+
+            if ($char === "'") {
+                $inString = true;
+                $current .= $char;
+
+                continue;
+            }
+
+            if ($char === ';') {
+                $statements[] = $current;
+                $current = '';
+
+                continue;
+            }
+
+            $current .= $char;
         }
 
-        return trim(implode(' ', $lines));
+        if ($inString) {
+            throw new RuntimeException('The archive contains an unterminated string.');
+        }
+
+        if (trim($current) !== '') {
+            $statements[] = $current;
+        }
+
+        return $statements;
     }
 
     /**
      * True when the statement is a delete or an insert for a known table.
+     *
+     * The whole statement has to match. A prefix match would let a crafted
+     * archive trail a second statement behind a valid one, and the second
+     * statement would run as part of the first. The values of an insert have
+     * to be plain literals too, so a value cannot smuggle a subquery in.
      */
     private function isRestoreStatement(string $statement): bool
     {
         // The identifier may be double quoted or, on MySQL, in backticks.
         $identifier = '(?:`|\")?([A-Za-z0-9_]+)(?:`|\")?';
 
-        if (! preg_match('/^DELETE\s+FROM\s+'.$identifier.'\s*;?$/i', $statement, $matches)
-            && ! preg_match('/^INSERT\s+INTO\s+'.$identifier.'\s*\(/i', $statement, $matches)) {
+        if (preg_match('/^DELETE\s+FROM\s+'.$identifier.'\s*$/i', $statement, $matches)) {
+            return in_array(strtolower($matches[1]), self::TABLES, true);
+        }
+
+        if (! preg_match('/^INSERT\s+INTO\s+'.$identifier.'\s*\(([^()]*)\)\s*VALUES\s*\((.*)\)\s*$/is', $statement, $matches)) {
             return false;
         }
 
-        return in_array(strtolower($matches[1]), self::TABLES, true);
+        if (! in_array(strtolower($matches[1]), self::TABLES, true)) {
+            return false;
+        }
+
+        return $this->holdsOnlyLiteralValues($matches[2]);
+    }
+
+    /**
+     * True when every value in a value list is a plain literal.
+     *
+     * A dump writes numbers, `NULL`, and quoted strings, and nothing else. A
+     * parenthesised expression would be a subquery, which reads rows the
+     * dump format never reads.
+     */
+    private function holdsOnlyLiteralValues(string $values): bool
+    {
+        $length = strlen($values);
+        $inString = false;
+
+        for ($i = 0; $i < $length; $i++) {
+            $char = $values[$i];
+
+            if ($inString) {
+                if ($char === "'") {
+                    if ($i + 1 < $length && $values[$i + 1] === "'") {
+                        $i++;
+
+                        continue;
+                    }
+
+                    $inString = false;
+                }
+
+                continue;
+            }
+
+            if ($char === "'") {
+                $inString = true;
+
+                continue;
+            }
+
+            if ($char === '(' || $char === ')') {
+                return false;
+            }
+        }
+
+        return ! $inString;
     }
 
     private function disableForeignKeys(): void
