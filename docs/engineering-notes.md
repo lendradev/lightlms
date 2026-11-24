@@ -508,3 +508,46 @@ statement poisoned the transaction for the tests that came after it.
 **Fix.** The restore runs its statements in a transaction of its own, which rolls back when one of
 them fails. Always run the suite on PostgreSQL as well as SQLite: a driver difference like this
 one only shows up there.
+## A flash message that never reaches the screen
+**Symptom.** The server answers "User created." and the page shows nothing.
+**Cause.** The flash travels with the Inertia props, but a message only shows up where a component
+reads it. The shell that wraps every product page had no message component, so the text was
+rendered into a prop nobody looked at.
+**Fix.** The shell mounts the message component once. Public pages that receive no flash stay
+without it, so the same component does not have to appear twice on a screen.
+## A green card and a red card that look the same
+**Symptom.** Success and failure are hard to tell apart at a glance.
+**Cause.** The alert component had a destructive variant that only changed the text colour, on the
+same background as everything else. The success token in the stylesheet was never used.
+**Fix.** Each variant now carries its own background, its own border and its own icon. The icon is
+what keeps them apart for a reader who cannot tell the colours apart.
+## A client-side render error leaves a blank page
+**Symptom.** A page turns white and stays white.
+**Cause.** React unmounts the whole tree when a render throws, and nothing catches it. Inertia
+does not offer an error boundary of its own.
+**Fix.** A boundary component wraps the application. It shows a card with the message and a
+reload button instead of an empty page.
+## A card title that is not a heading
+**Symptom.** A screen reader hears no structure on the product pages.
+**Cause.** The card title rendered a `div`, and the shell renders the only `h1` on the page.
+**Fix.** The card title renders a heading. The level is set per page: a card under a section that
+already has a heading becomes a subheading, so the levels never skip.
+## A form error the screen reader cannot connect to its field
+**Symptom.** The error is read out, but the reader does not know which field it belongs to.
+**Cause.** The message had no id, and the field did not point at it.
+**Fix.** Every field that can fail carries an id. The message shares that id, the field names it
+in `aria-describedby`, and the field says it is invalid. The message itself is announced at once
+through `role="alert"`.
+## A spinner that appears for a moment and then vanishes
+**Symptom.** The page flickers: a loading shape appears and disappears again.
+**Cause.** The skeleton was tied to the request itself, so a fast answer showed it for a few
+frames.
+**Fix.** The skeleton waits a quarter of a second before it appears, and it only appears when the
+browser is on its way to another page. A reload of the same page keeps its content.
+## A colour that does not follow the theme
+**Symptom.** The course covers look the same in both themes, and the progress bar keeps its own
+colour.
+**Cause.** The covers carried their colour values inside the component, and the progress bar
+carried a fixed hex value.
+**Fix.** The colour values live in the stylesheet as tokens now, and the component only passes the
+hue that belongs to the course. The progress bar reads the primary token of the running theme.

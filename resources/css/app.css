@@ -73,6 +73,15 @@
     --sidebar-accent-foreground: #241f31;
     --sidebar-border: #d0d0d0;
     --sidebar-ring: #1c71d8;
+
+    /* Generated course covers. The hue is set per card, everything else comes
+       from these tokens so the gradient stays legible in both themes. */
+    --cover-hue: 240;
+    --cover-lightness: 46%;
+    --cover-chroma: 0.11;
+    --cover-lightness-strong: 32%;
+    --cover-chroma-strong: 0.08;
+    --cover-sheen: rgb(255 255 255 / 0.18);
 }
 
 .dark {
@@ -124,6 +133,13 @@
     --sidebar-accent-foreground: #ffffff;
     --sidebar-border: #3f3f3f;
     --sidebar-ring: #62a0ef;
+
+    /* Dark covers sit darker and carry a softer sheen than the light theme. */
+    --cover-lightness: 34%;
+    --cover-chroma: 0.09;
+    --cover-lightness-strong: 22%;
+    --cover-chroma-strong: 0.06;
+    --cover-sheen: rgb(255 255 255 / 0.1);
 }
 
 @theme inline {
@@ -238,4 +254,27 @@
 
 @utility text-balance {
     text-wrap: balance;
+}
+
+/*
+ * Course covers are generated, so the colour lives here and the component only
+ * supplies a hue. Keeps the palette in the theme tokens and lets the cover
+ * change with the light/dark theme.
+ */
+@layer components {
+    .course-cover {
+        background-image: linear-gradient(
+            135deg,
+            oklch(var(--cover-lightness) var(--cover-chroma) var(--cover-hue)) 0%,
+            oklch(
+                    var(--cover-lightness-strong) var(--cover-chroma-strong)
+                        calc(var(--cover-hue) + 18)
+                )
+                100%
+        );
+    }
+
+    .course-cover-sheen {
+        background-image: radial-gradient(circle at 20% 120%, var(--cover-sheen), transparent 60%);
+    }
 }

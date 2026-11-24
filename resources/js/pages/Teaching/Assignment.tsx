@@ -159,7 +159,7 @@ export default function TeachingAssignment({
                     {assignment.instructions && (
                         <Card>
                             <CardHeader>
-                                <CardTitle className="text-sm">Instructions given to learners</CardTitle>
+                                <CardTitle as="h3" className="text-sm">Instructions given to learners</CardTitle>
                             </CardHeader>
                             <CardContent>
                                 <p className="whitespace-pre-line text-sm leading-relaxed text-muted-foreground">
@@ -172,7 +172,7 @@ export default function TeachingAssignment({
                     <div className="grid gap-6 lg:grid-cols-[20rem_1fr]">
                         <Card className="h-fit">
                             <CardHeader>
-                                <CardTitle className="text-sm">Learners</CardTitle>
+                                <CardTitle as="h3" className="text-sm">Learners</CardTitle>
                                 <CardDescription>
                                     {submissions.length === 0
                                         ? 'Nothing handed in yet.'
@@ -236,7 +236,7 @@ export default function TeachingAssignment({
                                 <>
                                     <Card>
                                         <CardHeader>
-                                            <CardTitle className="text-sm">
+                                            <CardTitle as="h3" className="text-sm">
                                                 {current.student.name}
                                             </CardTitle>
                                             <CardDescription>
@@ -265,7 +265,7 @@ export default function TeachingAssignment({
 
                                     <Card>
                                         <CardHeader>
-                                            <CardTitle className="text-sm">Grade</CardTitle>
+                                            <CardTitle as="h3" className="text-sm">Grade</CardTitle>
                                             <CardDescription>
                                                 Saving mirrors the mark into the course gradebook.
                                             </CardDescription>

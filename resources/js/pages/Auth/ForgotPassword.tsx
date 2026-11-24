@@ -1,7 +1,7 @@
 import { Head, Link, useForm } from '@inertiajs/react';
 import FlashMessage from '@/components/FlashMessage';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useTranslation } from '@/lib/i18n';
@@ -35,7 +35,6 @@ export default function ForgotPassword({ siteName }: Props) {
                     </div>
                     <Card>
                         <CardHeader>
-                            <CardTitle>{t('auth.resetTitle')}</CardTitle>
                             <CardDescription>{t('auth.resetIntro')}</CardDescription>
                         </CardHeader>
                         <CardContent className="grid gap-4">
@@ -55,8 +54,18 @@ export default function ForgotPassword({ siteName }: Props) {
                                         autoComplete="username"
                                         value={data.email}
                                         onChange={(event) => setData('email', event.target.value)}
+                                        aria-invalid={errors.email ? true : undefined}
+                                        aria-describedby={errors.email ? 'email-error' : undefined}
                                     />
-                                    {errors.email && <p className="text-xs text-destructive">{errors.email}</p>}
+                                    {errors.email && (
+                                        <p
+                                            id="email-error"
+                                            role="alert"
+                                            className="text-xs text-destructive"
+                                        >
+                                            {errors.email}
+                                        </p>
+                                    )}
                                 </div>
                                 <Button type="submit" disabled={processing}>
                                     {processing ? '…' : t('auth.resetSend')}

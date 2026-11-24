@@ -129,7 +129,7 @@ export default function LearningAssignment({
                     {assignment.instructions && (
                         <Card>
                             <CardHeader>
-                                <CardTitle className="text-sm">Instructions</CardTitle>
+                                <CardTitle as="h3" className="text-sm">Instructions</CardTitle>
                             </CardHeader>
                             <CardContent>
                                 <p className="whitespace-pre-line text-sm leading-relaxed text-muted-foreground">
@@ -151,7 +151,7 @@ export default function LearningAssignment({
                     {latest?.status === 'graded' && (
                         <Card>
                             <CardHeader>
-                                <CardTitle className="text-sm">Your mark</CardTitle>
+                                <CardTitle as="h3" className="text-sm">Your mark</CardTitle>
                                 <CardDescription>
                                     {latest.score === null
                                         ? 'Graded without a score.'
@@ -185,7 +185,7 @@ export default function LearningAssignment({
 
                     <Card>
                         <CardHeader>
-                            <CardTitle className="text-sm">Your answer</CardTitle>
+                            <CardTitle as="h3" className="text-sm">Your answer</CardTitle>
                             <CardDescription>
                                 {exhausted
                                     ? 'You have used every attempt for this assignment.'
@@ -245,7 +245,7 @@ export default function LearningAssignment({
                     {submissions.length > 0 && (
                         <Card>
                             <CardHeader>
-                                <CardTitle className="text-sm">Your attempts</CardTitle>
+                                <CardTitle as="h3" className="text-sm">Your attempts</CardTitle>
                             </CardHeader>
                             <CardContent>
                                 <ul className="divide-y">

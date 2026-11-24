@@ -1,6 +1,8 @@
 import { Head, Link, useForm } from '@inertiajs/react';
 import { useState } from 'react';
 import { AppShell } from '@/components/AppShell';
+import { EnrolledCourseListSkeleton } from '@/components/PageSkeletons';
+import { useIsNavigatingAway } from '@/components/PendingVisits';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -37,6 +39,7 @@ type Props = {
 
 export default function TeachingIndex({ courses }: Props) {
     const [creating, setCreating] = useState(false);
+    const isNavigating = useIsNavigatingAway();
 
     const { data, setData, post, processing, errors, reset } = useForm({
         title: '',
@@ -135,7 +138,9 @@ export default function TeachingIndex({ courses }: Props) {
                     </Dialog>
                 }
             >
-                {courses.length === 0 ? (
+                {isNavigating ? (
+                    <EnrolledCourseListSkeleton />
+                ) : courses.length === 0 ? (
                     <Card>
                         <CardContent className="grid place-items-center py-16 text-center">
                             <p className="font-serif text-lg font-semibold">No courses yet</p>

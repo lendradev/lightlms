@@ -159,7 +159,7 @@ export default function LearningGradebook({ course, items, categories, grades, c
                         {categories.length > 0 && (
                             <Card>
                                 <CardHeader>
-                                    <CardTitle className="text-sm">{t('gradebook.categories')}</CardTitle>
+                                    <CardTitle as="h3" className="text-sm">{t('gradebook.categories')}</CardTitle>
                                 </CardHeader>
                                 <CardContent>
                                     <dl className="space-y-3">

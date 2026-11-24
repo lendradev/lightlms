@@ -184,7 +184,7 @@ export default function TeachingQuiz({ course, quiz, questions, attempts, stats 
                     <div className="grid gap-6 lg:grid-cols-2">
                         <Card>
                             <CardHeader>
-                                <CardTitle className="text-sm">Question bank</CardTitle>
+                                <CardTitle as="h3" className="text-sm">Question bank</CardTitle>
                                 <CardDescription>
                                     Answers stay on the server and are never sent to a learner.
                                 </CardDescription>
@@ -232,7 +232,7 @@ export default function TeachingQuiz({ course, quiz, questions, attempts, stats 
 
                         <Card className="h-fit">
                             <CardHeader>
-                                <CardTitle className="text-sm">Add a question</CardTitle>
+                                <CardTitle as="h3" className="text-sm">Add a question</CardTitle>
                             </CardHeader>
                             <CardContent className="grid gap-4">
                                 <div className="grid gap-2">
@@ -341,7 +341,7 @@ export default function TeachingQuiz({ course, quiz, questions, attempts, stats 
 
                     <Card>
                         <CardHeader>
-                            <CardTitle className="text-sm">Attempts</CardTitle>
+                            <CardTitle as="h3" className="text-sm">Attempts</CardTitle>
                             <CardDescription>
                                 Short answers and essays are marked here by hand.
                             </CardDescription>

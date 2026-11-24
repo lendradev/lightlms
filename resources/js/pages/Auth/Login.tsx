@@ -1,7 +1,7 @@
 import { Head, Link, useForm } from '@inertiajs/react';
 import FlashMessage from '@/components/FlashMessage';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useTranslation } from '@/lib/i18n';
@@ -42,7 +42,6 @@ export default function Login({ registrationMode, siteName }: Props) {
 
                     <Card>
                         <CardHeader>
-                            <CardTitle>{t('auth.signIn')}</CardTitle>
                             <CardDescription>{t('auth.welcomeBody')}</CardDescription>
                         </CardHeader>
                         <CardContent className="grid gap-4">
@@ -62,8 +61,18 @@ export default function Login({ registrationMode, siteName }: Props) {
                                         autoComplete="username"
                                         value={data.email}
                                         onChange={(event) => setData('email', event.target.value)}
+                                        aria-invalid={errors.email ? true : undefined}
+                                        aria-describedby={errors.email ? 'email-error' : undefined}
                                     />
-                                    {errors.email && <p className="text-xs text-destructive">{errors.email}</p>}
+                                    {errors.email && (
+                                        <p
+                                            id="email-error"
+                                            role="alert"
+                                            className="text-xs text-destructive"
+                                        >
+                                            {errors.email}
+                                        </p>
+                                    )}
                                 </div>
 
                                 <div className="grid gap-2">
@@ -82,9 +91,19 @@ export default function Login({ registrationMode, siteName }: Props) {
                                         autoComplete="current-password"
                                         value={data.password}
                                         onChange={(event) => setData('password', event.target.value)}
+                                        aria-invalid={errors.password ? true : undefined}
+                                        aria-describedby={
+                                            errors.password ? 'password-error' : undefined
+                                        }
                                     />
                                     {errors.password && (
-                                        <p className="text-xs text-destructive">{errors.password}</p>
+                                        <p
+                                            id="password-error"
+                                            role="alert"
+                                            className="text-xs text-destructive"
+                                        >
+                                            {errors.password}
+                                        </p>
                                     )}
                                 </div>
 

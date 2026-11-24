@@ -1,5 +1,7 @@
 import { Head, Link } from '@inertiajs/react';
 import { AppShell } from '@/components/AppShell';
+import { EnrolledCourseListSkeleton } from '@/components/PageSkeletons';
+import { useIsNavigatingAway } from '@/components/PendingVisits';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -16,12 +18,16 @@ type Props = {
 };
 
 export default function LearningIndex({ courses }: Props) {
+    const isNavigating = useIsNavigatingAway();
+
     return (
         <>
             <Head title="My courses" />
 
             <AppShell title="My courses">
-                {courses.length === 0 ? (
+                {isNavigating ? (
+                    <EnrolledCourseListSkeleton />
+                ) : courses.length === 0 ? (
                     <Card>
                         <CardContent className="grid place-items-center py-16 text-center">
                             <p className="font-serif text-lg font-semibold">No courses yet</p>

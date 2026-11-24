@@ -67,8 +67,20 @@ export default function ResetPassword({ email, token, siteName }: Props) {
                                         autoComplete="new-password"
                                         value={data.password}
                                         onChange={(event) => setData('password', event.target.value)}
+                                        aria-invalid={errors.password ? true : undefined}
+                                        aria-describedby={
+                                            errors.password ? 'password-error' : undefined
+                                        }
                                     />
-                                    {errors.password && <p className="text-xs text-destructive">{errors.password}</p>}
+                                    {errors.password && (
+                                        <p
+                                            id="password-error"
+                                            role="alert"
+                                            className="text-xs text-destructive"
+                                        >
+                                            {errors.password}
+                                        </p>
+                                    )}
                                 </div>
                                 <div className="grid gap-2">
                                     <Label htmlFor="password_confirmation">
@@ -82,9 +94,23 @@ export default function ResetPassword({ email, token, siteName }: Props) {
                                         onChange={(event) =>
                                             setData('password_confirmation', event.target.value)
                                         }
+                                        aria-invalid={
+                                            errors.password_confirmation ? true : undefined
+                                        }
+                                        aria-describedby={
+                                            errors.password_confirmation
+                                                ? 'password-confirmation-error'
+                                                : undefined
+                                        }
                                     />
                                     {errors.password_confirmation && (
-                                        <p className="text-xs text-destructive">{errors.password_confirmation}</p>
+                                        <p
+                                            id="password-confirmation-error"
+                                            role="alert"
+                                            className="text-xs text-destructive"
+                                        >
+                                            {errors.password_confirmation}
+                                        </p>
                                     )}
                                 </div>
                                 <Button type="submit" disabled={processing}>

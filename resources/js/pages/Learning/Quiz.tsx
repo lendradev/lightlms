@@ -129,7 +129,7 @@ export default function LearningQuiz({ course, quiz, questions, attemptsLeft, at
                     {quiz.instructions && (
                         <Card>
                             <CardHeader>
-                                <CardTitle className="text-sm">Instructions</CardTitle>
+                                <CardTitle as="h3" className="text-sm">Instructions</CardTitle>
                             </CardHeader>
                             <CardContent>
                                 <p className="whitespace-pre-line text-sm leading-relaxed text-muted-foreground">
@@ -142,7 +142,7 @@ export default function LearningQuiz({ course, quiz, questions, attemptsLeft, at
                     {latest && (
                         <Card>
                             <CardHeader>
-                                <CardTitle className="text-sm">Last attempt</CardTitle>
+                                <CardTitle as="h3" className="text-sm">Last attempt</CardTitle>
                                 <CardDescription>
                                     {latest.score} of {latest.max_score} points
                                     {latest.percent !== null && ` (${latest.percent}%)`}
@@ -191,7 +191,7 @@ export default function LearningQuiz({ course, quiz, questions, attemptsLeft, at
 
                     <Card>
                         <CardHeader>
-                            <CardTitle className="text-sm">
+                            <CardTitle as="h3" className="text-sm">
                                 {exhausted ? 'No attempts left' : 'Answer the questions'}
                             </CardTitle>
                             <CardDescription>
@@ -338,7 +338,7 @@ export default function LearningQuiz({ course, quiz, questions, attemptsLeft, at
                     {attempts.length > 0 && (
                         <Card>
                             <CardHeader>
-                                <CardTitle className="text-sm">Your attempts</CardTitle>
+                                <CardTitle as="h3" className="text-sm">Your attempts</CardTitle>
                             </CardHeader>
                             <CardContent>
                                 <ul className="divide-y">

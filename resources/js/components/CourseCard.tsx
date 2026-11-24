@@ -1,5 +1,6 @@
 import { Link } from '@inertiajs/react';
 import { Clock, Layers, User } from 'lucide-react';
+import type { CSSProperties } from 'react';
 import { Badge } from '@/components/ui/badge';
 import type { CourseSummary } from '@/types';
 
@@ -10,22 +11,22 @@ type Props = {
 /**
  * Course covers are generated, not uploaded: a deterministic gradient keeps the
  * catalogue visually alive without shipping stock photography that would be
- * wrong for half the courses. The hue stays inside the indigo family so the
- * covers read as one set.
+ * wrong for half the courses. The hue is spread across the whole wheel so
+ * neighbouring courses do not look alike, and the colours themselves come
+ * from the theme tokens in app.css.
  */
-function coverStyle(slug: string) {
-    let hash = 0;
+function coverHue(slug: string) {
+    // FNV-1a spreads short strings better than the classic djb2-style hash.
+    // The golden angle then spreads the result across the wheel: a plain
+    // modulo lands three courses on three shades of the same green.
+    let hash = 0x811c9dc5;
 
     for (let index = 0; index < slug.length; index += 1) {
-        hash = (hash << 5) - hash + slug.charCodeAt(index);
-        hash |= 0;
+        hash ^= slug.charCodeAt(index);
+        hash = Math.imul(hash, 0x01000193);
     }
 
-    const hue = 240 + (Math.abs(hash) % 40);
-
-    return {
-        backgroundImage: `linear-gradient(135deg, oklch(34% 0.09 ${hue}) 0%, oklch(22% 0.06 ${hue + 18}) 100%)`,
-    };
+    return Math.round(((hash >>> 0) * 137.508) % 360);
 }
 
 export default function CourseCard({ course }: Props) {
@@ -38,11 +39,11 @@ export default function CourseCard({ course }: Props) {
             className="group flex flex-col overflow-hidden rounded-md border bg-card shadow-soft transition duration-200 hover:-translate-y-0.5 hover:shadow-lifted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
         >
             <div
-                className="relative aspect-[16/9] shrink-0 overflow-hidden"
-                style={coverStyle(course.slug)}
+                className="course-cover relative aspect-[16/9] shrink-0 overflow-hidden"
+                style={{ '--cover-hue': coverHue(course.slug) } as CSSProperties}
                 aria-hidden
             >
-                <span className="absolute inset-0 bg-[radial-gradient(circle_at_20%_120%,rgb(255_255_255/0.18),transparent_60%)]" />
+                <span className="course-cover-sheen absolute inset-0" />
                 <span className="absolute bottom-3 left-4 font-serif text-2xl font-semibold tracking-tight text-white/95">
                     {course.title.charAt(0)}
                 </span>

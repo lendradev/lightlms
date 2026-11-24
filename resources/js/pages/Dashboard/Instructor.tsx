@@ -1,5 +1,7 @@
 import { Head } from '@inertiajs/react';
 import { AppShell } from '@/components/AppShell';
+import { StatCardSkeleton } from '@/components/PageSkeletons';
+import { useIsNavigatingAway } from '@/components/PendingVisits';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
@@ -19,16 +21,26 @@ type Props = {
 };
 
 export default function DashboardInstructor({ courses, stats }: Props) {
+    const isNavigating = useIsNavigatingAway();
+
     return (
         <>
             <Head title="Teaching" />
 
             <AppShell title="Teaching">
-                <div className="grid gap-6 lg:grid-cols-3">
-                    <StatCard label="Courses" value={stats.courses} />
-                    <StatCard label="Enrolled students" value={stats.students} />
-                    <StatCard label="Awaiting review" value={stats.pendingReviews} />
-                </div>
+                {isNavigating ? (
+                    <div className="grid gap-6 lg:grid-cols-3">
+                        <StatCardSkeleton />
+                        <StatCardSkeleton />
+                        <StatCardSkeleton />
+                    </div>
+                ) : (
+                    <div className="grid gap-6 lg:grid-cols-3">
+                        <StatCard label="Courses" value={stats.courses} />
+                        <StatCard label="Enrolled students" value={stats.students} />
+                        <StatCard label="Awaiting review" value={stats.pendingReviews} />
+                    </div>
+                )}
 
                 <Card className="mt-8">
                     <CardHeader>

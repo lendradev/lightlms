@@ -28,6 +28,7 @@ import {
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import FlashMessage from '@/components/FlashMessage';
 import type { AuthUser } from '@/types';
 
 type NavItem = {
@@ -165,7 +166,10 @@ export function AppShell({ title, actions, children }: { title: string; actions?
                     </div>
                 </header>
 
-                <main className="flex-1 px-4 py-6 sm:px-6 sm:py-8 lg:px-8">{children}</main>
+                <main className="flex-1 px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+                    <FlashMessage className="mb-6" />
+                    {children}
+                </main>
             </div>
         </div>
     );

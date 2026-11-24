@@ -166,7 +166,7 @@ export default function LearningCourse({ course, completedLessonIds }: Props) {
                     <aside className="lg:sticky lg:top-20 lg:self-start">
                         <Card>
                             <CardHeader>
-                                <CardTitle className="text-sm">{t('course.progress')}</CardTitle>
+                                <CardTitle as="h3" className="text-sm">{t('course.progress')}</CardTitle>
                             </CardHeader>
                             <CardContent>
                                 <Progress value={progress} />
@@ -182,7 +182,7 @@ export default function LearningCourse({ course, completedLessonIds }: Props) {
 
                         <Card className="mt-4">
                             <CardHeader>
-                                <CardTitle className="text-sm">{t('course.grades')}</CardTitle>
+                                <CardTitle as="h3" className="text-sm">{t('course.grades')}</CardTitle>
                             </CardHeader>
                             <CardContent>
                                 <p className="text-xs text-muted-foreground">
@@ -198,7 +198,7 @@ export default function LearningCourse({ course, completedLessonIds }: Props) {
 
                         <Card className="mt-4">
                             <CardHeader>
-                                <CardTitle className="text-sm">{t('course.contents')}</CardTitle>
+                                <CardTitle as="h3" className="text-sm">{t('course.contents')}</CardTitle>
                             </CardHeader>
                             <CardContent>
                                 <ol className="space-y-3">

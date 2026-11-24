@@ -34,8 +34,8 @@ export default function DashboardAdmin({ stats, siteName }: Props) {
                     </CardHeader>
                     <CardContent>
                         <p className="text-sm text-muted-foreground">
-                            The administration area is being built out phase by phase. Backup, import, user
-                            management and category management land next.
+                            This screen reports what the site holds right now: users, courses and
+                            enrollments. Backups and restores are in the sidebar under Backup.
                         </p>
                     </CardContent>
                 </Card>

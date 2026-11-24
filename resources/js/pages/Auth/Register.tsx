@@ -76,8 +76,18 @@ export default function Register({
                                         autoComplete="name"
                                         value={data.name}
                                         onChange={(event) => setData('name', event.target.value)}
+                                        aria-invalid={errors.name ? true : undefined}
+                                        aria-describedby={errors.name ? 'name-error' : undefined}
                                     />
-                                    {errors.name && <p className="text-xs text-destructive">{errors.name}</p>}
+                                    {errors.name && (
+                                        <p
+                                            id="name-error"
+                                            role="alert"
+                                            className="text-xs text-destructive"
+                                        >
+                                            {errors.name}
+                                        </p>
+                                    )}
                                 </div>
 
                                 <div className="grid gap-2">
@@ -88,8 +98,18 @@ export default function Register({
                                         autoComplete="username"
                                         value={data.email}
                                         onChange={(event) => setData('email', event.target.value)}
+                                        aria-invalid={errors.email ? true : undefined}
+                                        aria-describedby={errors.email ? 'email-error' : undefined}
                                     />
-                                    {errors.email && <p className="text-xs text-destructive">{errors.email}</p>}
+                                    {errors.email && (
+                                        <p
+                                            id="email-error"
+                                            role="alert"
+                                            className="text-xs text-destructive"
+                                        >
+                                            {errors.email}
+                                        </p>
+                                    )}
                                 </div>
 
                                 {requiresInviteCode && (
@@ -99,9 +119,19 @@ export default function Register({
                                             id="invite_code"
                                             value={data.invite_code}
                                             onChange={(event) => setData('invite_code', event.target.value)}
+                                            aria-invalid={errors.invite_code ? true : undefined}
+                                            aria-describedby={
+                                                errors.invite_code ? 'invite-code-error' : undefined
+                                            }
                                         />
                                         {errors.invite_code && (
-                                            <p className="text-xs text-destructive">{errors.invite_code}</p>
+                                            <p
+                                                id="invite-code-error"
+                                                role="alert"
+                                                className="text-xs text-destructive"
+                                            >
+                                                {errors.invite_code}
+                                            </p>
                                         )}
                                     </div>
                                 )}
@@ -114,8 +144,20 @@ export default function Register({
                                         autoComplete="new-password"
                                         value={data.password}
                                         onChange={(event) => setData('password', event.target.value)}
+                                        aria-invalid={errors.password ? true : undefined}
+                                        aria-describedby={
+                                            errors.password ? 'password-error' : undefined
+                                        }
                                     />
-                                    {errors.password && <p className="text-xs text-destructive">{errors.password}</p>}
+                                    {errors.password && (
+                                        <p
+                                            id="password-error"
+                                            role="alert"
+                                            className="text-xs text-destructive"
+                                        >
+                                            {errors.password}
+                                        </p>
+                                    )}
                                 </div>
 
                                 <div className="grid gap-2">
@@ -130,7 +172,24 @@ export default function Register({
                                         onChange={(event) =>
                                             setData('password_confirmation', event.target.value)
                                         }
+                                        aria-invalid={
+                                            errors.password_confirmation ? true : undefined
+                                        }
+                                        aria-describedby={
+                                            errors.password_confirmation
+                                                ? 'password-confirmation-error'
+                                                : undefined
+                                        }
                                     />
+                                    {errors.password_confirmation && (
+                                        <p
+                                            id="password-confirmation-error"
+                                            role="alert"
+                                            className="text-xs text-destructive"
+                                        >
+                                            {errors.password_confirmation}
+                                        </p>
+                                    )}
                                 </div>
 
                                 <Button type="submit" disabled={processing}>

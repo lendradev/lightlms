@@ -246,7 +246,7 @@ export default function TeachingGradebook({
                         {topLevel.map((category) => (
                             <Card key={category.id}>
                                 <CardHeader>
-                                    <CardTitle className="text-sm">{category.name}</CardTitle>
+                                    <CardTitle as="h3" className="text-sm">{category.name}</CardTitle>
                                     <CardDescription>
                                         {category.weight !== null
                                         ? `${t('gradebook.weight')} ×${category.weight}`

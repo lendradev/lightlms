@@ -2,6 +2,8 @@ import { Head, Link, router } from '@inertiajs/react';
 import { LayoutGrid, List, SlidersHorizontal } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import CourseCard from '@/components/CourseCard';
+import { CourseListSkeleton } from '@/components/PageSkeletons';
+import { useIsNavigatingAway } from '@/components/PendingVisits';
 import { SiteFooter, SiteHeader } from '@/components/SiteChrome';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -52,6 +54,7 @@ export default function CoursesIndex({ courses, filters, levels, auth }: Props) 
     };
 
     const hasFilters = Boolean(filters.q || filters.level);
+    const isNavigating = useIsNavigatingAway();
 
     return (
         <>
@@ -228,7 +231,9 @@ export default function CoursesIndex({ courses, filters, levels, auth }: Props) 
                             </div>
                         </div>
 
-                        {courses.data.length === 0 ? (
+                        {isNavigating ? (
+                            <CourseListSkeleton />
+                        ) : courses.data.length === 0 ? (
                             <Card className="mt-8 grid place-items-center px-6 py-16 text-center">
                                 <p className="font-serif text-lg font-semibold text-foreground">
                                     No courses found

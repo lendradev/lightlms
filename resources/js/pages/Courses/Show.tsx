@@ -1,8 +1,10 @@
 import { Head, Link } from '@inertiajs/react';
 import { Clock, GraduationCap, Layers, User } from 'lucide-react';
+import { useIsNavigatingAway } from '@/components/PendingVisits';
 import { SiteFooter, SiteHeader } from '@/components/SiteChrome';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 import type { Course, SharedProps } from '@/types';
 
 type Props = {
@@ -22,6 +24,7 @@ export default function CourseShow({ course, auth }: Props) {
     const totalLessons = course.modules.reduce((sum, module) => sum + module.lessons.length, 0);
     const hours = Math.floor(course.duration_minutes / 60);
     const minutes = course.duration_minutes % 60;
+    const isNavigating = useIsNavigatingAway();
 
     return (
         <>
@@ -88,40 +91,52 @@ export default function CourseShow({ course, auth }: Props) {
                             </h2>
 
                             <div className="mt-4 divide-y rounded-md border bg-card">
-                                {course.modules.map((module) => (
-                                    <div key={module.id} className="p-5">
-                                        <h3 className="font-medium text-foreground">{module.title}</h3>
-                                        {module.summary && (
-                                            <p className="mt-0.5 text-sm text-muted-foreground">
-                                                {module.summary}
-                                            </p>
-                                        )}
-
-                                        <ul className="mt-3 divide-y border-t">
-                                            {module.lessons.map((lesson) => (
-                                                <li
-                                                    key={lesson.id}
-                                                    className="flex items-center gap-3 py-2.5 text-sm"
-                                                >
-                                                    <span className="w-6 shrink-0 text-muted-foreground">
-                                                        {lesson.position}
-                                                    </span>
-                                                    <span className="min-w-0 flex-1 truncate text-foreground">
-                                                        {lesson.title}
-                                                    </span>
-                                                    {lesson.duration_minutes > 0 && (
-                                                        <span className="shrink-0 text-xs text-muted-foreground">
-                                                            {lesson.duration_minutes} min
-                                                        </span>
-                                                    )}
-                                                    <Badge variant="outline" className="shrink-0 capitalize">
-                                                        {typeLabels[lesson.type] ?? lesson.type}
-                                                    </Badge>
-                                                </li>
-                                            ))}
-                                        </ul>
+                                {isNavigating ? (
+                                    <div className="space-y-3 p-5" aria-hidden>
+                                        <Skeleton className="h-5 w-2/3" />
+                                        <Skeleton className="h-4 w-1/2" />
+                                        <Skeleton className="h-4 w-full" />
+                                        <Skeleton className="h-4 w-5/6" />
                                     </div>
-                                ))}
+                                ) : (
+                                    course.modules.map((module) => (
+                                        <div key={module.id} className="p-5">
+                                            <h3 className="font-medium text-foreground">{module.title}</h3>
+                                            {module.summary && (
+                                                <p className="mt-0.5 text-sm text-muted-foreground">
+                                                    {module.summary}
+                                                </p>
+                                            )}
+
+                                            <ul className="mt-3 divide-y border-t">
+                                                {module.lessons.map((lesson) => (
+                                                    <li
+                                                        key={lesson.id}
+                                                        className="flex items-center gap-3 py-2.5 text-sm"
+                                                    >
+                                                        <span className="w-6 shrink-0 text-muted-foreground">
+                                                            {lesson.position}
+                                                        </span>
+                                                        <span className="min-w-0 flex-1 truncate text-foreground">
+                                                            {lesson.title}
+                                                        </span>
+                                                        {lesson.duration_minutes > 0 && (
+                                                            <span className="shrink-0 text-xs text-muted-foreground">
+                                                                {lesson.duration_minutes} min
+                                                            </span>
+                                                        )}
+                                                        <Badge
+                                                            variant="outline"
+                                                            className="shrink-0 capitalize"
+                                                        >
+                                                            {typeLabels[lesson.type] ?? lesson.type}
+                                                        </Badge>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                    ))
+                                )}
                             </div>
                         </section>
                     </article>
@@ -129,7 +144,7 @@ export default function CourseShow({ course, auth }: Props) {
                     <aside className="lg:sticky lg:top-20 lg:self-start">
                         <Card>
                             <CardHeader>
-                                <CardTitle className="text-sm">Course info</CardTitle>
+                                <CardTitle as="h3" className="text-sm">Course info</CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <InfoField label="Instructors" value={course.instructor_name ?? 'LightLMS'} />

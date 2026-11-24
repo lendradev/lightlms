@@ -1,6 +1,8 @@
 import { Head, Link } from '@inertiajs/react';
 import { ArrowRight, CalendarClock, GraduationCap, ListChecks } from 'lucide-react';
 import { AppShell } from '@/components/AppShell';
+import { StatCardSkeleton } from '@/components/PageSkeletons';
+import { useIsNavigatingAway } from '@/components/PendingVisits';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -36,30 +38,40 @@ type Props = {
 };
 
 export default function DashboardStudent({ stats, enrollments, upcoming, grades }: Props) {
+    const isNavigating = useIsNavigatingAway();
+
     return (
         <>
             <Head title="Dashboard" />
 
             <AppShell title="Dashboard">
-                <div className="grid gap-4 sm:grid-cols-3">
-                    <StatCard
-                        icon={GraduationCap}
-                        label="Enrolled courses"
-                        value={stats.enrolled}
-                        href="/learning"
-                    />
-                    <StatCard
-                        icon={ListChecks}
-                        label="Completed"
-                        value={stats.completed}
-                        href="/learning"
-                    />
-                    <StatCard
-                        icon={CalendarClock}
-                        label="Awaiting review"
-                        value={stats.pendingSubmissions}
-                    />
-                </div>
+                {isNavigating ? (
+                    <div className="grid gap-4 sm:grid-cols-3">
+                        <StatCardSkeleton />
+                        <StatCardSkeleton />
+                        <StatCardSkeleton />
+                    </div>
+                ) : (
+                    <div className="grid gap-4 sm:grid-cols-3">
+                        <StatCard
+                            icon={GraduationCap}
+                            label="Enrolled courses"
+                            value={stats.enrolled}
+                            href="/learning"
+                        />
+                        <StatCard
+                            icon={ListChecks}
+                            label="Completed"
+                            value={stats.completed}
+                            href="/learning"
+                        />
+                        <StatCard
+                            icon={CalendarClock}
+                            label="Awaiting review"
+                            value={stats.pendingSubmissions}
+                        />
+                    </div>
+                )}
 
                 <div className="mt-6 grid gap-6 lg:grid-cols-[1.4fr_1fr]">
                     <Card>

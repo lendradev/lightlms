@@ -1,4 +1,5 @@
 import { usePage } from '@inertiajs/react';
+import { CircleAlert, CircleCheck } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
 type Props = {
@@ -13,6 +14,10 @@ type Props = {
  *
  * The server decides what the text says, so the same component works for a
  * confirmation, a refusal and a warning alike.
+ *
+ * Success and failure differ in shape as well as in colour: each one carries
+ * its own icon, so the difference survives a monochrome screen or a reader
+ * who cannot tell green from red.
  */
 export default function FlashMessage({ className }: { className?: string }) {
     const { flash } = usePage().props as unknown as Props;
@@ -24,6 +29,7 @@ export default function FlashMessage({ className }: { className?: string }) {
     if (flash.error) {
         return (
             <Alert variant="destructive" className={className}>
+                <CircleAlert aria-hidden />
                 <AlertDescription>{flash.error}</AlertDescription>
             </Alert>
         );
@@ -31,7 +37,8 @@ export default function FlashMessage({ className }: { className?: string }) {
 
     if (flash.success) {
         return (
-            <Alert className={className}>
+            <Alert variant="success" className={className}>
+                <CircleCheck aria-hidden />
                 <AlertDescription>{flash.success}</AlertDescription>
             </Alert>
         );
